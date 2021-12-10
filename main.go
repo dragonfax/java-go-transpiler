@@ -1,7 +1,11 @@
 package main
 
 import (
-	"os"
+	"encoding/json"
+	"fmt"
+	"io/fs"
+	"path/filepath"
+	"strings"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 	"github.com/dragonfax/delver_converter/parser"
@@ -9,19 +13,67 @@ import (
 
 type listener struct {
 	*parser.BaseJavaParserListener
+
+	File     *File
+	Filename string
 }
+
+func (s *listener) EnterCompilationUnit(ctx *parser.CompilationUnitContext) {
+	s.File = &File{}
+}
+
+func (s *listener) EnterQualifiedName(ctx *parser.QualifiedNameContext) {
+	if s.File.QualifiedPackageName == "" {
+		// first one, must be the package name
+		s.File.QualifiedPackageName = ctx.GetText()
+	}
+}
+
+func (s *listener) ExitCompilationUnit(ctx *parser.CompilationUnitContext) {
+	// file is done.
+}
+
+const sourceDir = "../delverengine/Dungeoneer/src/com/interrupt/"
+
+var lexer *parser.JavaLexer
+var p *parser.JavaParser
 
 func main() {
 
-	input, _ := antlr.NewFileStream(os.Args[1])
-	lexer := parser.NewJavaLexer(input)
+	lexer = parser.NewJavaLexer(nil)
+	p = parser.NewJavaParser(nil)
+
+	walkFunc := func(path string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
+		if !entry.IsDir() && strings.HasSuffix(entry.Name(), ".java") {
+			parse(path)
+		}
+		return nil
+	}
+	err := filepath.WalkDir(sourceDir, walkFunc)
+	if err != nil {
+		panic(err)
+	}
+
+}
+
+func parse(path string) {
+	input, _ := antlr.NewFileStream(path)
+	lexer.SetInputStream(input)
 	stream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
+	p.SetInputStream(stream)
 
-	p := parser.NewJavaParser(stream)
-
-	p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
+	// p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
 
 	p.BuildParseTrees = true
-	antlr.ParseTreeWalkerDefault.Walk(&listener{}, p.CompilationUnit())
+	listener := &listener{Filename: path}
+	antlr.ParseTreeWalkerDefault.Walk(listener, p.CompilationUnit())
 
+	js, err := json.Marshal(listener)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(js))
 }
