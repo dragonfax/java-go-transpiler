@@ -18,10 +18,17 @@ type Class struct {
 	Members []*Member
 }
 
+func NewClass() *Class {
+	c := &Class{}
+	c.Members = make([]*Member, 0)
+	return c
+}
+
 type Member struct {
 	Name      string
 	Static    bool
 	Output    Type
+	Type      string
 	Arguments []*Argument
 	Body      []*CodeLine
 }

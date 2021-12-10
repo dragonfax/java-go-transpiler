@@ -11,6 +11,7 @@ type ClassListener struct {
 func NewClassListener(file *File) *ClassListener {
 	s := &ClassListener{}
 	s.file = file
+	s.file.Class = NewClass()
 	return s
 }
 
@@ -24,4 +25,9 @@ func (s *ClassListener) EnterTypeType(ctx *parser.TypeTypeContext) {
 
 func (s *ClassListener) ExitTypeDeclaration(ctx *parser.TypeDeclarationContext) {
 	stackListener.Pop()
+}
+
+func (s *ClassListener) EnterMethodDeclaration(ctx *parser.MethodDeclarationContext) {
+	// stackListener.Push(NewMethodListener(s.file))
+	NewMethodListener(s.file, ctx)
 }

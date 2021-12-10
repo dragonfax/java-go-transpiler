@@ -21,9 +21,9 @@ func (s *FileListener) EnterQualifiedName(ctx *parser.QualifiedNameContext) {
 		s.File.QualifiedPackageName = ctx.GetText()
 	}
 
-	if s.inImport {
+	/* if s.inImport {
 		s.File.Imports = append(s.File.Imports, ctx.GetText())
-	}
+	}*/
 }
 
 func (s *FileListener) ExitCompilationUnit(ctx *parser.CompilationUnitContext) {
