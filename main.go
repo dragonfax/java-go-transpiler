@@ -16,6 +16,8 @@ const sourceDir = "../delverengine/Dungeoneer/src/com/interrupt/"
 var lexer *parser.JavaLexer
 var p *parser.JavaParser
 
+var stackListener *StackListener
+
 func main() {
 
 	lexer = parser.NewJavaLexer(nil)
@@ -38,6 +40,12 @@ func main() {
 }
 
 func parse(path string) {
+
+	fileL := &FileListener{Filename: path}
+
+	stackListener = NewStackListener()
+	stackListener.Push(fileL)
+
 	input, _ := antlr.NewFileStream(path)
 	lexer.SetInputStream(input)
 	stream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
@@ -46,10 +54,9 @@ func parse(path string) {
 	// p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
 
 	p.BuildParseTrees = true
-	listener := &listener{Filename: path}
-	antlr.ParseTreeWalkerDefault.Walk(listener, p.CompilationUnit())
+	antlr.ParseTreeWalkerDefault.Walk(stackListener, p.CompilationUnit())
 
-	js, err := json.MarshalIndent(listener, "", "  ")
+	js, err := json.MarshalIndent(fileL, "", "  ")
 	if err != nil {
 		panic(err)
 	}
