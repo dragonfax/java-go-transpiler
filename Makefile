@@ -1,4 +1,4 @@
 
 grammer:
-	antlr -o parser -Dlanguage=Go Java.g4
+	antlr -o parser -Dlanguage=Go JavaLexer.g4 JavaParser.g4
 
