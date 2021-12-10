@@ -37,3 +37,9 @@ func (s *listener) EnterImportDeclaration(ctx *parser.ImportDeclarationContext) 
 func (s *listener) ExitImportDeclaration(ctx *parser.ImportDeclarationContext) {
 	s.inImport = false
 }
+
+func (s *listener) EnterTypeType(ctx *parser.TypeTypeContext) {
+	if s.File.BaseClass == "" {
+		s.File.BaseClass = ctx.ClassOrInterfaceType().GetText()
+	}
+}

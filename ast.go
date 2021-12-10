@@ -4,6 +4,7 @@ type File struct {
 	QualifiedPackageName string
 	Imports              []string
 	Class                *Class
+	BaseClass            string
 }
 
 func NewFile() *File {
