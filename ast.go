@@ -6,6 +6,12 @@ type File struct {
 	Class                *Class
 }
 
+func NewFile() *File {
+	f := &File{}
+	f.Imports = make([]string, 0)
+	return f
+}
+
 type Class struct {
 	Name    string
 	Members []*Member

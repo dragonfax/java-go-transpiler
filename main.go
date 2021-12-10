@@ -11,28 +11,6 @@ import (
 	"github.com/dragonfax/delver_converter/parser"
 )
 
-type listener struct {
-	*parser.BaseJavaParserListener
-
-	File     *File
-	Filename string
-}
-
-func (s *listener) EnterCompilationUnit(ctx *parser.CompilationUnitContext) {
-	s.File = &File{}
-}
-
-func (s *listener) EnterQualifiedName(ctx *parser.QualifiedNameContext) {
-	if s.File.QualifiedPackageName == "" {
-		// first one, must be the package name
-		s.File.QualifiedPackageName = ctx.GetText()
-	}
-}
-
-func (s *listener) ExitCompilationUnit(ctx *parser.CompilationUnitContext) {
-	// file is done.
-}
-
 const sourceDir = "../delverengine/Dungeoneer/src/com/interrupt/"
 
 var lexer *parser.JavaLexer
@@ -71,7 +49,7 @@ func parse(path string) {
 	listener := &listener{Filename: path}
 	antlr.ParseTreeWalkerDefault.Walk(listener, p.CompilationUnit())
 
-	js, err := json.Marshal(listener)
+	js, err := json.MarshalIndent(listener, "", "  ")
 	if err != nil {
 		panic(err)
 	}
