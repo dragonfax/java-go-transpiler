@@ -15,29 +15,15 @@ import (
 )
 
 const sourceDir = "../delverengine/Dungeoneer/src/com/interrupt/"
-
-var lexer *parser.JavaLexer
-var p *parser.JavaParser
-
-var stackListener *StackListener
-
 const golangTemplateFilename = "golang.tmpl"
 
-func mustByteListErr(buf []byte, err error) []byte {
-	if err != nil {
-		panic(err)
-	}
-	return buf
-}
+var lexer = parser.NewJavaLexer(nil)
+var p = parser.NewJavaParser(nil)
 
 var golangTemplate = mustByteListErr(ioutil.ReadFile(golangTemplateFilename))
-
 var targetPath = os.Args[1]
 
 func main() {
-
-	lexer = parser.NewJavaLexer(nil)
-	p = parser.NewJavaParser(nil)
 
 	if len(os.Args) > 2 {
 		parse(os.Args[2])
@@ -74,20 +60,27 @@ func outputFile(file *File) {
 
 func parse(path string) {
 
-	fileL := &FileListener{Filename: path}
+	fmt.Println(path)
 
-	stackListener = NewStackListener()
-	stackListener.Push(fileL)
+	stackListener := NewStackListener()
+
+	fileListener := NewFileListener(stackListener, path)
+	stackListener.Push(fileListener)
 
 	input, _ := antlr.NewFileStream(path)
 	lexer.SetInputStream(input)
 	stream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
 	p.SetInputStream(stream)
-
 	// p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
-
 	p.BuildParseTrees = true
 	antlr.ParseTreeWalkerDefault.Walk(stackListener, p.CompilationUnit())
+
+	if stackListener.Len() != 1 {
+		if stackListener.Len() == 2 {
+			panic(fmt.Sprintf("left over listener %T", stackListener.stack[1]))
+		}
+		panic("wrong number of listeners left over, " + fmt.Sprintf("%d", stackListener.Len()))
+	}
 
 	/*
 		js, err := json.MarshalIndent(p.CompilationUnit(), "", "  ")
@@ -97,12 +90,11 @@ func parse(path string) {
 	*/
 	// fmt.Println(p.CompilationUnit().ToStringTree())
 
-	js, err := json.MarshalIndent(fileL, "", "  ")
+	js, err := json.MarshalIndent(fileListener.File, "", "  ")
 	if err != nil {
 		panic(err)
 	}
 	fmt.Println(string(js))
 
-	outputFile(fileL.File)
-
+	outputFile(fileListener.File)
 }

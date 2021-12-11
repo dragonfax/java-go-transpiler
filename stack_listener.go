@@ -1,6 +1,10 @@
 package main
 
-import "github.com/dragonfax/delver_converter/parser"
+import (
+	"fmt"
+
+	"github.com/dragonfax/delver_converter/parser"
+)
 
 type StackListener struct {
 	parser.JavaParserListener
@@ -14,14 +18,49 @@ func NewStackListener() *StackListener {
 	return s
 }
 
+func (s *StackListener) Len() int {
+	return len(s.stack)
+}
+
 func (s *StackListener) Push(s2 parser.JavaParserListener) {
+	fmt.Printf("pushing %T\n", s2)
 	s.stack = append(s.stack, s2)
 	s.JavaParserListener = s2
 }
 
-func (s *StackListener) Pop() {
-	if len(s.stack) == 0 {
-		panic("poping end of stack")
+func (s *StackListener) Pop(what parser.JavaParserListener) {
+	if len(s.stack) == 1 {
+		panic("can't pop the last element")
 	}
+
+	if s.JavaParserListener != what {
+		panic(fmt.Sprintf("trying pop %T when %T", what, s.JavaParserListener))
+	}
+
+	if s.JavaParserListener != s.stack[len(s.stack)-1] {
+		panic("current parser not last on list")
+	}
+
+	fmt.Printf("popping %T\n", s.JavaParserListener)
+	s.stack = s.stack[0 : len(s.stack)-1]
 	s.JavaParserListener = s.stack[len(s.stack)-1]
+}
+
+type StackableListener struct {
+	StackListener *StackListener
+}
+
+func NewStackableListener(sl *StackListener) *StackableListener {
+	s := &StackableListener{StackListener: sl}
+	return s
+}
+
+func (s *StackableListener) Pop(who interface{}, what parser.JavaParserListener) {
+	fmt.Printf("%T is poping...", who)
+	s.StackListener.Pop(what)
+}
+
+func (s *StackableListener) Push(who interface{}, s2 parser.JavaParserListener) {
+	fmt.Printf("%T is pushing...", who)
+	s.StackListener.Push(s2)
 }

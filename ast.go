@@ -5,6 +5,7 @@ type File struct {
 	Imports              []string
 	Class                *Class
 	BaseClass            string
+	Filename             string
 }
 
 func NewFile() *File {
