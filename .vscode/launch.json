@@ -1,0 +1,16 @@
+{
+    "version": "2.0.0",
+    "configurations": [
+        {
+            "name": "Debug ANTLR4 grammar",
+            "type": "antlr-debug",
+            "request": "launch",
+            "input": "../delverengine/Dungeoneer/src/com/interrupt/dungeoneer/entities/areas/Area.java",
+            "grammar": "JavaParser.g4",
+            // "actionFile": "grammars/exampleActions.js",
+            "startRule": "compilationUnit",
+            "printParseTree": true,
+            "visualParseTree": true
+        }
+    ]
+}

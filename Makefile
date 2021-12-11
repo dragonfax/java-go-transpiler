@@ -1,7 +1,8 @@
 .PHONY = run
 
 run: delver_converter
-	./delver_converter ../delver_converted
+	rm ../delver_converted/*.go || true
+	./delver_converter ../delver_converted $(file)
 
 delver_converter: go.* *.go parser/*
 	go build

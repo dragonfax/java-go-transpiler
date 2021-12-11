@@ -39,18 +39,23 @@ func main() {
 	lexer = parser.NewJavaLexer(nil)
 	p = parser.NewJavaParser(nil)
 
-	walkFunc := func(path string, entry fs.DirEntry, err error) error {
+	if len(os.Args) > 2 {
+		parse(os.Args[2])
+	} else {
+
+		walkFunc := func(path string, entry fs.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+			if !entry.IsDir() && strings.HasSuffix(entry.Name(), ".java") {
+				parse(path)
+			}
+			return nil
+		}
+		err := filepath.WalkDir(sourceDir, walkFunc)
 		if err != nil {
-			return err
+			panic(err)
 		}
-		if !entry.IsDir() && strings.HasSuffix(entry.Name(), ".java") {
-			parse(path)
-		}
-		return nil
-	}
-	err := filepath.WalkDir(sourceDir, walkFunc)
-	if err != nil {
-		panic(err)
 	}
 
 }
@@ -83,6 +88,14 @@ func parse(path string) {
 
 	p.BuildParseTrees = true
 	antlr.ParseTreeWalkerDefault.Walk(stackListener, p.CompilationUnit())
+
+	/*
+		js, err := json.MarshalIndent(p.CompilationUnit(), "", "  ")
+		if err != nil {
+			panic(err)
+		}
+	*/
+	// fmt.Println(p.CompilationUnit().ToStringTree())
 
 	js, err := json.MarshalIndent(fileL, "", "  ")
 	if err != nil {
