@@ -33,6 +33,12 @@ type Member struct {
 	Body      []*CodeLine
 }
 
+func NewMember() *Member {
+	m := &Member{}
+	m.Body = make([]*CodeLine, 0)
+	return m
+}
+
 type Type struct {
 }
 
@@ -40,4 +46,5 @@ type Argument struct {
 }
 
 type CodeLine struct {
+	Body string
 }

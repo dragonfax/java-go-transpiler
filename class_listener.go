@@ -29,5 +29,5 @@ func (s *ClassListener) ExitTypeDeclaration(ctx *parser.TypeDeclarationContext) 
 
 func (s *ClassListener) EnterMethodDeclaration(ctx *parser.MethodDeclarationContext) {
 	// stackListener.Push(NewMethodListener(s.file))
-	NewMethodListener(s.file, ctx)
+	stackListener.Push(NewMethodListener(s.file, ctx))
 }
