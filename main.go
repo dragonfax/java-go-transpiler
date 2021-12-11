@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"fmt"
 	"io/fs"
 	"io/ioutil"
 	"os"
@@ -82,13 +84,11 @@ func parse(path string) {
 	p.BuildParseTrees = true
 	antlr.ParseTreeWalkerDefault.Walk(stackListener, p.CompilationUnit())
 
-	/*
-		js, err := json.MarshalIndent(fileL, "", "  ")
-		if err != nil {
-			panic(err)
-		}
-		fmt.Println(string(js))
-	*/
+	js, err := json.MarshalIndent(fileL, "", "  ")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(string(js))
 
 	outputFile(fileL.File)
 

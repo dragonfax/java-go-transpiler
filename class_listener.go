@@ -24,6 +24,7 @@ func (s *ClassListener) EnterTypeType(ctx *parser.TypeTypeContext) {
 }
 
 func (s *ClassListener) ExitTypeDeclaration(ctx *parser.TypeDeclarationContext) {
+	s.file.Class.Name = ctx.ClassDeclaration().(*parser.ClassDeclarationContext).IDENTIFIER().GetText()
 	stackListener.Pop()
 }
 
