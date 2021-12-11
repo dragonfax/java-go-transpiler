@@ -1,13 +1,14 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
 	"io/fs"
+	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
+	"github.com/aymerick/raymond"
 	"github.com/dragonfax/delver_converter/parser"
 )
 
@@ -17,6 +18,19 @@ var lexer *parser.JavaLexer
 var p *parser.JavaParser
 
 var stackListener *StackListener
+
+const golangTemplateFilename = "golang.tmpl"
+
+func mustByteListErr(buf []byte, err error) []byte {
+	if err != nil {
+		panic(err)
+	}
+	return buf
+}
+
+var golangTemplate = mustByteListErr(ioutil.ReadFile(golangTemplateFilename))
+
+var targetPath = os.Args[1]
 
 func main() {
 
@@ -39,6 +53,18 @@ func main() {
 
 }
 
+func outputFile(file *File) {
+	result, err := raymond.Render(string(golangTemplate), file)
+	if err != nil {
+		panic(err)
+	}
+
+	err = ioutil.WriteFile(targetPath+"/"+file.QualifiedPackageName+".go", []byte(result), 0664)
+	if err != nil {
+		panic(err)
+	}
+}
+
 func parse(path string) {
 
 	fileL := &FileListener{Filename: path}
@@ -56,9 +82,14 @@ func parse(path string) {
 	p.BuildParseTrees = true
 	antlr.ParseTreeWalkerDefault.Walk(stackListener, p.CompilationUnit())
 
-	js, err := json.MarshalIndent(fileL, "", "  ")
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(string(js))
+	/*
+		js, err := json.MarshalIndent(fileL, "", "  ")
+		if err != nil {
+			panic(err)
+		}
+		fmt.Println(string(js))
+	*/
+
+	outputFile(fileL.File)
+
 }

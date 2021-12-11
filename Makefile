@@ -1,7 +1,7 @@
 .PHONY = run
 
 run: delver_converter
-	./delver_converter
+	./delver_converter ../delver_converted
 
 delver_converter: go.* *.go parser/*
 	go build
