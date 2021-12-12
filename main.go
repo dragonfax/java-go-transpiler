@@ -46,13 +46,24 @@ func main() {
 
 }
 
+func snakeCase(s string) string {
+	if s == "" {
+		panic("no filename given")
+	}
+	s = strings.TrimPrefix(s, "../")
+	s = strings.TrimSuffix(s, ".java")
+	return strings.ReplaceAll(s, "/", "_")
+}
+
 func outputFile(file *File) {
 	result, err := raymond.Render(string(golangTemplate), file)
 	if err != nil {
 		panic(err)
 	}
 
-	err = ioutil.WriteFile(targetPath+"/"+file.QualifiedPackageName+".go", []byte(result), 0664)
+	snakeFilename := snakeCase(file.Filename)
+	fmt.Printf("writing '%s'\n", snakeFilename)
+	err = ioutil.WriteFile(targetPath+"/"+snakeFilename+".go", []byte(result), 0664)
 	if err != nil {
 		panic(err)
 	}

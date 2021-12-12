@@ -5,7 +5,7 @@
             "name": "Debug ANTLR4 grammar",
             "type": "antlr-debug",
             "request": "launch",
-            "input": "../delverengine/Dungeoneer/src/com/interrupt/dungeoneer/entities/areas/Area.java",
+            "input": "../delverengine/Dungeoneer/src/com/interrupt/dungeoneer/entities/areas/TeleportArea.java",
             "grammar": "JavaParser.g4",
             // "actionFile": "grammars/exampleActions.js",
             "startRule": "compilationUnit",

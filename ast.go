@@ -1,11 +1,10 @@
 package main
 
 type File struct {
-	QualifiedPackageName string
-	Imports              []string
-	Class                *Class
-	BaseClass            string
-	Filename             string
+	Filename    string
+	PackageName string
+	Imports     []string
+	Class       *Class
 }
 
 func NewFile() *File {
@@ -15,37 +14,27 @@ func NewFile() *File {
 }
 
 type Class struct {
-	Name    string
-	Members []*Member
+	Name       string
+	BaseClass  string
+	Interfaces []string
+	Members    []Member
 }
 
 func NewClass() *Class {
 	c := &Class{}
-	c.Members = make([]*Member, 0)
+	c.Members = make([]Member, 0)
 	return c
 }
 
-type Member struct {
-	Name      string
-	Static    bool
-	Output    Type
-	Type      string
-	Arguments []*Argument
-	Body      []*CodeLine
+type Member interface{}
+
+type BaseMember struct {
+	Name string
 }
 
-func NewMember() *Member {
-	m := &Member{}
-	m.Body = make([]*CodeLine, 0)
-	return m
-}
+var _ Member = &Constructor{}
 
-type Type struct {
-}
-
-type Argument struct {
-}
-
-type CodeLine struct {
-	Body string
+type Constructor struct {
+	Name        string
+	Expressions []OperatorNode
 }
