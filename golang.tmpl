@@ -1,5 +1,18 @@
 package main
 
-type {{ this.Class.Name }} struct {
-    {{ this.BaseClass }}
+type {{ Class.Name }} struct {
+
+    {{#if BaseClass}}
+        *{{ BaseClass }}
+    {{/if}}
+
+    {{#each Class.Members}}
+        {{ Name }}() {
+            {{#each Body}}
+                {{ this }}
+            {{/each}}
+        }
+    {{/each}}
+
+
 }

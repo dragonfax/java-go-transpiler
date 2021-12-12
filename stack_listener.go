@@ -23,7 +23,6 @@ func (s *StackListener) Len() int {
 }
 
 func (s *StackListener) Push(s2 parser.JavaParserListener) {
-	fmt.Printf("pushing %T\n", s2)
 	s.stack = append(s.stack, s2)
 	s.JavaParserListener = s2
 }
@@ -41,7 +40,6 @@ func (s *StackListener) Pop(what parser.JavaParserListener) {
 		panic("current parser not last on list")
 	}
 
-	fmt.Printf("popping %T\n", s.JavaParserListener)
 	s.stack = s.stack[0 : len(s.stack)-1]
 	s.JavaParserListener = s.stack[len(s.stack)-1]
 }
@@ -56,11 +54,9 @@ func NewStackableListener(sl *StackListener) *StackableListener {
 }
 
 func (s *StackableListener) Pop(who interface{}, what parser.JavaParserListener) {
-	fmt.Printf("%T is poping...", who)
 	s.StackListener.Pop(what)
 }
 
 func (s *StackableListener) Push(who interface{}, s2 parser.JavaParserListener) {
-	fmt.Printf("%T is pushing...", who)
 	s.StackListener.Push(s2)
 }
