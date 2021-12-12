@@ -1,5 +1,7 @@
 package main
 
+import "fmt"
+
 type File struct {
 	Filename    string
 	PackageName string
@@ -26,7 +28,9 @@ func NewClass() *Class {
 	return c
 }
 
-type Member interface{}
+type Member interface {
+	String() string
+}
 
 type BaseMember struct {
 	Name string
@@ -35,6 +39,21 @@ type BaseMember struct {
 var _ Member = &Constructor{}
 
 type Constructor struct {
-	Name        string
+	BaseMember
 	Expressions []OperatorNode
+}
+
+func (c *Constructor) String() string {
+	if c == nil {
+		return ""
+	}
+
+	prefix := "     "
+	body := ""
+	for _, node := range c.Expressions {
+		if node != nil {
+			body += prefix + node.String() + "\n"
+		}
+	}
+	return fmt.Sprintf("func New%s() *%s{\n%s\n}\n\n", c.Name, c.Name, body)
 }

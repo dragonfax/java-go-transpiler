@@ -38,9 +38,9 @@ func (s *ClassListener) EnterConstructorDeclaration(ctx *parser.ConstructorDecla
 	name := ctx.IDENTIFIER().GetText()
 
 	c := &Constructor{
-		Name:        name,
 		Expressions: make([]OperatorNode, 0),
 	}
+	c.Name = name
 
 	// ctx.FormalPameters()
 

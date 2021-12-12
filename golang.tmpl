@@ -1,18 +1,18 @@
-package main
+package main // {{ PackageName }}
 
-type {{ Class.Name }} struct {
+{{#with Class }}
 
+{{#each Interfaces }}
+var _ {{ this }} = &{{Name}}{}
+{{/each}}
+
+type {{ Name }} struct {
     {{#if BaseClass}}
         *{{ BaseClass }}
     {{/if}}
-
-    {{#each Class.Members}}
-        {{ Name }}() {
-            {{#each Body}}
-                {{ this }}
-            {{/each}}
-        }
-    {{/each}}
-
-
 }
+
+{{#each Members}}{{ this }}
+{{/each}}
+
+{{/with}}
