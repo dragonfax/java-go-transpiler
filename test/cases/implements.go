@@ -1,0 +1,30 @@
+package steam
+
+import "github.com/dragonfax/delver_converted/com/badlogic/gdx/utils"
+
+var _ SteamApiInterface = &NullSteamApi{}
+
+type NullSteamApi struct {
+}
+
+func Init() bool {
+	return false
+}
+
+func GetWorkshopFolders() util.Array[String] {
+	return NewArray[String]()
+}
+
+func RunCallbacks() { }
+
+func Achieve(achievementName string) { }
+
+func Achieve(achievementName string, numProgress int, maxProgress int) { }
+
+func Dispose() { }
+
+func UploadToWorkshop(workshopId int64, modImagePath string, modTitle string, modFolderPath string) { }
+
+func IsAvailable() bool {
+	return false
+}

@@ -1,6 +1,6 @@
-package main
+package tool
 
-func mustByteListErr(buf []byte, err error) []byte {
+func MustByteListErr(buf []byte, err error) []byte {
 	if err != nil {
 		panic(err)
 	}

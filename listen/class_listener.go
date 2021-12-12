@@ -1,4 +1,4 @@
-package main
+package listen
 
 import "github.com/dragonfax/delver_converter/parser"
 
