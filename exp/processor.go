@@ -12,7 +12,7 @@ func expressionProcessor(expression *parser.ExpressionContext) ExpressionNode {
 	if expression.ASSIGN() != nil {
 		operator = Equals
 	} else if expression.RETURN() {
-
+		// ???
 	}
 
 	subExpressions := expression.AllExpression()
@@ -57,6 +57,10 @@ func StatementProcessor(statementCtx *parser.StatementContext) ExpressionNode {
 	// TODO only one expression per block? no this isn't complicated enough.
 	// but okay for a first of expression parsing
 
+	if statementCtx.GetBlockLabel() != nil {
+		return NewBlockNode(statementCtx.GetBlockLabel().(*parser.BlockContext))
+	}
+
 	if statementCtx.IF() != nil {
 		return &IfNode{
 			Condition: expressionProcessor(statementCtx.ParExpression().(*parser.ParExpressionContext).Expression().(*parser.ExpressionContext)),
@@ -66,13 +70,7 @@ func StatementProcessor(statementCtx *parser.StatementContext) ExpressionNode {
 	}
 
 	if statementCtx.FOR() != nil {
-		init, condition, increment := forControlProcessor(statementCtx.ForControl())
-		return &ForNode{
-			Condition: condition,
-			Init:      init,
-			Increment: increment,
-			Body:      StatementProcessor(statementCtx.Statement(0).(*parser.StatementContext)),
-		}
+		return NewForNode(statementCtx)
 	}
 
 	if statementCtx.WHILE() != nil {
@@ -165,98 +163,4 @@ func StatementProcessor(statementCtx *parser.StatementContext) ExpressionNode {
 	// ignore unknown structures.
 	// TODO log them
 	return nil
-}
-
-func forControlProcessor(forControlCtx *parser.ForControlContext) (init []ExpressionNode, condition ExpressionNode, increment []ExpressionNode) {
-	if forControlCtx.EnhancedForControl() != nil {
-		panic("didn't think we'd see these")
-	}
-
-	if forControlCtx.GetForUpdate() != nil {
-		increment = make([]ExpressionNode, 0)
-		for _, exp := range forControlCtx.GetForUpdate().(*parser.ExpressionListContext).AllExpression() {
-			node := expressionProcessor(exp.(*parser.ExpressionContext))
-			increment = append(increment, node)
-		}
-	}
-
-	if forControlCtx.Expression() != nil {
-		condition = expressionProcessor(forControlCtx.Expression().(*parser.ExpressionContext))
-	}
-
-	if forControlCtx.ForInit() != nil {
-		initCtx := forControlCtx.ForInit().(*parser.ForInitContext)
-		init = make([]ExpressionNode, 0)
-		if initCtx.LocalVariableDeclaration() != nil {
-			// variable declaractions
-			declCtx := initCtx.LocalVariableDeclaration().(*parser.LocalVariableDeclarationContext)
-			init = localVariableDeclarationProcessor(declCtx)
-		} else {
-			// expression list
-			for _, exp := range initCtx.ExpressionList().(*parser.ExpressionListContext).AllExpression() {
-				node := expressionProcessor(exp.(*parser.ExpressionContext))
-				init = append(init, node)
-			}
-		}
-	}
-
-	return
-}
-
-func localVariableDeclarationProcessor(decl *parser.LocalVariableDeclarationContext) []ExpressionNode {
-
-	l := make([]ExpressionNode, 0)
-
-	typ := decl.TypeType().GetText()
-
-	for _, varDecl := range decl.VariableDeclarators().(*parser.VariableDeclaratorsContext).AllVariableDeclarator() {
-
-		varDeclCtx := varDecl.(*parser.VariableDeclaratorContext)
-
-		varInitCtx := varDeclCtx.VariableInitializer().(*parser.VariableInitializerContext)
-
-		exp := variableInitializerProcessor(varInitCtx)
-
-		node := &VariableDeclNode{
-			Type:       typ,
-			Name:       varDeclCtx.VariableDeclaratorId().GetText(),
-			Expression: exp,
-		}
-
-		l = append(l, node)
-	}
-
-	return l
-}
-
-func variableInitializerProcessor(ctx *parser.VariableInitializerContext) ExpressionNode {
-	var exp ExpressionNode
-	if ctx.Expression() != nil {
-		exp = expressionProcessor(ctx.Expression().(*parser.ExpressionContext))
-	}
-	if ctx.ArrayInitializer() != nil {
-		exp = arrayInitializerProcessor(ctx.ArrayInitializer().(*parser.ArrayInitializerContext))
-	}
-
-	return exp
-}
-
-func arrayInitializerProcessor(ctx *parser.ArrayInitializerContext) *ArrayLiteral {
-
-	if len(ctx.AllVariableInitializer()) == 0 {
-		return &ArrayLiteral{}
-	}
-
-	l := make([]ExpressionNode, 0)
-	for _, varInit := range ctx.AllVariableInitializer() {
-		varInitCtx := varInit.(*parser.VariableInitializerContext)
-
-		exp := variableInitializerProcessor(varInitCtx)
-
-		l = append(l, exp)
-	}
-
-	return &ArrayLiteral{
-		Elements: l,
-	}
 }

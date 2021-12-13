@@ -2,7 +2,6 @@ package exp
 
 import (
 	"fmt"
-	"strings"
 )
 
 type ExpressionNode interface {
@@ -81,20 +80,6 @@ func (in *IfNode) String() string {
 	return fmt.Sprintf("if %s {\n%s} else {\n%s}\n", in.Condition, in.Body.String(), in.Else.String())
 }
 
-type ForNode struct {
-	Condition     ExpressionNode
-	Init          ExpressionNode
-	Increment     ExpressionNode
-	Body          ExpressionNode
-	ConditionLast bool // Do...While
-}
-
-func (fn *ForNode) String() string {
-	// TODO ConditionLast
-	// TODO remove unnecessary semicolons
-	return fmt.Sprintf("for %s;%s;%s {\n%s}\n", fn.Init, fn.Condition, fn.Increment, fn.Body)
-}
-
 type ReturnNode struct {
 	Expression ExpressionNode
 }
@@ -134,38 +119,4 @@ type LabelNode struct {
 
 func (ln *LabelNode) String() string {
 	return fmt.Sprintf("%s: %s\n", ln.Label, ln.Expression.String())
-}
-
-type BlockNode struct {
-	Body []ExpressionNode
-}
-
-func (bn *BlockNode) String() string {
-	return fmt.Sprintf("{\n%s}\n", expressionListToString(bn.Body))
-}
-
-type VariableDeclNode struct {
-	Type       string
-	Name       string
-	Expression ExpressionNode // for now
-}
-
-func (vn *VariableDeclNode) String() string {
-	if vn.Expression == nil {
-		return fmt.Sprintf("%s %s", vn.Name, vn.Type)
-	}
-	return fmt.Sprintf("%s := %s", vn.Name, vn.Expression) // we'll assume the type matches the expression.
-}
-
-type ArrayLiteral struct {
-	Type     string
-	Elements []ExpressionNode
-}
-
-func (al *ArrayLiteral) String() string {
-	l := make([]string, 0)
-	for _, node := range al.Elements {
-		l = append(l, node.String())
-	}
-	return fmt.Sprintf("[]%s{}", al.Type, strings.Join(l, ","))
 }
