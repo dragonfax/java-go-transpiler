@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/dragonfax/delver_converter/ast"
+
 	"github.com/aymerick/raymond"
 )
 
@@ -47,7 +49,7 @@ func snakeCase(s string) string {
 	return strings.ReplaceAll(s, "/", "_")
 }
 
-func outputFile(file *File) {
+func outputFile(file *ast.File) {
 	result, err := raymond.Render(string(golangTemplate), file)
 	if err != nil {
 		panic(err)

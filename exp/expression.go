@@ -58,7 +58,7 @@ func (vn *VariableNode) String() string {
 }
 
 // deal with the recursive expression tree.
-func expressionProcessor(expression *parser.ExpressionContext) OperatorNode {
+func ExpressionProcessor(expression *parser.ExpressionContext) OperatorNode {
 
 	var operator Operator
 	if expression.ASSIGN() != nil {
@@ -68,14 +68,14 @@ func expressionProcessor(expression *parser.ExpressionContext) OperatorNode {
 	subExpressions := expression.AllExpression()
 	if len(subExpressions) == 1 {
 		node := &UnaryOperatorNode{
-			Left: expressionProcessor(subExpressions[0].(*parser.ExpressionContext)),
+			Left: ExpressionProcessor(subExpressions[0].(*parser.ExpressionContext)),
 		}
 		node.Operator = operator
 		return node
 	} else if len(subExpressions) == 2 {
 		node := &BinaryOperatorNode{
-			Left:  expressionProcessor(subExpressions[0].(*parser.ExpressionContext)),
-			Right: expressionProcessor(subExpressions[1].(*parser.ExpressionContext)),
+			Left:  ExpressionProcessor(subExpressions[0].(*parser.ExpressionContext)),
+			Right: ExpressionProcessor(subExpressions[1].(*parser.ExpressionContext)),
 		}
 		node.Operator = operator
 		return node

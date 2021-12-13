@@ -1,6 +1,10 @@
 package ast
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/dragonfax/delver_converter/exp"
+)
 
 type File struct {
 	Filename    string
@@ -25,6 +29,7 @@ type Class struct {
 func NewClass() *Class {
 	c := &Class{}
 	c.Members = make([]Member, 0)
+	c.Interfaces = make([]string, 0)
 	return c
 }
 
@@ -33,14 +38,15 @@ type Member interface {
 }
 
 type BaseMember struct {
-	Name string
+	Name     string
+	Modifier string
 }
 
 var _ Member = &Constructor{}
 
 type Constructor struct {
 	BaseMember
-	Expressions []OperatorNode
+	Expressions []exp.OperatorNode
 }
 
 func (c *Constructor) String() string {

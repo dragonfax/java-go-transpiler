@@ -1,18 +1,21 @@
 package listen
 
-import "github.com/dragonfax/delver_converter/parser"
+import (
+	"github.com/dragonfax/delver_converter/ast"
+	"github.com/dragonfax/delver_converter/parser"
+)
 
 type FileListener struct {
 	*StackableListener
 	*parser.BaseJavaParserListener
 
-	File *File
+	File *ast.File
 }
 
 func NewFileListener(sl *StackListener, filename string) *FileListener {
 	f := &FileListener{
 		StackableListener: NewStackableListener(sl),
-		File:              NewFile(),
+		File:              ast.NewFile(),
 	}
 	f.File.Filename = filename
 	return f
