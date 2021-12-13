@@ -4,6 +4,7 @@ import (
 	"io/ioutil"
 	"testing"
 
+	"github.com/dragonfax/delver_converter/trans"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -11,7 +12,7 @@ const casesDir = "./cases"
 
 func TestParser(t *testing.T) {
 
-	testPrefixes := []string{"implements", "interface", "static_variable"}
+	testPrefixes := []string{"implements", "interface", "static_variable" /* ,"math" */}
 
 	for _, testPrefix := range testPrefixes {
 		java, err := ioutil.ReadFile(casesDir + "/" + testPrefix + ".java")
