@@ -12,7 +12,7 @@ type {{ Name }} struct {
     {{/if}}
 }
 
-{{#each Members}}{{ this }}
+{{#each Members}}{{{ this }}}
 {{/each}}
 
 {{/with}}

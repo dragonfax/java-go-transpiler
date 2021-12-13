@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/dragonfax/java_converter/input/exp"
+	"github.com/dragonfax/java_converter/tool"
 )
 
 type File struct {
@@ -54,6 +55,13 @@ func NewConstructor() *Constructor {
 }
 
 func (c *Constructor) String() string {
+	if c == nil {
+		panic("nil constructor")
+	}
+	if tool.IsNilInterface(c.Body) {
+		panic("nil constructor body")
+	}
+
 	return fmt.Sprintf("func New%s() *%s{\n%s\n}\n\n", c.Name, c.Name, c.Body)
 }
 
@@ -73,12 +81,18 @@ func NewMethod(class string) *Method {
 }
 
 func (m *Method) String() string {
+	if m == nil {
+		panic("nil method")
+	}
 	prefix := "     "
 	body := ""
-	for _, node := range m.Expressions {
-		if node != nil {
-			body += prefix + node.String() + "\n"
+	if m.Expressions != nil {
+		for _, node := range m.Expressions {
+			if node != nil {
+				body += prefix + node.String() + "\n"
+			}
 		}
 	}
+
 	return fmt.Sprintf("func (this *%s) %s(%s) *%s{\n%s\n}\n\n", m.Class, m.Name, m.Arguments, m.ReturnType, body)
 }

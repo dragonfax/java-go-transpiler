@@ -2,6 +2,8 @@ package exp
 
 import (
 	"fmt"
+
+	"github.com/dragonfax/java_converter/tool"
 )
 
 type ExpressionNode interface {
@@ -9,8 +11,14 @@ type ExpressionNode interface {
 }
 
 func expressionListToString(list []ExpressionNode) string {
+	if list == nil {
+		panic("list expression list")
+	}
 	s := ""
 	for _, node := range list {
+		if tool.IsNilInterface(node) {
+			panic("nil node in expression list")
+		}
 		s += node.String() + "\n"
 	}
 	return s
@@ -36,7 +44,18 @@ type BinaryOperatorNode struct {
 }
 
 func (bo *BinaryOperatorNode) String() string {
-	return bo.Left.String() + string(bo.Operator) + bo.Right.String()
+	if bo == nil {
+		panic("nil binary operator")
+	}
+	left := "<NIL>"
+	if bo.Left != nil {
+		left = bo.Left.String()
+	}
+	right := "<NIL>"
+	if bo.Right != nil {
+		right = bo.Right.String()
+	}
+	return left + string(bo.Operator) + right
 }
 
 var _ ExpressionNode = &UnaryOperatorNode{}
@@ -48,7 +67,14 @@ type UnaryOperatorNode struct {
 }
 
 func (uo *UnaryOperatorNode) String() string {
-	return string(uo.Operator) + uo.Left.String()
+	if uo == nil {
+		panic("nil unary operator")
+	}
+	left := "<NIL>"
+	if uo.Left != nil {
+		left = uo.Left.String()
+	}
+	return string(uo.Operator) + left
 }
 
 type LiteralNode struct {
@@ -56,6 +82,9 @@ type LiteralNode struct {
 }
 
 func (ln *LiteralNode) String() string {
+	if ln == nil {
+		panic("nil literal node")
+	}
 	return ln.Value
 }
 
@@ -64,6 +93,9 @@ type VariableNode struct {
 }
 
 func (vn *VariableNode) String() string {
+	if vn == nil {
+		panic("nil variable node")
+	}
 	return vn.Name
 }
 
@@ -74,6 +106,9 @@ type IfNode struct {
 }
 
 func (in *IfNode) String() string {
+	if in == nil {
+		panic("nil if node")
+	}
 	if in.Else == nil {
 		return fmt.Sprintf("if %s {\n%s}\n", in.Condition, in.Body.String())
 	}
@@ -85,6 +120,9 @@ type ReturnNode struct {
 }
 
 func (rn *ReturnNode) String() string {
+	if rn == nil {
+		panic("nil return node")
+	}
 	return fmt.Sprintf("return %s\n", rn.Expression.String())
 }
 
@@ -93,6 +131,9 @@ type ThrowNode struct {
 }
 
 func (tn *ThrowNode) String() string {
+	if tn == nil {
+		panic("nil throw node")
+	}
 	return fmt.Sprintf("panic(%s)\n", tn.Expression.String())
 }
 
@@ -101,6 +142,9 @@ type BreakNode struct {
 }
 
 func (bn *BreakNode) String() string {
+	if bn == nil {
+		panic("nil break node")
+	}
 	return fmt.Sprintf("break %s\n", bn.Label)
 }
 
@@ -109,6 +153,9 @@ type ContinueNode struct {
 }
 
 func (cn *ContinueNode) String() string {
+	if cn == nil {
+		panic("nil continue node")
+	}
 	return fmt.Sprintf("continue %s\n", cn.Label)
 }
 
@@ -118,5 +165,8 @@ type LabelNode struct {
 }
 
 func (ln *LabelNode) String() string {
+	if ln == nil {
+		panic("nil label node")
+	}
 	return fmt.Sprintf("%s: %s\n", ln.Label, ln.Expression.String())
 }

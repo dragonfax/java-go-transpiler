@@ -11,6 +11,9 @@ type BlockNode struct {
 }
 
 func (bn *BlockNode) String() string {
+	if bn == nil {
+		panic("nil block")
+	}
 	return fmt.Sprintf("{\n%s}\n", expressionListToString(bn.Body))
 }
 
