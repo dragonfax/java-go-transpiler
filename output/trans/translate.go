@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
+	"github.com/dragonfax/delver_converter/input/parser"
 	"github.com/dragonfax/delver_converter/listen"
-	"github.com/dragonfax/delver_converter/parser"
 	"github.com/dragonfax/delver_converter/tool"
 )
 

@@ -1,9 +1,9 @@
 package listen
 
 import (
-	"github.com/dragonfax/delver_converter/ast"
-	"github.com/dragonfax/delver_converter/exp"
-	"github.com/dragonfax/delver_converter/parser"
+	"github.com/dragonfax/delver_converter/input/ast"
+	"github.com/dragonfax/delver_converter/input/exp"
+	"github.com/dragonfax/delver_converter/input/parser"
 )
 
 type ClassListener struct {

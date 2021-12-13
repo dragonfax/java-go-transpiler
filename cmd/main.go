@@ -8,7 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/dragonfax/delver_converter/ast"
+	"github.com/dragonfax/delver_converter/input/ast"
 
 	"github.com/aymerick/raymond"
 )

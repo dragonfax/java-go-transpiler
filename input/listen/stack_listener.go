@@ -3,7 +3,7 @@ package listen
 import (
 	"fmt"
 
-	"github.com/dragonfax/delver_converter/parser"
+	"github.com/dragonfax/delver_converter/input/parser"
 )
 
 type StackListener struct {
