@@ -15,17 +15,17 @@ func expressionProcessor(expression *parser.ExpressionContext) ExpressionNode {
 
 	subExpressions := expression.AllExpression()
 	if len(subExpressions) == 1 {
-		node := &UnaryOperatorNode{
-			Left: expressionProcessor(subExpressions[0].(*parser.ExpressionContext)),
-		}
-		node.Operator = operator
+		node := NewUnaryOperatorNode(
+			operator,
+			expressionProcessor(subExpressions[0].(*parser.ExpressionContext)),
+		)
 		return node
 	} else if len(subExpressions) == 2 {
-		node := &BinaryOperatorNode{
-			Left:  expressionProcessor(subExpressions[0].(*parser.ExpressionContext)),
-			Right: expressionProcessor(subExpressions[1].(*parser.ExpressionContext)),
-		}
-		node.Operator = operator
+		node := NewBinaryOperatorNode(
+			operator,
+			expressionProcessor(subExpressions[0].(*parser.ExpressionContext)),
+			expressionProcessor(subExpressions[1].(*parser.ExpressionContext)),
+		)
 		return node
 	}
 
@@ -34,15 +34,11 @@ func expressionProcessor(expression *parser.ExpressionContext) ExpressionNode {
 	if expression.Primary() != nil {
 		primary := expression.Primary().(*parser.PrimaryContext)
 		if primary.IDENTIFIER() != nil {
-			node := &VariableNode{
-				Name: primary.IDENTIFIER().GetText(),
-			}
+			node := NewVariableNode(primary.IDENTIFIER().GetText())
 			return node
 		} else if primary.Literal() != nil {
 			literal := primary.Literal().(*parser.LiteralContext)
-			return &LiteralNode{
-				Value: literal.GetText(),
-			}
+			return NewLiteralNode(literal.GetText())
 		}
 	}
 
@@ -60,11 +56,11 @@ func StatementProcessor(statementCtx *parser.StatementContext) ExpressionNode {
 	}
 
 	if statementCtx.IF() != nil {
-		return &IfNode{
-			Condition: expressionProcessor(statementCtx.ParExpression().(*parser.ParExpressionContext).Expression().(*parser.ExpressionContext)),
-			Body:      StatementProcessor(statementCtx.Statement(0).(*parser.StatementContext)),
-			Else:      StatementProcessor(statementCtx.Statement(1).(*parser.StatementContext)),
-		}
+		return NewIfNode(
+			expressionProcessor(statementCtx.ParExpression().(*parser.ParExpressionContext).Expression().(*parser.ExpressionContext)),
+			StatementProcessor(statementCtx.Statement(0).(*parser.StatementContext)),
+			StatementProcessor(statementCtx.Statement(1).(*parser.StatementContext)),
+		)
 	}
 
 	if statementCtx.FOR() != nil {
@@ -87,27 +83,19 @@ func StatementProcessor(statementCtx *parser.StatementContext) ExpressionNode {
 	}
 
 	if statementCtx.RETURN() != nil {
-		return &ReturnNode{
-			Expression: expressionProcessor(statementCtx.Expression(0).(*parser.ExpressionContext)),
-		}
+		return NewReturnNode(expressionProcessor(statementCtx.Expression(0).(*parser.ExpressionContext)))
 	}
 
 	if statementCtx.THROW() != nil {
-		return &ThrowNode{
-			Expression: expressionProcessor(statementCtx.Expression(0).(*parser.ExpressionContext)),
-		}
+		return NewThrowNode(expressionProcessor(statementCtx.Expression(0).(*parser.ExpressionContext)))
 	}
 
 	if statementCtx.BREAK() != nil {
-		return &BreakNode{
-			Label: statementCtx.IDENTIFIER().GetText(),
-		}
+		return NewBreakNode(statementCtx.IDENTIFIER().GetText())
 	}
 
 	if statementCtx.CONTINUE() != nil {
-		return &ContinueNode{
-			Label: statementCtx.IDENTIFIER().GetText(),
-		}
+		return NewContinueNode(statementCtx.IDENTIFIER().GetText())
 	}
 
 	/*
@@ -120,10 +108,10 @@ func StatementProcessor(statementCtx *parser.StatementContext) ExpressionNode {
 
 	if statementCtx.GetIdentifierLabel() != nil {
 		// must be a statement, with a label
-		return &LabelNode{
-			Label:      statementCtx.GetIdentifierLabel().GetText(),
-			Expression: StatementProcessor(statementCtx.Statement(0).(*parser.StatementContext)),
-		}
+		return NewLabelNode(
+			statementCtx.GetIdentifierLabel().GetText(),
+			StatementProcessor(statementCtx.Statement(0).(*parser.StatementContext)),
+		)
 	}
 
 	// we dont' expect a lone statement

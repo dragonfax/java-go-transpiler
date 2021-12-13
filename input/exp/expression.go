@@ -43,19 +43,23 @@ type BinaryOperatorNode struct {
 	Right ExpressionNode
 }
 
+func NewBinaryOperatorNode(operator Operator, left ExpressionNode, right ExpressionNode) *BinaryOperatorNode {
+	if operator == "" {
+		panic("no operator")
+	}
+	if tool.IsNilInterface(left) {
+		panic("no left expression")
+	}
+	if tool.IsNilInterface(right) {
+		panic("no right expression")
+	}
+	this := &BinaryOperatorNode{Left: left, Right: right}
+	this.Operator = operator
+	return this
+}
+
 func (bo *BinaryOperatorNode) String() string {
-	if bo == nil {
-		panic("nil binary operator")
-	}
-	left := "<NIL>"
-	if bo.Left != nil {
-		left = bo.Left.String()
-	}
-	right := "<NIL>"
-	if bo.Right != nil {
-		right = bo.Right.String()
-	}
-	return left + string(bo.Operator) + right
+	return fmt.Sprintf("%s%s%s", bo.Left, bo.Operator, bo.Right)
 }
 
 var _ ExpressionNode = &UnaryOperatorNode{}
@@ -66,25 +70,34 @@ type UnaryOperatorNode struct {
 	Left ExpressionNode
 }
 
+func NewUnaryOperatorNode(operator Operator, left ExpressionNode) *UnaryOperatorNode {
+	if operator == "" {
+		panic("no operator")
+	}
+	if tool.IsNilInterface(left) {
+		panic("no expression")
+	}
+	this := &UnaryOperatorNode{Left: left}
+	this.Operator = operator
+	return this
+}
+
 func (uo *UnaryOperatorNode) String() string {
-	if uo == nil {
-		panic("nil unary operator")
-	}
-	left := "<NIL>"
-	if uo.Left != nil {
-		left = uo.Left.String()
-	}
-	return string(uo.Operator) + left
+	return fmt.Sprintf("%s%s", uo.Operator, uo.Left)
 }
 
 type LiteralNode struct {
 	Value string
 }
 
-func (ln *LiteralNode) String() string {
-	if ln == nil {
-		panic("nil literal node")
+func NewLiteralNode(value string) *LiteralNode {
+	if value == "" {
+		panic("no value")
 	}
+	return &LiteralNode{Value: value}
+}
+
+func (ln *LiteralNode) String() string {
 	return ln.Value
 }
 
@@ -92,10 +105,16 @@ type VariableNode struct {
 	Name string
 }
 
-func (vn *VariableNode) String() string {
-	if vn == nil {
-		panic("nil variable node")
+func NewVariableNode(name string) *VariableNode {
+	if name == "" {
+		panic("missing name")
 	}
+	return &VariableNode{
+		Name: name,
+	}
+}
+
+func (vn *VariableNode) String() string {
 	return vn.Name
 }
 
@@ -105,35 +124,55 @@ type IfNode struct {
 	Else      ExpressionNode
 }
 
+func NewIfNode(condition, body, els ExpressionNode) *IfNode {
+	if tool.IsNilInterface(body) {
+		panic("missing body")
+	}
+	if tool.IsNilInterface(condition) {
+		panic("missing condition")
+	}
+	return &IfNode{
+		Condition: condition,
+		Body:      body,
+		Else:      els,
+	}
+}
+
 func (in *IfNode) String() string {
-	if in == nil {
-		panic("nil if node")
+	if tool.IsNilInterface(in.Else) {
+		return fmt.Sprintf("if %s {\n%s}\n", in.Condition, in.Body)
 	}
-	if in.Else == nil {
-		return fmt.Sprintf("if %s {\n%s}\n", in.Condition, in.Body.String())
-	}
-	return fmt.Sprintf("if %s {\n%s} else {\n%s}\n", in.Condition, in.Body.String(), in.Else.String())
+	return fmt.Sprintf("if %s {\n%s} else {\n%s}\n", in.Condition, in.Body, in.Else)
 }
 
 type ReturnNode struct {
 	Expression ExpressionNode
 }
 
+func NewReturnNode(exp ExpressionNode) *ReturnNode {
+	return &ReturnNode{Expression: exp}
+}
+
 func (rn *ReturnNode) String() string {
-	if rn == nil {
-		panic("nil return node")
+	exp := ""
+	if !tool.IsNilInterface(rn.Expression) {
+		exp = rn.Expression.String()
 	}
-	return fmt.Sprintf("return %s\n", rn.Expression.String())
+	return fmt.Sprintf("return %s\n", exp)
 }
 
 type ThrowNode struct {
 	Expression ExpressionNode
 }
 
-func (tn *ThrowNode) String() string {
-	if tn == nil {
-		panic("nil throw node")
+func NewThrowNode(exp ExpressionNode) *ThrowNode {
+	if tool.IsNilInterface(exp) {
+		panic("missing expression")
 	}
+	return &ThrowNode{Expression: exp}
+}
+
+func (tn *ThrowNode) String() string {
 	return fmt.Sprintf("panic(%s)\n", tn.Expression.String())
 }
 
@@ -141,10 +180,11 @@ type BreakNode struct {
 	Label string
 }
 
+func NewBreakNode(label string) *BreakNode {
+	return &BreakNode{Label: label}
+}
+
 func (bn *BreakNode) String() string {
-	if bn == nil {
-		panic("nil break node")
-	}
 	return fmt.Sprintf("break %s\n", bn.Label)
 }
 
@@ -152,10 +192,11 @@ type ContinueNode struct {
 	Label string
 }
 
+func NewContinueNode(label string) *ContinueNode {
+	return &ContinueNode{Label: label}
+}
+
 func (cn *ContinueNode) String() string {
-	if cn == nil {
-		panic("nil continue node")
-	}
 	return fmt.Sprintf("continue %s\n", cn.Label)
 }
 
@@ -164,9 +205,16 @@ type LabelNode struct {
 	Expression ExpressionNode
 }
 
-func (ln *LabelNode) String() string {
-	if ln == nil {
-		panic("nil label node")
+func NewLabelNode(label string, exp ExpressionNode) *LabelNode {
+	if label == "" {
+		panic("label missing")
 	}
-	return fmt.Sprintf("%s: %s\n", ln.Label, ln.Expression.String())
+	if tool.IsNilInterface(exp) {
+		panic("expression missing")
+	}
+	return &LabelNode{Label: label, Expression: exp}
+}
+
+func (ln *LabelNode) String() string {
+	return fmt.Sprintf("%s: %s\n", ln.Label, ln.Expression)
 }
