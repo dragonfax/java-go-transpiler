@@ -122,87 +122,93 @@ func NewDynamicLight5(float x, float y, float z, float range, Vector3 lightColor
 	this.lightColor = lightColor;
 }
 
-void updateLightColor(float delta) {
-	time += delta;
+func (this *DynamicLight) updateLightColor(delta float64) {
+	this.time += delta;
 	
-	workColor.set(lightColor);
-	workRange = range;
+	this.workColor.set(lightColor)
+	this.workRange = this.Range
 
-	if(toggleAnimationTime != 0) {
+	if this.toggleAnimationTime != 0 {
 		// animate when turning on / off
-		if(on && toggleLerpTime < 1)
-			toggleLerpTime += delta / toggleAnimationTime;
-		else if(!on && toggleLerpTime > 0)
-			toggleLerpTime -= delta / toggleAnimationTime;
+		if this.on && this.toggleLerpTime < 1 {
+			this.toggleLerpTime += delta / this.toggleAnimationTime
+		} else if !this.on && this.toggleLerpTime > 0 {
+			this.toggleLerpTime -= delta / this.toggleAnimationTime;
+		}
 
 		// clamp!
-		if(toggleLerpTime < 0)
-			toggleLerpTime = 0;
-		if(toggleLerpTime > 1)
-			toggleLerpTime = 1;
+		if this.toggleLerpTime < 0 {
+			this.toggleLerpTime = 0
+		}
+		if this.toggleLerpTime > 1 {
+			this.toggleLerpTime = 1
+		}
 	}
 	
-	if(lightType == LightType.steady) {
+	if this.lightType == steady {
 		// steady lights do nothing
-	}
-	else if(lightType == LightType.fire) {
-		workColor.scl(1 - (float)Math.sin(time * 0.11f) * 0.1f);
-		workColor.scl(1 - (float)Math.sin(time * 0.147f) * 0.1f);
-		workColor.scl(1 - (float)Math.sin(time * 0.263f) * 0.1f);
+	} else if this.lightType == fire {
+		this.workColor.scl(1 - math.Sin(this.time * 0.11) * 0.1)
+		this.workColor.scl(1 - math.Sin(this.time * 0.147) * 0.1)
+		this.workColor.scl(1 - math.Sin(this.time * 0.263) * 0.1)
 		
-		workRange *= 1 - (float)Math.sin(time * 0.111f) * 0.05f;
-		workRange *= 1 - (float)Math.sin(time * 0.1477f) * 0.05f;
-		workRange *= 1 - (float)Math.sin(time * 0.2631f) * 0.05f;
-	}
-	else if(lightType == LightType.torch) {
-		workColor.scl(1 - (float)Math.sin(time * 0.11f) * 0.5f);
-		workColor.scl(1 - (float)Math.sin(time * 0.147f) * 0.5f);
-		workColor.scl(1 - (float)Math.sin(time * 0.263f) * 0.5f);
+		this.workRange *= 1 - math.Sin(this.time * 0.111) * 0.05
+		this.workRange *= 1 - math.Sin(this.time * 0.1477) * 0.05
+		this.workRange *= 1 - math.Sin(this.time * 0.2631) * 0.05
+	} else if this.lightType == torch {
+		this.workColor.scl(1 - math.Sin(this.time * 0.11) * 0.5)
+		this.workColor.scl(1 - math.Sin(this.time * 0.147) * 0.5)
+		this.workColor.scl(1 - math.Sin(this.time * 0.263) * 0.5)
 		
-		workRange *= 1 - (float)Math.sin(time * 0.111f) * 0.05f;
-		workRange *= 1 - (float)Math.sin(time * 0.1477f) * 0.05f;
-		workRange *= 1 - (float)Math.sin(time * 0.2631f) * 0.05f;
-	}
-	else if(lightType == LightType.flicker_on) {
-		workColor.scl(Game.rand.nextFloat() > 0.95f ? 1f : 0f);
-	}
-	else if(lightType == LightType.flicker_off) {
-		workColor.scl(Game.rand.nextFloat() > 0.95f ? 0f : 1f);
-	}
-	else if(lightType == LightType.sin_slow) {
-		workColor.scl((float)Math.sin(time * 0.02f) + 1f);
-	}
-	else if(lightType == LightType.sin_slight) {
-		workColor.scl((float)(Math.sin(time * 0.05f) + 1f) * 0.2f + 1f);
-	}
-	else if(lightType == LightType.sin_fast) {
-		workColor.scl((float)Math.sin(time * 0.2f) + 1f);
+		this.workRange *= 1 - math.Sin(this.time * 0.111) * 0.05
+		this.workRange *= 1 - math.Sin(this.time * 0.1477) * 0.05
+		this.workRange *= 1 - math.Sin(this.time * 0.2631) * 0.05
+	} else if this.lightType == flicker_on {
+		a := Game.Rand.nextFloat()
+		if a > 0.95 {
+			b := 1.0
+		} else {
+			b := 0.0
+		}
+		this.workColor.scl(b)
+	} else if this.lightType == flicker_off {
+		this.workColor.scl(ternaryFloat64(Game.rand.nextFloat() > 0.95, 0.0, 1.0));
+	} else if this.lightType == sin_slow {
+		this.workColor.scl(math.Sin(this.time * 0.02) + 1)
+	} else if this.lightType == sin_slight {
+		this.workColor.scl((math.Sin(this.time * 0.05) + 1) * 0.2 + 1)
+	} else if this.lightType == sin_fast {
+		this.workColor.scl(math.Sin(this.time * 0.2) + 1)
 	}
 
-	if(toggleLerpTime > 0 && toggleLerpTime < 1) {
-		workColor.scl(Interpolation.linear.apply(toggleLerpTime));
+	if this.toggleLerpTime > 0 && this.toggleLerpTime < 1 {
+		this.workColor.scl(Interpolation.linear.apply(this.toggleLerpTime))
 	}
 	
-	if(colorLerpTarget != null) {
-		float lerpA = lerpTimer / lerpTime;
-		workColor.lerp(colorLerpTarget, lerpA);
-		workRange = Interpolation.linear.apply(range, rangeLerpTarget, lerpA);
-		lerpTimer += delta;
+	if this.colorLerpTarget != nil {
+		lerpA := this.lerpTimer / this.lerpTime
+		this.workColor.lerp(this.colorLerpTarget, lerpA)
+		this.workRange = Interpolation.linear.apply(this.Range, this.rangeLerpTarget, lerpA)
+		this.lerpTimer += delta;
 		
-		if(lerpTimer >= lerpTime) {
-			workColor.set(colorLerpTarget);
+		if this.lerpTimer >= this.lerpTime {
+			this.workColor.set(this.colorLerpTarget)
 			
-			colorLerpTarget = null;
+			this.colorLerpTarget = nil
 			
-			if(killAfterLerp != null && killAfterLerp) isActive = false;
+			if this.killAfterLerp != nil && this.killAfterLerp {
+				this.isActive = false
+			}
 		}
 	}
 
-	if(Float.isNaN(workRange)) workRange = 0;
+	if math.IsNaN(this.workRange)) {
+		this.workRange = 0
+	}
 
-	haloSize = workRange * 0.175f;
-	haloSize *= Interpolation.circleOut.apply(workColor.len() * 0.4f);
-	haloSize *= haloSizeMod;
+	this.haloSize = this.workRange * 0.175;
+	this.haloSize *= Interpolation.circleOut.apply(len(this.workColor) * 0.4);
+	this.haloSize *= this.haloSizeMod;
 }
 
 func (this *DynamicLight) Tick(level Level, delta float64) {
