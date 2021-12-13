@@ -51,17 +51,9 @@ func (s *ClassListener) EnterConstructorDeclaration(ctx *parser.ConstructorDecla
 
 	// ctx.FormalPameters()
 
-	for _, blockChild := range ctx.Block().GetChildren() {
-		blockStatementContext, ok := blockChild.(*parser.BlockStatementContext)
-		if ok {
-			statement := blockStatementContext.Statement().(*parser.StatementContext)
+	node := exp.NewBlockNode(ctx.Block().(*parser.BlockContext))
+	c.Body = node
 
-			// TODO only one expression per block? no this isn't complicated enough.
-			// but okay for a first of expression parsing
-			node := exp.ExpressionProcessor(statement.Expression(0).(*parser.ExpressionContext))
-			c.Expressions = append(c.Expressions, node)
-		}
-	}
 	s.File.Class.Members = append(s.File.Class.Members, c)
 }
 

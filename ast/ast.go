@@ -46,29 +46,20 @@ var _ Member = &Constructor{}
 
 type Constructor struct {
 	BaseMember
-	Expressions []exp.OperatorNode
+	Body exp.ExpressionNode
 }
 
 func NewConstructor() *Constructor {
-	return &Constructor{
-		Expressions: make([]exp.OperatorNode, 0),
-	}
+	return &Constructor{}
 }
 
 func (c *Constructor) String() string {
-	prefix := "     "
-	body := ""
-	for _, node := range c.Expressions {
-		if node != nil {
-			body += prefix + node.String() + "\n"
-		}
-	}
-	return fmt.Sprintf("func New%s() *%s{\n%s\n}\n\n", c.Name, c.Name, body)
+	return fmt.Sprintf("func New%s() *%s{\n%s\n}\n\n", c.Name, c.Name, c.Body)
 }
 
 type Method struct {
 	BaseMember
-	Expressions []exp.OperatorNode
+	Expressions []exp.ExpressionNode
 	Arguments   string
 	ReturnType  string
 	Class       string
@@ -77,7 +68,7 @@ type Method struct {
 func NewMethod(class string) *Method {
 	return &Method{
 		Class:       class,
-		Expressions: make([]exp.OperatorNode, 0),
+		Expressions: make([]exp.ExpressionNode, 0),
 	}
 }
 

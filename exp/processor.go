@@ -11,8 +11,6 @@ func expressionProcessor(expression *parser.ExpressionContext) ExpressionNode {
 	var operator Operator
 	if expression.ASSIGN() != nil {
 		operator = Equals
-	} else if expression.RETURN() {
-		// ???
 	}
 
 	subExpressions := expression.AllExpression()

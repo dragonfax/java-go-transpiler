@@ -17,7 +17,7 @@ func (al *ArrayLiteral) String() string {
 	for _, node := range al.Elements {
 		l = append(l, node.String())
 	}
-	return fmt.Sprintf("[]%s{}", al.Type, strings.Join(l, ","))
+	return fmt.Sprintf("[]%s{%s}", al.Type, strings.Join(l, ","))
 }
 
 func NewArrayLiteral(ctx *parser.ArrayInitializerContext) *ArrayLiteral {
