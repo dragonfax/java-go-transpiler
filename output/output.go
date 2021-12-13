@@ -1,6 +1,7 @@
 package output
 
 import (
+	"errors"
 	"fmt"
 	"io/fs"
 	"os"
@@ -28,13 +29,16 @@ func TranslateOneFile(filename string) {
 
 	// remove target file if its already there.
 	_, err := os.Stat(targetFilename)
-	if err == nil {
+	if err != nil {
+		if !errors.Is(err, os.ErrNotExist) {
+			panic(fmt.Sprintf("%T %v %s", err, err, err))
+		}
+	} else {
+		// file exists. thats a problem.
 		err = os.Remove(targetFilename)
 		if err != nil {
 			panic(err)
 		}
-	} else if err != os.ErrNotExist {
-		panic(err)
 	}
 
 	targetDirectory := filepath.Dir(targetFilename)

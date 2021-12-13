@@ -16,7 +16,7 @@ import (
 	"github.com/dragonfax/java_converter/tool"
 )
 
-const golangTemplateFilename = "golang.tmpl"
+const golangTemplateFilename = "output/templates/golang.tmpl"
 
 var lexer = parser.NewJavaLexer(nil)
 var p = parser.NewJavaParser(nil)
