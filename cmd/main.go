@@ -18,7 +18,7 @@ func main() {
 	if info.IsDir() {
 		err = output.CrawlDir(source)
 	} else {
-		err = output.ParseFilename(source)
+		output.TranslateOneFile(source)
 	}
 	if err != nil {
 		panic(err)

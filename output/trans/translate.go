@@ -64,7 +64,8 @@ func dumpAST(file *ast.File) {
 	fmt.Println(string(js))
 }
 
-func TranslateFiles(filename, targetFilename string) {
+// input filename to go-code string
+func TranslateFile(filename string) string {
 
 	goAST := parseAST(filename)
 
@@ -74,6 +75,12 @@ func TranslateFiles(filename, targetFilename string) {
 
 	goCode = goFmt(goCode)
 
+	return goCode
+}
+
+// input filename to output filename
+func TranslateFiles(filename, targetFilename string) {
+	goCode := TranslateFile(filename)
 	outputFile(targetFilename, goCode)
 }
 

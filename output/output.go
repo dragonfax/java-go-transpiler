@@ -10,15 +10,6 @@ import (
 	"github.com/dragonfax/delver_converter/output/trans"
 )
 
-func snakeCase(s string) string {
-	if s == "" {
-		panic("no filename given")
-	}
-	s = strings.TrimPrefix(s, "../")
-	s = strings.TrimSuffix(s, ".java")
-	return strings.ReplaceAll(s, "/", "_")
-}
-
 func walkFunc(filename string, entry fs.DirEntry, err error) error {
 	if err != nil {
 		return err
@@ -28,14 +19,15 @@ func walkFunc(filename string, entry fs.DirEntry, err error) error {
 		return nil
 	}
 
-	/* this isn't good enough, we might have ../
-	write the go files to the same place?
-	no that'll get ugly.
-	*/
-	targetFilename := generateTargetFilename(filename)
+	TranslateOneFile(filename)
+	return nil
+}
+
+func TranslateOneFile(filename string) {
+	targetFilename := GenerateTargetFilename(filename)
 
 	// remove target file if its already there.
-	_, err = os.Stat(targetFilename)
+	_, err := os.Stat(targetFilename)
 	if err == nil {
 		err = os.Remove(targetFilename)
 		if err != nil {
@@ -45,15 +37,22 @@ func walkFunc(filename string, entry fs.DirEntry, err error) error {
 		panic(err)
 	}
 
+	targetDirectory := filepath.Dir(targetFilename)
+	err = os.MkdirAll(targetDirectory, 0775)
+	if err != nil {
+		panic(err)
+	}
+
 	fmt.Printf("%s -> %s\n", filename, targetFilename)
-	return trans.TranslateFiles(filename, targetFilename)
+	trans.TranslateFiles(filename, targetFilename)
+
 }
 
 func CrawlDir(path string) error {
 	return filepath.WalkDir(path, walkFunc)
 }
 
-func generateTargetFilename(filename string) string {
+func GenerateTargetFilename(filename string) string {
 
 	// change suffix
 	baseFilename := strings.TrimSuffix(filename, ".java")

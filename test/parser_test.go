@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/dragonfax/delver_converter/trans"
+	"github.com/dragonfax/delver_converter/output/trans"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -16,16 +16,16 @@ func TestParser(t *testing.T) {
 	testPrefixes := []string{"implements", "interface", "static_variable", "math"}
 
 	for _, testPrefix := range testPrefixes {
-		java, err := ioutil.ReadFile(casesDir + "/" + testPrefix + ".java" + exampleFileSuffix)
+		javaFilename := casesDir + "/" + testPrefix + ".java" + exampleFileSuffix
+		goFilename := casesDir + "/" + testPrefix + ".go" + exampleFileSuffix
+
+		translatedGoCode := trans.TranslateFile(javaFilename)
+
+		expectedGoCode, err := ioutil.ReadFile(goFilename)
 		if err != nil {
 			panic(err)
 		}
-		goCode, err := ioutil.ReadFile(casesDir + "/" + testPrefix + ".go" + exampleFileSuffix)
-		if err != nil {
-			panic(err)
-		}
-		result := trans.Translate(string(java))
-		assert.Equal(t, string(goCode), result)
+		assert.Equal(t, string(expectedGoCode), translatedGoCode)
 	}
 
 }
