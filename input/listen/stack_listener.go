@@ -22,6 +22,10 @@ func (s *StackListener) Len() int {
 	return len(s.stack)
 }
 
+func (s *StackListener) Peek() parser.JavaParserListener {
+	return s.stack[len(s.stack)-1]
+}
+
 func (s *StackListener) Push(s2 parser.JavaParserListener) {
 	s.stack = append(s.stack, s2)
 	s.JavaParserListener = s2
