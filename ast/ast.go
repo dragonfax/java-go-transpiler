@@ -49,11 +49,13 @@ type Constructor struct {
 	Expressions []exp.OperatorNode
 }
 
-func (c *Constructor) String() string {
-	if c == nil {
-		return ""
+func NewConstructor() *Constructor {
+	return &Constructor{
+		Expressions: make([]exp.OperatorNode, 0),
 	}
+}
 
+func (c *Constructor) String() string {
 	prefix := "     "
 	body := ""
 	for _, node := range c.Expressions {
@@ -62,4 +64,30 @@ func (c *Constructor) String() string {
 		}
 	}
 	return fmt.Sprintf("func New%s() *%s{\n%s\n}\n\n", c.Name, c.Name, body)
+}
+
+type Method struct {
+	BaseMember
+	Expressions []exp.OperatorNode
+	Arguments   string
+	ReturnType  string
+	Class       string
+}
+
+func NewMethod(class string) *Method {
+	return &Method{
+		Class:       class,
+		Expressions: make([]exp.OperatorNode, 0),
+	}
+}
+
+func (m *Method) String() string {
+	prefix := "     "
+	body := ""
+	for _, node := range m.Expressions {
+		if node != nil {
+			body += prefix + node.String() + "\n"
+		}
+	}
+	return fmt.Sprintf("func (this *%s) %s(%s) *%s{\n%s\n}\n\n", m.Class, m.Name, m.Arguments, m.ReturnType, body)
 }

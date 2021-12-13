@@ -45,9 +45,7 @@ func (s *ClassListener) EnterConstructorDeclaration(ctx *parser.ConstructorDecla
 
 	name := ctx.IDENTIFIER().GetText()
 
-	c := &ast.Constructor{
-		Expressions: make([]exp.OperatorNode, 0),
-	}
+	c := ast.NewConstructor()
 	c.Modifier = s.lastModifier
 	c.Name = name
 
@@ -81,4 +79,27 @@ func (s *ClassListener) EnterClassBodyDeclaration(ctx *parser.ClassBodyDeclarati
 		}
 	}
 
+}
+
+func (s *ClassListener) EnterMethodDeclaration(ctx *parser.MethodDeclarationContext) {
+
+	name := ctx.IDENTIFIER().GetText()
+
+	m := ast.NewMethod(s.File.Class.Name)
+	m.Modifier = s.lastModifier
+	m.Name = name
+	m.Arguments = ctx.FormalParameters().GetText()
+	m.ReturnType = ctx.TypeTypeOrVoid().GetText()
+
+	for _, blockChild := range ctx.MethodBody().(*parser.MethodBodyContext).Block().GetChildren() {
+		blockStatementContext, ok := blockChild.(*parser.BlockStatementContext)
+		if ok {
+			statement := blockStatementContext.Statement().(*parser.StatementContext)
+
+			node := exp.StatementProcessor(statement)
+			m.Expressions = append(m.Expressions, node)
+
+		}
+	}
+	s.File.Class.Members = append(s.File.Class.Members, m)
 }
