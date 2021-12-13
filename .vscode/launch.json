@@ -6,7 +6,7 @@
             "type": "antlr-debug",
             "request": "launch",
             "input": "./test/cases/implements.java.example",
-            "grammar": "grammar/JavaParser.g4",
+            "grammar": "input/grammar/JavaParser.g4",
             "startRule": "compilationUnit",
             "printParseTree": true,
             "visualParseTree": true
