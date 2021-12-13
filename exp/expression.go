@@ -1,6 +1,21 @@
 package exp
 
-import "github.com/dragonfax/delver_converter/parser"
+import (
+	"fmt"
+	"strings"
+)
+
+type ExpressionNode interface {
+	String() string
+}
+
+func expressionListToString(list []ExpressionNode) string {
+	s := ""
+	for _, node := range list {
+		s += node.String() + "\n"
+	}
+	return s
+}
 
 type Operator string
 
@@ -8,33 +23,29 @@ const (
 	Equals Operator = "="
 )
 
-type OperatorNode interface {
-	String() string
-}
-
 type BaseOperatorNode struct {
 	Operator Operator
 }
 
-var _ OperatorNode = &BinaryOperatorNode{}
+var _ ExpressionNode = &BinaryOperatorNode{}
 
 type BinaryOperatorNode struct {
 	BaseOperatorNode
 
-	Left  OperatorNode
-	Right OperatorNode
+	Left  ExpressionNode
+	Right ExpressionNode
 }
 
 func (bo *BinaryOperatorNode) String() string {
 	return bo.Left.String() + string(bo.Operator) + bo.Right.String()
 }
 
-var _ OperatorNode = &UnaryOperatorNode{}
+var _ ExpressionNode = &UnaryOperatorNode{}
 
 type UnaryOperatorNode struct {
 	BaseOperatorNode
 
-	Left OperatorNode
+	Left ExpressionNode
 }
 
 func (uo *UnaryOperatorNode) String() string {
@@ -57,167 +68,104 @@ func (vn *VariableNode) String() string {
 	return vn.Name
 }
 
-// deal with the recursive expression tree.
-func expressionProcessor(expression *parser.ExpressionContext) OperatorNode {
-	if expression == nil {
-		return nil
-	}
-
-	var operator Operator
-	if expression.ASSIGN() != nil {
-		operator = Equals
-	} else if expression.RETURN() {
-
-	}
-
-	subExpressions := expression.AllExpression()
-	if len(subExpressions) == 1 {
-		node := &UnaryOperatorNode{
-			Left: expressionProcessor(subExpressions[0].(*parser.ExpressionContext)),
-		}
-		node.Operator = operator
-		return node
-	} else if len(subExpressions) == 2 {
-		node := &BinaryOperatorNode{
-			Left:  expressionProcessor(subExpressions[0].(*parser.ExpressionContext)),
-			Right: expressionProcessor(subExpressions[1].(*parser.ExpressionContext)),
-		}
-		node.Operator = operator
-		return node
-	}
-
-	// not a simple unary or binary operator
-
-	if expression.Primary() != nil {
-		primary := expression.Primary().(*parser.PrimaryContext)
-		if primary.IDENTIFIER() != nil {
-			node := &VariableNode{
-				Name: primary.IDENTIFIER().GetText(),
-			}
-			return node
-		} else if primary.Literal() != nil {
-			literal := primary.Literal().(*parser.LiteralContext)
-			return &LiteralNode{
-				Value: literal.GetText(),
-			}
-		}
-	}
-
-	// TODO
-
-	return nil
+type IfNode struct {
+	Condition ExpressionNode
+	Body      ExpressionNode
+	Else      ExpressionNode
 }
 
-func StatementProcessor(statementCtx *parser.StatementContext) OperatorNode {
-	// TODO only one expression per block? no this isn't complicated enough.
-	// but okay for a first of expression parsing
-
-	if statementCtx.IF() != nil {
-		return &IfNode{
-			Condition: expressionProcessor(statementCtx.ParExpression()),
-			Body:      expressionProcessor(StatementCtx.Statement(0)),
-			Else:      expressionProcessor(StatementCtx.Statement(1)),
-		}
+func (in *IfNode) String() string {
+	if in.Else == nil {
+		return fmt.Sprintf("if %s {\n%s}\n", in.Condition, in.Body.String())
 	}
+	return fmt.Sprintf("if %s {\n%s} else {\n%s}\n", in.Condition, in.Body.String(), in.Else.String())
+}
 
-	if statementCtx.FOR() != nil {
-		init, condition, increment := forControlProcessor(statementCtx.ForControl())
-		return &ForNode{
-			Condition: condition,
-			Init:      init,
-			Increment: increment,
-			Body:      statementCtx.Statement(0),
-		}
+type ForNode struct {
+	Condition     ExpressionNode
+	Init          ExpressionNode
+	Increment     ExpressionNode
+	Body          ExpressionNode
+	ConditionLast bool // Do...While
+}
+
+func (fn *ForNode) String() string {
+	// TODO ConditionLast
+	// TODO remove unnecessary semicolons
+	return fmt.Sprintf("for %s;%s;%s {\n%s}\n", fn.Init, fn.Condition, fn.Increment, fn.Body)
+}
+
+type ReturnNode struct {
+	Expression ExpressionNode
+}
+
+func (rn *ReturnNode) String() string {
+	return fmt.Sprintf("return %s\n", rn.Expression.String())
+}
+
+type ThrowNode struct {
+	Expression ExpressionNode
+}
+
+func (tn *ThrowNode) String() string {
+	return fmt.Sprintf("panic(%s)\n", tn.Expression.String())
+}
+
+type BreakNode struct {
+	Label string
+}
+
+func (bn *BreakNode) String() string {
+	return fmt.Sprintf("break %s\n", bn.Label)
+}
+
+type ContinueNode struct {
+	Label string
+}
+
+func (cn *ContinueNode) String() string {
+	return fmt.Sprintf("continue %s\n", cn.Label)
+}
+
+type LabelNode struct {
+	Label      string
+	Expression ExpressionNode
+}
+
+func (ln *LabelNode) String() string {
+	return fmt.Sprintf("%s: %s\n", ln.Label, ln.Expression.String())
+}
+
+type BlockNode struct {
+	Body []ExpressionNode
+}
+
+func (bn *BlockNode) String() string {
+	return fmt.Sprintf("{\n%s}\n", expressionListToString(bn.Body))
+}
+
+type VariableDeclNode struct {
+	Type       string
+	Name       string
+	Expression ExpressionNode // for now
+}
+
+func (vn *VariableDeclNode) String() string {
+	if vn.Expression == nil {
+		return fmt.Sprintf("%s %s", vn.Name, vn.Type)
 	}
+	return fmt.Sprintf("%s := %s", vn.Name, vn.Expression) // we'll assume the type matches the expression.
+}
 
-	if statementCtx.WHILE() != nil {
-		return &ForNode{
-			Condition: statementCtx.ParExpression(),
-			Body:      statementCtx.Statement(0),
-		}
+type ArrayLiteral struct {
+	Type     string
+	Elements []ExpressionNode
+}
+
+func (al *ArrayLiteral) String() string {
+	l := make([]string, 0)
+	for _, node := range al.Elements {
+		l = append(l, node.String())
 	}
-
-	if statementCtx.DO() != nil {
-		return &ForNode{
-			Condition:     statementCtx.ParExpression(),
-			Body:          statementCtx.Statement(0),
-			ConditionLast: true,
-		}
-	}
-
-	if statementCtx.RETURN() != nil {
-		return &ReturnNode{
-			Expression: statementCtx.Expression(0),
-		}
-	}
-
-	if statementCtx.THROW() != nil {
-		return &ThrowNode{
-			Expression: statementCtx.Expression(0),
-		}
-	}
-
-	if statementCtx.BREAK() != nil {
-		return &BreakNode{
-			Label: statementCtx.IDENTIFIER().GetText(),
-		}
-	}
-
-	if statementCtx.CONTINUE() != nil {
-		return &ContinueNode{
-			Label: statementCtx.IDENTIFIER().GetText(),
-		}
-	}
-
-	/*
-	   | TRY block (catchClause+ finallyBlock? | finallyBlock)
-	   | TRY resourceSpecification block catchClause* finallyBlock?
-	   | SWITCH parExpression '{' switchBlockStatementGroup* switchLabel* '}'
-
-	   | statementExpression=expression ';'
-	*/
-
-	if statementCtx.GetIdentifierLabel() != nil {
-		// must be a statement, with a label
-		return &LabelNode{
-			Label:      statementCtx.GetIdentifierLabel().GetText(),
-			Expression: statementCtx.Statement(0),
-		}
-	}
-
-	// we dont' expect a lone statement
-	// but we might get a lone expression.
-	// check for both.
-
-	statementCount := len(statementCtx.AllStatement())
-	if statementCount >= 1 {
-
-		if statementCount > 1 {
-			// TODO log warning, really didn't expect this.
-		}
-
-		// TODO log warning, didn't expect this. missing grammar element?
-		return StatementProcessor(statementCtx.Statement(0))
-	}
-
-	// multiple expressions are possible in a single statement,
-	// joined by commas, such as multi assignment.
-	expressionCount := len(statementCtx.AllExpression())
-	if expressionCount == 0 {
-		// TODO warn, I dont' expect this to happen.
-		return nil
-	}
-	if expressionCount >= 1 {
-
-		if expressionCount > 1 {
-			// TODO log this, should handle this scenario. its not uncommon.
-		}
-
-		// common scenario.
-		return expressionProcessor(statementCtx.Expression(0))
-	}
-
-	// ignore unknown structures.
-	// TODO log them
-	return nil
+	return fmt.Sprintf("[]%s{}", al.Type, strings.Join(l, ","))
 }
