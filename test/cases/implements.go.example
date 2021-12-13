@@ -1,6 +1,6 @@
 package steam
 
-import "github.com/dragonfax/delver_converted/com/badlogic/gdx/utils"
+import "github.com/dragonfax/java_converted/com/badlogic/gdx/utils"
 
 var _ SteamApiInterface = &NullSteamApi{}
 

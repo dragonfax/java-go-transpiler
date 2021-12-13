@@ -10,10 +10,10 @@ import (
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 	"github.com/aymerick/raymond"
-	"github.com/dragonfax/delver_converter/input/ast"
-	"github.com/dragonfax/delver_converter/input/listen"
-	"github.com/dragonfax/delver_converter/input/parser"
-	"github.com/dragonfax/delver_converter/tool"
+	"github.com/dragonfax/java_converter/input/ast"
+	"github.com/dragonfax/java_converter/input/listen"
+	"github.com/dragonfax/java_converter/input/parser"
+	"github.com/dragonfax/java_converter/tool"
 )
 
 const golangTemplateFilename = "golang.tmpl"

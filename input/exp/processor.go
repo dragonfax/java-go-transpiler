@@ -1,6 +1,6 @@
 package exp
 
-import "github.com/dragonfax/delver_converter/input/parser"
+import "github.com/dragonfax/java_converter/input/parser"
 
 // deal with the recursive expression tree.
 func expressionProcessor(expression *parser.ExpressionContext) ExpressionNode {

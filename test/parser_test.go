@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"testing"
 
-	"github.com/dragonfax/delver_converter/output/trans"
+	"github.com/dragonfax/java_converter/output/trans"
 	"github.com/stretchr/testify/assert"
 )
 

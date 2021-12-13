@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/dragonfax/delver_converter/input/parser"
+	"github.com/dragonfax/java_converter/input/parser"
 )
 
 type ArrayLiteral struct {

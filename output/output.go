@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/dragonfax/delver_converter/output/trans"
+	"github.com/dragonfax/java_converter/output/trans"
 )
 
 func walkFunc(filename string, entry fs.DirEntry, err error) error {

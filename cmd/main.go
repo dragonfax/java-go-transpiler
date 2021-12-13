@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/dragonfax/delver_converter/output"
+	"github.com/dragonfax/java_converter/output"
 )
 
 func main() {

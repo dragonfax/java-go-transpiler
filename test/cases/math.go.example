@@ -1,11 +1,11 @@
 package entities
 
-import "github.com/dragonfax/delver_converted/com/badlogic/gdx/math"
-import "github.com/dragonfax/delver_converted/com/interrupt/dungeoneer"
-import "github.com/dragonfax/delver_converted/com/interrupt/dungeoneer/annotations"
-import "github.com/dragonfax/delver_converted/com/interrupt/dungeoneer/game"
-import "github.com/dragonfax/delver_converted/com/interrupt/dungeoneer/game/Level"
-import "github.com/dragonfax/delver_converted/com/interrupt/dungeoneer/gfx"
+import "github.com/dragonfax/java_converted/com/badlogic/gdx/math"
+import "github.com/dragonfax/java_converted/com/interrupt/dungeoneer"
+import "github.com/dragonfax/java_converted/com/interrupt/dungeoneer/annotations"
+import "github.com/dragonfax/java_converted/com/interrupt/dungeoneer/game"
+import "github.com/dragonfax/java_converted/com/interrupt/dungeoneer/game/Level"
+import "github.com/dragonfax/java_converted/com/interrupt/dungeoneer/gfx"
 
 type DynamicLight struct {
 	*Entity

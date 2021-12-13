@@ -1,8 +1,8 @@
 package listen
 
 import (
-	"github.com/dragonfax/delver_converter/input/ast"
-	"github.com/dragonfax/delver_converter/input/parser"
+	"github.com/dragonfax/java_converter/input/ast"
+	"github.com/dragonfax/java_converter/input/parser"
 )
 
 type FileListener struct {

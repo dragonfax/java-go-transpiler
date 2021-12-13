@@ -1,4 +1,4 @@
-module github.com/dragonfax/delver_converter
+module github.com/dragonfax/java_converter
 
 go 1.17
 
