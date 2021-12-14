@@ -21,6 +21,10 @@ const golangTemplateFilename = "output/templates/golang.tmpl"
 var lexer = parser.NewJavaLexer(nil)
 var p = parser.NewJavaParser(nil)
 
+func init() {
+	parser.RuleNames = p.RuleNames
+}
+
 var golangTemplate = tool.MustByteListErr(ioutil.ReadFile(golangTemplateFilename))
 
 func parseAST(path string) *ast.File {

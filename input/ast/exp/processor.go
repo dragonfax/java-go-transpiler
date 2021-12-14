@@ -34,7 +34,15 @@ func expressionProcessor(expressionI parser.IExpressionContext) ExpressionNode {
 			// method call
 
 			// (variable with instance, method call (Identifier =name, expressionList = parameters) )
-			return NewMethodCall(expression.Expression(0).(*parser.ExpressionContext).IDENTIFIER().GetText(), expression.MethodCall())
+			if tool.IsNilInterface(expression.Expression(0)) {
+				panic("expression with dot and 1 expression, but no identifier (not method call?\n" + expression.GetText() + "\n")
+			}
+			if expression.Expression(0).(*parser.ExpressionContext).IDENTIFIER() == nil {
+				panic("not a method call, misisng identifier: " + expression.GetText() + "\n" + expression.ToStringTree(parser.RuleNames, nil) + "\n")
+			}
+			instanceName := expression.Expression(0).(*parser.ExpressionContext).IDENTIFIER().GetText()
+			methodCall := expression.MethodCall()
+			return NewMethodCall(instanceName, methodCall)
 		}
 		/*
 			operator := "?"
