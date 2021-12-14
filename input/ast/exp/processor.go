@@ -17,6 +17,10 @@ func expressionProcessor(expressionI parser.IExpressionContext) ExpressionNode {
 		return expressionFromPrimary(expression.Primary())
 	}
 
+	if expression.NEW() != nil {
+		return NewConstructorCall(expression.Creator())
+	}
+
 	if expression.DOT() != nil {
 		if expression.IDENTIFIER() != nil {
 			return NewInstanceAttributeReference(expression.IDENTIFIER().GetText(), expressionProcessor(expression.Expression(0)))

@@ -2,6 +2,7 @@ package exp
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/dragonfax/java_converter/input/parser"
 	"github.com/dragonfax/java_converter/tool"
@@ -229,4 +230,41 @@ func NewIdentifierNode(id string) *IdentifierNode {
 
 func (in *IdentifierNode) String() string {
 	return in.Identifier
+}
+
+type ConstructorCall struct {
+	Class         string
+	TypeArguments []string
+	Arguments     []ExpressionNode
+}
+
+func NewConstructorCall(creator parser.ICreatorContext) *ConstructorCall {
+	creatorCtx := creator.(*parser.CreatorContext)
+
+	creatorNameCtx := creatorCtx.CreatedName().(*parser.CreatedNameContext)
+	class := creatorNameCtx.IDENTIFIER(0).GetText()
+
+	typeArguments := make([]string, 0)
+	for _, typeArg := range creatorNameCtx.TypeArgumentsOrDiamond(0).(*parser.TypeArgumentsOrDiamondContext).TypeArguments().(*parser.TypeArgumentsContext).AllTypeArgument() {
+		typeArgCtx := typeArg.(*parser.TypeArgumentContext)
+		typeArguments = append(typeArguments, typeArgCtx.GetText())
+	}
+
+	arguments := make([]ExpressionNode, 0)
+	for _, expression := range creatorCtx.ClassCreatorRest().(*parser.ClassCreatorRestContext).Arguments().(*parser.ArgumentsContext).ExpressionList().(*parser.ExpressionListContext).AllExpression() {
+		arguments = append(arguments, expressionProcessor(expression))
+	}
+
+	return &ConstructorCall{
+		Class:         class,
+		TypeArguments: typeArguments,
+		Arguments:     arguments,
+	}
+}
+
+func (cc *ConstructorCall) String() string {
+	if len(cc.TypeArguments) == 0 {
+		return fmt.Sprintf("New%s(%s)", cc.Class, expressionListToString(cc.Arguments))
+	}
+	return fmt.Sprintf("New%s[%s](%s)", cc.Class, strings.Join(cc.TypeArguments, ",'"), expressionListToString(cc.Arguments))
 }
