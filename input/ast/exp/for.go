@@ -6,7 +6,41 @@ import (
 	"github.com/dragonfax/java_converter/input/parser"
 )
 
-type ForNode struct {
+func NewForNode(statementCtx *parser.StatementContext) ExpressionNode {
+
+	if statementCtx.ForControl().(*parser.ForControlContext).EnhancedForControl() != nil {
+		return NewEnhancedForNode(statementCtx)
+	}
+	return NewClassicForNode(statementCtx)
+}
+
+type EnhancedForNode struct {
+	Variable ExpressionNode
+	Instance ExpressionNode
+	Body     ExpressionNode
+}
+
+func NewEnhancedForNode(statementCtx *parser.StatementContext) *EnhancedForNode {
+
+	forControlCtx := statementCtx.ForControl().(*parser.ForControlContext)
+	enhancedCtx := forControlCtx.EnhancedForControl().(*parser.EnhancedForControlContext)
+
+	instance := expressionProcessor(enhancedCtx.Expression())
+	variable := NewVariableDecl(enhancedCtx.TypeType().GetText(), enhancedCtx.VariableDeclaratorId().GetText(), nil)
+
+	body := StatementProcessor(statementCtx.Statement(0).(*parser.StatementContext))
+	return &EnhancedForNode{
+		Variable: variable,
+		Instance: instance,
+		Body:     body,
+	}
+}
+
+func (ef *EnhancedForNode) String() string {
+	return fmt.Sprintf("for ( %s : %s ) %s", ef.Variable, ef.Instance, ef.Body)
+}
+
+type ClassicForNode struct {
 	Condition     ExpressionNode
 	Init          []ExpressionNode
 	Increment     []ExpressionNode
@@ -14,15 +48,15 @@ type ForNode struct {
 	ConditionLast bool // Do...While
 }
 
-func (fn *ForNode) String() string {
+func (fn *ClassicForNode) String() string {
 	// TODO ConditionLast
 	// TODO remove unnecessary semicolons
 	return fmt.Sprintf("for %s;%s;%s {\n%s}\n", fn.Init, fn.Condition, fn.Increment, fn.Body)
 }
 
-func NewForNode(statementCtx *parser.StatementContext) *ForNode {
-	init, condition, increment := forControlProcessor(statementCtx.ForControl().(*parser.ForControlContext))
-	return &ForNode{
+func NewClassicForNode(statementCtx *parser.StatementContext) *ClassicForNode {
+	init, condition, increment := classicForControlProcessor(statementCtx.ForControl().(*parser.ForControlContext))
+	return &ClassicForNode{
 		Condition: condition,
 		Init:      init,
 		Increment: increment,
@@ -30,11 +64,7 @@ func NewForNode(statementCtx *parser.StatementContext) *ForNode {
 	}
 }
 
-func forControlProcessor(forControlCtx *parser.ForControlContext) (init []ExpressionNode, condition ExpressionNode, increment []ExpressionNode) {
-	if forControlCtx.EnhancedForControl() != nil {
-		panic("didn't think we'd see these")
-	}
-
+func classicForControlProcessor(forControlCtx *parser.ForControlContext) (init []ExpressionNode, condition ExpressionNode, increment []ExpressionNode) {
 	if forControlCtx.GetForUpdate() != nil {
 		increment = make([]ExpressionNode, 0)
 		for _, exp := range forControlCtx.GetForUpdate().(*parser.ExpressionListContext).AllExpression() {

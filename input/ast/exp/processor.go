@@ -5,88 +5,6 @@ import (
 	"github.com/dragonfax/java_converter/tool"
 )
 
-// deal with the recursive expression tree.
-func expressionProcessor(expressionI parser.IExpressionContext) ExpressionNode {
-	if tool.IsNilInterface(expressionI) {
-		return nil
-	}
-
-	expression := expressionI.(*parser.ExpressionContext)
-
-	if expression.Primary() != nil {
-		return expressionFromPrimary(expression.Primary())
-	}
-
-	if expression.NEW() != nil {
-		return NewConstructorCall(expression.Creator())
-	}
-
-	if expression.DOT() != nil {
-		if expression.IDENTIFIER() != nil {
-			return NewInstanceAttributeReference(expression.IDENTIFIER().GetText(), expressionProcessor(expression.Expression(0)))
-		}
-	}
-
-	if expression.MethodCall() != nil {
-		if expression.DOT() != nil {
-
-			// method call
-
-			// (variable with instance, method call (Identifier =name, expressionList = parameters) )
-			if tool.IsNilInterface(expression.Expression(0)) {
-				panic("expression with dot and 1 expression, but no identifier (not method call?\n" + expression.GetText() + "\n")
-			}
-
-			instance := expressionProcessor(expression.Expression(0))
-
-			methodCall := expression.MethodCall()
-			return NewMethodCall(instance, methodCall)
-		} else {
-			panic("method call without a preceding DOT")
-		}
-	}
-
-	if expression.GetPrefix() != nil {
-		// prefix operator
-		return NewUnaryOperatorNode(true, expression.GetPrefix().GetText(), expressionProcessor(expression.Expression(0)))
-	}
-
-	if expression.GetPostfix() != nil {
-		return NewUnaryOperatorNode(false, expression.GetPostfix().GetText(), expressionProcessor(expression.Expression(0)))
-	}
-
-	if expression.GetBop() != nil {
-		if expression.COLON() != nil {
-			left := expressionProcessor(expression.Expression(0))
-			middle := expressionProcessor(expression.Expression(1))
-			right := expressionProcessor(expression.Expression(2))
-			return NewTernaryOperatorNode(expression.GetBop().GetText(), left, middle, right)
-		}
-		return NewBinaryOperatorNode(expression.GetBop().GetText(), expressionProcessor(expression.Expression(0)), expressionProcessor(expression.Expression(1)))
-	}
-
-	if len(expression.AllGT())+len(expression.AllLT()) > 0 {
-		// shifting binary operator
-
-		left := expressionProcessor(expression.Expression(0))
-		right := expressionProcessor(expression.Expression(1))
-
-		operator := ""
-		for _, t := range expression.AllGT() {
-			operator += t.GetText()
-		}
-		for _, t := range expression.AllLT() {
-			operator += t.GetText()
-		}
-
-		return NewBinaryOperatorNode(operator, left, right)
-	}
-
-	panic("unknown expression: " + expression.GetText() + "\n" + expression.ToStringTree(parser.RuleNames, nil))
-
-	// return nil
-}
-
 func StatementProcessor(statementCtxI parser.IStatementContext) ExpressionNode {
 	// TODO only one expression per block? no this isn't complicated enough.
 	// but okay for a first of expression parsing
@@ -114,14 +32,14 @@ func StatementProcessor(statementCtxI parser.IStatementContext) ExpressionNode {
 	}
 
 	if statementCtx.WHILE() != nil {
-		return &ForNode{
+		return &ClassicForNode{
 			Condition: expressionProcessor(statementCtx.ParExpression().(*parser.ParExpressionContext).Expression().(*parser.ExpressionContext)),
 			Body:      StatementProcessor(statementCtx.Statement(0).(*parser.StatementContext)),
 		}
 	}
 
 	if statementCtx.DO() != nil {
-		return &ForNode{
+		return &ClassicForNode{
 			Condition:     expressionProcessor(statementCtx.ParExpression().(*parser.ParExpressionContext).Expression().(*parser.ExpressionContext)),
 			Body:          StatementProcessor(statementCtx.Statement(0).(*parser.StatementContext)),
 			ConditionLast: true,
@@ -129,7 +47,7 @@ func StatementProcessor(statementCtxI parser.IStatementContext) ExpressionNode {
 	}
 
 	if statementCtx.RETURN() != nil {
-		return NewReturnNode(expressionProcessor(statementCtx.Expression(0).(*parser.ExpressionContext)))
+		return NewReturnNode(expressionProcessor(statementCtx.Expression(0)))
 	}
 
 	if statementCtx.THROW() != nil {
@@ -137,11 +55,17 @@ func StatementProcessor(statementCtxI parser.IStatementContext) ExpressionNode {
 	}
 
 	if statementCtx.BREAK() != nil {
-		return NewBreakNode(statementCtx.IDENTIFIER().GetText())
+		if statementCtx.IDENTIFIER() != nil {
+			return NewBreakNode(statementCtx.IDENTIFIER().GetText())
+		}
+		return NewBreakNode("")
 	}
 
 	if statementCtx.CONTINUE() != nil {
-		return NewContinueNode(statementCtx.IDENTIFIER().GetText())
+		if statementCtx.IDENTIFIER() != nil {
+			return NewContinueNode(statementCtx.IDENTIFIER().GetText())
+		}
+		return NewContinueNode("")
 	}
 
 	/*
@@ -195,31 +119,4 @@ func StatementProcessor(statementCtxI parser.IStatementContext) ExpressionNode {
 	// ignore unknown structures.
 	// TODO log them
 	return nil
-}
-
-func expressionFromPrimary(primary parser.IPrimaryContext) ExpressionNode {
-	primaryCtx := primary.(*parser.PrimaryContext)
-
-	if primaryCtx.IDENTIFIER() != nil {
-		return NewIdentifierNode(primaryCtx.IDENTIFIER().GetText())
-	}
-
-	if primaryCtx.THIS() != nil {
-		return NewIdentifierNode("this")
-	}
-
-	if primaryCtx.SUPER() != nil {
-		return NewIdentifierNode("super")
-	}
-
-	if primaryCtx.Expression() != nil {
-		return expressionProcessor(primaryCtx.Expression())
-	}
-
-	if primaryCtx.Literal() != nil {
-		literal := primaryCtx.Literal().(*parser.LiteralContext)
-		return NewLiteralNode(literal.GetText())
-	}
-
-	panic("unknown primary type")
 }

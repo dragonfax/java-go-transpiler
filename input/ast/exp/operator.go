@@ -35,6 +35,13 @@ func NewBinaryOperatorNode(operator string, left ExpressionNode, right Expressio
 }
 
 func (bo *BinaryOperatorNode) String() string {
+	if bo.Operator == "[" {
+		return fmt.Sprintf("%s[%s]", bo.Left, bo.Right)
+	}
+	if bo.Operator == "(" {
+		// cast operator
+		return fmt.Sprintf("(%s)%s", bo.Left, bo.Right)
+	}
 	return fmt.Sprintf("%s%s%s", bo.Left, bo.Operator, bo.Right)
 }
 

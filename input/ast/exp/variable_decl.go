@@ -19,6 +19,16 @@ func (vn *VariableDeclNode) String() string {
 	return fmt.Sprintf("%s := %s", vn.Name, vn.Expression) // we'll assume the type matches the expression.
 }
 
+func NewVariableDecl(typ string, name string, expression ExpressionNode) *VariableDeclNode {
+	if typ == "" {
+		panic(" no variable type")
+	}
+	if name == "" {
+		panic("no variable name")
+	}
+	return &VariableDeclNode{Type: typ, Name: name, Expression: expression}
+}
+
 func NewVariableDeclNodeList(decl *parser.LocalVariableDeclarationContext) []ExpressionNode {
 
 	l := make([]ExpressionNode, 0)
@@ -29,9 +39,11 @@ func NewVariableDeclNodeList(decl *parser.LocalVariableDeclarationContext) []Exp
 
 		varDeclCtx := varDecl.(*parser.VariableDeclaratorContext)
 
-		varInitCtx := varDeclCtx.VariableInitializer().(*parser.VariableInitializerContext)
-
-		exp := variableInitializerProcessor(varInitCtx)
+		var exp ExpressionNode
+		if varDeclCtx.VariableInitializer() != nil {
+			varInitCtx := varDeclCtx.VariableInitializer().(*parser.VariableInitializerContext)
+			exp = variableInitializerProcessor(varInitCtx)
+		}
 
 		node := &VariableDeclNode{
 			Type:       typ,
