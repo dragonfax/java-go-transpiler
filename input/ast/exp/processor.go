@@ -14,17 +14,12 @@ func expressionProcessor(expressionI parser.IExpressionContext) ExpressionNode {
 	expression := expressionI.(*parser.ExpressionContext)
 
 	if expression.Primary() != nil {
-		primary := expression.Primary().(*parser.PrimaryContext)
-		if primary.IDENTIFIER() != nil {
-			node := NewVariableNode(primary.IDENTIFIER().GetText())
-			return node
-		} else if primary.Literal() != nil {
-			literal := primary.Literal().(*parser.LiteralContext)
-			return NewLiteralNode(literal.GetText())
-		} else if primary.THIS() != nil {
-			return NewSelfReference() // "this" keyword
-		} else {
-			panic("unknown primary expression: " + expression.GetText())
+		return expressionFromPrimary(expression.Primary())
+	}
+
+	if expression.DOT() != nil {
+		if expression.IDENTIFIER() != nil {
+			return NewInstanceAttributeReference(expression.IDENTIFIER().GetText(), expressionProcessor(expression.Expression(0)))
 		}
 	}
 
@@ -37,27 +32,33 @@ func expressionProcessor(expressionI parser.IExpressionContext) ExpressionNode {
 			if tool.IsNilInterface(expression.Expression(0)) {
 				panic("expression with dot and 1 expression, but no identifier (not method call?\n" + expression.GetText() + "\n")
 			}
-			if expression.Expression(0).(*parser.ExpressionContext).IDENTIFIER() == nil {
-				panic("not a method call, missing identifier: " + expression.GetText() + "\n" + expression.ToStringTree(parser.RuleNames, nil) + "\n")
-			}
 
-			instanceName := expression.Expression(0).(*parser.ExpressionContext).IDENTIFIER().GetText()
+			instance := expressionProcessor(expression.Expression(0))
 
 			methodCall := expression.MethodCall()
-			return NewMethodCall(instanceName, methodCall)
+			return NewMethodCall(instance, methodCall)
 		} else {
-			panic("method call but not in a dot expression")
+			panic("method call without a preceding DOT")
 		}
 	}
 
-	if expression.ASSIGN() != nil {
-		return NewBinaryOperatorNode(Equals, expressionProcessor(expression.Expression(0)), expressionProcessor(expression.Expression(1)))
-	} else if expression.DOT() != nil {
-		if expression.IDENTIFIER() != nil {
-			return NewInstanceAttributeReference(expression.IDENTIFIER().GetText(), expressionProcessor(expression.Expression(0)))
-		} else {
-			panic("unknown")
+	if expression.GetPrefix() != nil {
+		// prefix operator
+		return NewUnaryOperatorNode(true, expression.GetPrefix().GetText(), expressionProcessor(expression.Expression(0)))
+	}
+
+	if expression.GetPostfix() != nil {
+		return NewUnaryOperatorNode(false, expression.GetPostfix().GetText(), expressionProcessor(expression.Expression(0)))
+	}
+
+	if expression.GetBop() != nil {
+		if expression.COLON() != nil {
+			left := expressionProcessor(expression.Expression(0))
+			middle := expressionProcessor(expression.Expression(1))
+			right := expressionProcessor(expression.Expression(2))
+			return NewTernaryOperatorNode(expression.GetBop().GetText(), left, middle, right)
 		}
+		return NewBinaryOperatorNode(expression.GetBop().GetText(), expressionProcessor(expression.Expression(0)), expressionProcessor(expression.Expression(1)))
 	}
 
 	panic("unknown expression: " + expression.GetText() + "\n" + expression.ToStringTree(parser.RuleNames, nil))
@@ -167,4 +168,31 @@ func StatementProcessor(statementCtx *parser.StatementContext) ExpressionNode {
 	// ignore unknown structures.
 	// TODO log them
 	return nil
+}
+
+func expressionFromPrimary(primary parser.IPrimaryContext) ExpressionNode {
+	primaryCtx := primary.(*parser.PrimaryContext)
+
+	if primaryCtx.IDENTIFIER() != nil {
+		return NewIdentifierNode(primaryCtx.IDENTIFIER().GetText())
+	}
+
+	if primaryCtx.THIS() != nil {
+		return NewIdentifierNode("this")
+	}
+
+	if primaryCtx.SUPER() != nil {
+		return NewIdentifierNode("super")
+	}
+
+	if primaryCtx.Expression() != nil {
+		return expressionProcessor(primaryCtx.Expression())
+	}
+
+	if primaryCtx.Literal() != nil {
+		literal := primaryCtx.Literal().(*parser.LiteralContext)
+		return NewLiteralNode(literal.GetText())
+	}
+
+	panic("unknown primary type")
 }

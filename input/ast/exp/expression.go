@@ -158,17 +158,6 @@ func (ln *LabelNode) String() string {
 	return fmt.Sprintf("%s: %s\n", ln.Label, ln.Expression)
 }
 
-type SelfReference struct {
-}
-
-func NewSelfReference() *SelfReference {
-	return &SelfReference{}
-}
-
-func (sr *SelfReference) String() string {
-	return "this"
-}
-
 type InstanceAttributeReference struct {
 	Attribute         string
 	InstanceReference ExpressionNode
@@ -190,14 +179,14 @@ func (ia *InstanceAttributeReference) String() string {
 }
 
 type MethodCall struct {
-	Instance   string
+	Instance   ExpressionNode
 	MethodName string
 	Arguments  []ExpressionNode
 }
 
-func NewMethodCall(instance string, methodCall parser.IMethodCallContext) *MethodCall {
-	if instance == "" {
-		panic("no instance name in call")
+func NewMethodCall(instance ExpressionNode, methodCall parser.IMethodCallContext) *MethodCall {
+	if tool.IsNilInterface(instance) {
+		panic("no instance for method call")
 	}
 	if tool.IsNilInterface(methodCall) {
 		panic("no method call")
@@ -228,4 +217,16 @@ func NewMethodCall(instance string, methodCall parser.IMethodCallContext) *Metho
 
 func (mc *MethodCall) String() string {
 	return fmt.Sprintf("%s.%s(%s)", mc.Instance, mc.MethodName, expressionListToString(mc.Arguments))
+}
+
+type IdentifierNode struct {
+	Identifier string
+}
+
+func NewIdentifierNode(id string) *IdentifierNode {
+	return &IdentifierNode{Identifier: id}
+}
+
+func (in *IdentifierNode) String() string {
+	return in.Identifier
 }

@@ -6,14 +6,8 @@ import (
 	"github.com/dragonfax/java_converter/tool"
 )
 
-type Operator string
-
-const (
-	Equals Operator = "="
-)
-
 type BaseOperatorNode struct {
-	Operator Operator
+	Operator string
 }
 
 var _ ExpressionNode = &BinaryOperatorNode{}
@@ -25,7 +19,7 @@ type BinaryOperatorNode struct {
 	Right ExpressionNode
 }
 
-func NewBinaryOperatorNode(operator Operator, left ExpressionNode, right ExpressionNode) *BinaryOperatorNode {
+func NewBinaryOperatorNode(operator string, left ExpressionNode, right ExpressionNode) *BinaryOperatorNode {
 	if operator == "" {
 		panic("no operator")
 	}
@@ -48,11 +42,12 @@ var _ ExpressionNode = &UnaryOperatorNode{}
 
 type UnaryOperatorNode struct {
 	BaseOperatorNode
+	Prefix bool
 
 	Left ExpressionNode
 }
 
-func NewUnaryOperatorNode(operator Operator, left ExpressionNode) *UnaryOperatorNode {
+func NewUnaryOperatorNode(prefix bool, operator string, left ExpressionNode) *UnaryOperatorNode {
 	if operator == "" {
 		panic("no operator")
 	}
@@ -66,4 +61,34 @@ func NewUnaryOperatorNode(operator Operator, left ExpressionNode) *UnaryOperator
 
 func (uo *UnaryOperatorNode) String() string {
 	return fmt.Sprintf("%s%s", uo.Operator, uo.Left)
+}
+
+type TernaryOperatorNode struct {
+	BaseOperatorNode
+
+	Left   ExpressionNode
+	Middle ExpressionNode
+	Right  ExpressionNode
+}
+
+func NewTernaryOperatorNode(operator string, left ExpressionNode, middle ExpressionNode, right ExpressionNode) *TernaryOperatorNode {
+	if operator == "" {
+		panic("no operator")
+	}
+	if tool.IsNilInterface(left) {
+		panic("no left expression")
+	}
+	if tool.IsNilInterface(middle) {
+		panic("no middle")
+	}
+	if tool.IsNilInterface(right) {
+		panic("no right expression")
+	}
+	this := &TernaryOperatorNode{Left: left, Middle: middle, Right: right}
+	this.Operator = operator
+	return this
+}
+
+func (bo *TernaryOperatorNode) String() string {
+	return fmt.Sprintf("%s%s%s:%s", bo.Left, bo.Operator, bo.Middle, bo.Right)
 }
