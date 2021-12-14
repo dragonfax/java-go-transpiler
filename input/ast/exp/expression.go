@@ -251,8 +251,10 @@ func NewConstructorCall(creator parser.ICreatorContext) *ConstructorCall {
 	}
 
 	arguments := make([]ExpressionNode, 0)
-	for _, expression := range creatorCtx.ClassCreatorRest().(*parser.ClassCreatorRestContext).Arguments().(*parser.ArgumentsContext).ExpressionList().(*parser.ExpressionListContext).AllExpression() {
-		arguments = append(arguments, expressionProcessor(expression))
+	if creatorCtx.ClassCreatorRest().(*parser.ClassCreatorRestContext).Arguments().(*parser.ArgumentsContext).ExpressionList() != nil {
+		for _, expression := range creatorCtx.ClassCreatorRest().(*parser.ClassCreatorRestContext).Arguments().(*parser.ArgumentsContext).ExpressionList().(*parser.ExpressionListContext).AllExpression() {
+			arguments = append(arguments, expressionProcessor(expression))
+		}
 	}
 
 	return &ConstructorCall{
