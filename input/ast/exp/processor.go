@@ -28,9 +28,9 @@ func expressionProcessor(expressionI parser.IExpressionContext) ExpressionNode {
 		}
 	}
 
-	expressionCount := len(expression.AllExpression())
-	if expressionCount == 1 {
+	if expression.MethodCall() != nil {
 		if expression.DOT() != nil {
+
 			// method call
 
 			// (variable with instance, method call (Identifier =name, expressionList = parameters) )
@@ -38,40 +38,29 @@ func expressionProcessor(expressionI parser.IExpressionContext) ExpressionNode {
 				panic("expression with dot and 1 expression, but no identifier (not method call?\n" + expression.GetText() + "\n")
 			}
 			if expression.Expression(0).(*parser.ExpressionContext).IDENTIFIER() == nil {
-				panic("not a method call, misisng identifier: " + expression.GetText() + "\n" + expression.ToStringTree(parser.RuleNames, nil) + "\n")
+				panic("not a method call, missing identifier: " + expression.GetText() + "\n" + expression.ToStringTree(parser.RuleNames, nil) + "\n")
 			}
+
 			instanceName := expression.Expression(0).(*parser.ExpressionContext).IDENTIFIER().GetText()
+
 			methodCall := expression.MethodCall()
 			return NewMethodCall(instanceName, methodCall)
-		}
-		/*
-			operator := "?"
-			node := NewUnaryOperatorNode(
-				Operator(operator),
-				expressionProcessor(expression.Expression(0).(*parser.ExpressionContext)),
-			)
-		*/
-		panic("unknown unary operator")
-		// return node
-	} else if expressionCount == 2 {
-		var operator Operator
-		if expression.ASSIGN() != nil {
-			operator = Equals
-		} else if expression.DOT() != nil {
-			return NewInstanceAttributeReference(expression.IDENTIFIER().GetText(), expressionProcessor(expression.Expression(0))) // attribute, variable with instance
 		} else {
-			panic("unknown binary operator: " + expression.GetText())
+			panic("method call but not in a dot expression")
 		}
-
-		node := NewBinaryOperatorNode(
-			operator,
-			expressionProcessor(expression.Expression(0).(*parser.ExpressionContext)),
-			expressionProcessor(expression.Expression(1).(*parser.ExpressionContext)),
-		)
-		return node
 	}
 
-	panic("unknown expression: " + expression.GetText())
+	if expression.ASSIGN() != nil {
+		return NewBinaryOperatorNode(Equals, expressionProcessor(expression.Expression(0)), expressionProcessor(expression.Expression(1)))
+	} else if expression.DOT() != nil {
+		if expression.IDENTIFIER() != nil {
+			return NewInstanceAttributeReference(expression.IDENTIFIER().GetText(), expressionProcessor(expression.Expression(0)))
+		} else {
+			panic("unknown")
+		}
+	}
+
+	panic("unknown expression: " + expression.GetText() + "\n" + expression.ToStringTree(parser.RuleNames, nil))
 
 	// return nil
 }
