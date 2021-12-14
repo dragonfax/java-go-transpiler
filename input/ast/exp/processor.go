@@ -65,14 +65,37 @@ func expressionProcessor(expressionI parser.IExpressionContext) ExpressionNode {
 		return NewBinaryOperatorNode(expression.GetBop().GetText(), expressionProcessor(expression.Expression(0)), expressionProcessor(expression.Expression(1)))
 	}
 
+	if len(expression.AllGT())+len(expression.AllLT()) > 0 {
+		// shifting binary operator
+
+		left := expressionProcessor(expression.Expression(0))
+		right := expressionProcessor(expression.Expression(1))
+
+		operator := ""
+		for _, t := range expression.AllGT() {
+			operator += t.GetText()
+		}
+		for _, t := range expression.AllLT() {
+			operator += t.GetText()
+		}
+
+		return NewBinaryOperatorNode(operator, left, right)
+	}
+
 	panic("unknown expression: " + expression.GetText() + "\n" + expression.ToStringTree(parser.RuleNames, nil))
 
 	// return nil
 }
 
-func StatementProcessor(statementCtx *parser.StatementContext) ExpressionNode {
+func StatementProcessor(statementCtxI parser.IStatementContext) ExpressionNode {
 	// TODO only one expression per block? no this isn't complicated enough.
 	// but okay for a first of expression parsing
+
+	if tool.IsNilInterface(statementCtxI) {
+		return nil
+	}
+
+	statementCtx := statementCtxI.(*parser.StatementContext)
 
 	if statementCtx.GetBlockLabel() != nil {
 		return NewBlockNode(statementCtx.GetBlockLabel().(*parser.BlockContext))
@@ -80,9 +103,9 @@ func StatementProcessor(statementCtx *parser.StatementContext) ExpressionNode {
 
 	if statementCtx.IF() != nil {
 		return NewIfNode(
-			expressionProcessor(statementCtx.ParExpression().(*parser.ParExpressionContext).Expression().(*parser.ExpressionContext)),
-			StatementProcessor(statementCtx.Statement(0).(*parser.StatementContext)),
-			StatementProcessor(statementCtx.Statement(1).(*parser.StatementContext)),
+			expressionProcessor(statementCtx.ParExpression().(*parser.ParExpressionContext).Expression()),
+			StatementProcessor(statementCtx.Statement(0)),
+			StatementProcessor(statementCtx.Statement(1)),
 		)
 	}
 

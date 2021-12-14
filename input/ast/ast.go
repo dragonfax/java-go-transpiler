@@ -67,16 +67,29 @@ func (c *Constructor) String() string {
 
 type Method struct {
 	BaseMember
-	Expressions []exp.ExpressionNode
-	Arguments   string
-	ReturnType  string
-	Class       string
+
+	Body       exp.ExpressionNode
+	Arguments  string
+	ReturnType string
+	Class      string
 }
 
-func NewMethod(class string) *Method {
+func NewMethod(modifier string, name string, class string, arguments, returnType string, body exp.ExpressionNode) *Method {
+	if class == "" {
+		panic("no class")
+	}
+	if returnType == "" {
+		panic("no return type")
+	}
+	if arguments == "" {
+		panic("no arguments")
+	}
 	return &Method{
-		Class:       class,
-		Expressions: make([]exp.ExpressionNode, 0),
+		BaseMember: BaseMember{Modifier: modifier, Name: name},
+		Class:      class,
+		Arguments:  arguments,
+		ReturnType: returnType,
+		Body:       body,
 	}
 }
 
@@ -84,15 +97,6 @@ func (m *Method) String() string {
 	if m == nil {
 		panic("nil method")
 	}
-	prefix := "     "
-	body := ""
-	if m.Expressions != nil {
-		for _, node := range m.Expressions {
-			if node != nil {
-				body += prefix + node.String() + "\n"
-			}
-		}
-	}
 
-	return fmt.Sprintf("func (this *%s) %s(%s) *%s{\n%s\n}\n\n", m.Class, m.Name, m.Arguments, m.ReturnType, body)
+	return fmt.Sprintf("func (this *%s) %s(%s) *%s{\n%s\n}\n\n", m.Class, m.Name, m.Arguments, m.ReturnType, m.Body)
 }

@@ -17,7 +17,8 @@ func (bn *BlockNode) String() string {
 	return fmt.Sprintf("{\n%s}\n", expressionListToString(bn.Body))
 }
 
-func NewBlockNode(ctx *parser.BlockContext) *BlockNode {
+func NewBlockNode(block parser.IBlockContext) *BlockNode {
+	ctx := block.(*parser.BlockContext)
 
 	l := make([]ExpressionNode, 0)
 

@@ -208,8 +208,10 @@ func NewMethodCall(instance ExpressionNode, methodCall parser.IMethodCallContext
 
 	arguments := make([]ExpressionNode, 0)
 
-	for _, expression := range methodCallCtx.ExpressionList().(*parser.ExpressionListContext).AllExpression() {
-		arguments = append(arguments, expressionProcessor(expression))
+	if methodCallCtx.ExpressionList() != nil {
+		for _, expression := range methodCallCtx.ExpressionList().(*parser.ExpressionListContext).AllExpression() {
+			arguments = append(arguments, expressionProcessor(expression))
+		}
 	}
 
 	this := &MethodCall{Instance: instance, MethodName: methodName, Arguments: arguments}
@@ -245,9 +247,11 @@ func NewConstructorCall(creator parser.ICreatorContext) *ConstructorCall {
 	class := creatorNameCtx.IDENTIFIER(0).GetText()
 
 	typeArguments := make([]string, 0)
-	for _, typeArg := range creatorNameCtx.TypeArgumentsOrDiamond(0).(*parser.TypeArgumentsOrDiamondContext).TypeArguments().(*parser.TypeArgumentsContext).AllTypeArgument() {
-		typeArgCtx := typeArg.(*parser.TypeArgumentContext)
-		typeArguments = append(typeArguments, typeArgCtx.GetText())
+	if creatorNameCtx.TypeArgumentsOrDiamond(0) != nil {
+		for _, typeArg := range creatorNameCtx.TypeArgumentsOrDiamond(0).(*parser.TypeArgumentsOrDiamondContext).TypeArguments().(*parser.TypeArgumentsContext).AllTypeArgument() {
+			typeArgCtx := typeArg.(*parser.TypeArgumentContext)
+			typeArguments = append(typeArguments, typeArgCtx.GetText())
+		}
 	}
 
 	arguments := make([]ExpressionNode, 0)

@@ -77,21 +77,8 @@ func (s *ClassListener) EnterMethodDeclaration(ctx *parser.MethodDeclarationCont
 
 	name := ctx.IDENTIFIER().GetText()
 
-	m := ast.NewMethod(s.File.Class.Name)
-	m.Modifier = s.lastModifier
-	m.Name = name
-	m.Arguments = ctx.FormalParameters().GetText()
-	m.ReturnType = ctx.TypeTypeOrVoid().GetText()
+	body := exp.NewBlockNode(ctx.MethodBody().(*parser.MethodBodyContext).Block())
+	m := ast.NewMethod(s.lastModifier, name, s.File.Class.Name, ctx.FormalParameters().GetText(), ctx.TypeTypeOrVoid().GetText(), body)
 
-	for _, blockChild := range ctx.MethodBody().(*parser.MethodBodyContext).Block().GetChildren() {
-		blockStatementContext, ok := blockChild.(*parser.BlockStatementContext)
-		if ok {
-			statement := blockStatementContext.Statement().(*parser.StatementContext)
-
-			node := exp.StatementProcessor(statement)
-			m.Expressions = append(m.Expressions, node)
-
-		}
-	}
 	s.File.Class.Members = append(s.File.Class.Members, m)
 }

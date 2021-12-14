@@ -60,12 +60,12 @@ func parseAST(path string) *ast.File {
 	return fileListener.File
 }
 
-func dumpAST(file *ast.File) {
+func dumpAST(file *ast.File) string {
 	js, err := json.MarshalIndent(file, "", "  ")
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(string(js))
+	return string(js)
 }
 
 // input filename to go-code string
@@ -73,13 +73,13 @@ func TranslateFile(filename string) string {
 
 	goAST := parseAST(filename)
 
-	dumpAST(goAST)
+	js := dumpAST(goAST)
 
-	goCode := generateGo(goAST)
+	// goCode := generateGo(goAST)
 
-	goCode = goFmt(goCode)
+	// goCode = goFmt(goCode)
 
-	return goCode
+	return js // goCode
 }
 
 // input filename to output filename
