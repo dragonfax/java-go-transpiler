@@ -1,35 +1,17 @@
 package exp
 
-import "github.com/dragonfax/java_converter/input/parser"
+import (
+	"github.com/dragonfax/java_converter/input/parser"
+	"github.com/dragonfax/java_converter/tool"
+)
 
 // deal with the recursive expression tree.
-func expressionProcessor(expression *parser.ExpressionContext) ExpressionNode {
-	if expression == nil {
+func expressionProcessor(expressionI parser.IExpressionContext) ExpressionNode {
+	if tool.IsNilInterface(expressionI) {
 		return nil
 	}
 
-	var operator Operator
-	if expression.ASSIGN() != nil {
-		operator = Equals
-	}
-
-	subExpressions := expression.AllExpression()
-	if len(subExpressions) == 1 {
-		node := NewUnaryOperatorNode(
-			operator,
-			expressionProcessor(subExpressions[0].(*parser.ExpressionContext)),
-		)
-		return node
-	} else if len(subExpressions) == 2 {
-		node := NewBinaryOperatorNode(
-			operator,
-			expressionProcessor(subExpressions[0].(*parser.ExpressionContext)),
-			expressionProcessor(subExpressions[1].(*parser.ExpressionContext)),
-		)
-		return node
-	}
-
-	// not a simple unary or binary operator
+	expression := expressionI.(*parser.ExpressionContext)
 
 	if expression.Primary() != nil {
 		primary := expression.Primary().(*parser.PrimaryContext)
@@ -39,12 +21,51 @@ func expressionProcessor(expression *parser.ExpressionContext) ExpressionNode {
 		} else if primary.Literal() != nil {
 			literal := primary.Literal().(*parser.LiteralContext)
 			return NewLiteralNode(literal.GetText())
+		} else if primary.THIS() != nil {
+			return NewSelfReference() // "this" keyword
+		} else {
+			panic("unknown primary expression: " + expression.GetText())
 		}
 	}
 
-	// TODO
+	expressionCount := len(expression.AllExpression())
+	if expressionCount == 1 {
+		if expression.DOT() != nil {
+			// method call
 
-	return nil
+			// (variable with instance, method call (Identifier =name, expressionList = parameters) )
+			return NewMethodCall(expression.Expression(0).(*parser.ExpressionContext).IDENTIFIER().GetText(), expression.MethodCall())
+		}
+		/*
+			operator := "?"
+			node := NewUnaryOperatorNode(
+				Operator(operator),
+				expressionProcessor(expression.Expression(0).(*parser.ExpressionContext)),
+			)
+		*/
+		panic("unknown unary operator")
+		// return node
+	} else if expressionCount == 2 {
+		var operator Operator
+		if expression.ASSIGN() != nil {
+			operator = Equals
+		} else if expression.DOT() != nil {
+			return NewInstanceAttributeReference(expression.IDENTIFIER().GetText(), expressionProcessor(expression.Expression(0))) // attribute, variable with instance
+		} else {
+			panic("unknown binary operator: " + expression.GetText())
+		}
+
+		node := NewBinaryOperatorNode(
+			operator,
+			expressionProcessor(expression.Expression(0).(*parser.ExpressionContext)),
+			expressionProcessor(expression.Expression(1).(*parser.ExpressionContext)),
+		)
+		return node
+	}
+
+	panic("unknown expression: " + expression.GetText())
+
+	// return nil
 }
 
 func StatementProcessor(statementCtx *parser.StatementContext) ExpressionNode {

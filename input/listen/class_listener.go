@@ -2,7 +2,7 @@ package listen
 
 import (
 	"github.com/dragonfax/java_converter/input/ast"
-	"github.com/dragonfax/java_converter/input/exp"
+	"github.com/dragonfax/java_converter/input/ast/exp"
 	"github.com/dragonfax/java_converter/input/parser"
 )
 

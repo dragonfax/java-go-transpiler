@@ -3,6 +3,7 @@ package exp
 import (
 	"fmt"
 
+	"github.com/dragonfax/java_converter/input/parser"
 	"github.com/dragonfax/java_converter/tool"
 )
 
@@ -155,4 +156,76 @@ func NewLabelNode(label string, exp ExpressionNode) *LabelNode {
 
 func (ln *LabelNode) String() string {
 	return fmt.Sprintf("%s: %s\n", ln.Label, ln.Expression)
+}
+
+type SelfReference struct {
+}
+
+func NewSelfReference() *SelfReference {
+	return &SelfReference{}
+}
+
+func (sr *SelfReference) String() string {
+	return "this"
+}
+
+type InstanceAttributeReference struct {
+	Attribute         string
+	InstanceReference ExpressionNode
+}
+
+func NewInstanceAttributeReference(attribute string, instanceExpression ExpressionNode) *InstanceAttributeReference {
+	if attribute == "" {
+		panic("no attribute")
+	}
+	if tool.IsNilInterface(instanceExpression) {
+		panic("no instance")
+	}
+	this := &InstanceAttributeReference{Attribute: attribute, InstanceReference: instanceExpression}
+	return this
+}
+
+func (ia *InstanceAttributeReference) String() string {
+	return fmt.Sprintf("%s.%s", ia.InstanceReference, ia.Attribute)
+}
+
+type MethodCall struct {
+	Instance   string
+	MethodName string
+	Arguments  []ExpressionNode
+}
+
+func NewMethodCall(instance string, methodCall parser.IMethodCallContext) *MethodCall {
+	if instance == "" {
+		panic("no instance name in call")
+	}
+	if tool.IsNilInterface(methodCall) {
+		panic("no method call")
+	}
+
+	methodCallCtx := methodCall.(*parser.MethodCallContext)
+
+	methodName := ""
+	if methodCallCtx.SUPER() != nil {
+		methodName = "super"
+	} else if methodCallCtx.THIS() != nil {
+		methodName = "this"
+	} else if methodCallCtx.IDENTIFIER() != nil {
+		methodName = methodCallCtx.IDENTIFIER().GetText()
+	} else {
+		panic("no method name in method call")
+	}
+
+	arguments := make([]ExpressionNode, 0)
+
+	for _, expression := range methodCallCtx.ExpressionList().(*parser.ExpressionListContext).AllExpression() {
+		arguments = append(arguments, expressionProcessor(expression))
+	}
+
+	this := &MethodCall{Instance: instance, MethodName: methodName, Arguments: arguments}
+	return this
+}
+
+func (mc *MethodCall) String() string {
+	return fmt.Sprintf("%s.%s(%s)", mc.Instance, mc.MethodName, expressionListToString(mc.Arguments))
 }

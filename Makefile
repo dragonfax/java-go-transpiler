@@ -6,6 +6,9 @@ GO_SOURCE_FILES = $(shell find ./ -type f -name '*.go')
 run: java_converter
 	./java_converter $(target)
 
+debug:
+	dlv --api-version 2 --headless --listen :40000 debug cmd/main.go -- $(target)
+
 java_converter: go.* $(GO_SOURCE_FILES)
 	go build -o java_converter cmd/main.go
 

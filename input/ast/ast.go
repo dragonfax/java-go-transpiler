@@ -3,7 +3,7 @@ package ast
 import (
 	"fmt"
 
-	"github.com/dragonfax/java_converter/input/exp"
+	"github.com/dragonfax/java_converter/input/ast/exp"
 	"github.com/dragonfax/java_converter/tool"
 )
 
