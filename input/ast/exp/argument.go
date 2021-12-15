@@ -8,7 +8,7 @@ import (
  * not used in a method call, thats just an expression
  */
 type ArgumentNode struct {
-	Type     *TypeNode
+	Type     TypeNode
 	Name     string
 	Ellipses bool
 }
@@ -20,7 +20,7 @@ func (an *ArgumentNode) String() string {
 	return fmt.Sprintf("%s %s", an.Name, an.Type)
 }
 
-func NewArgument(typ *TypeNode, name string, ellipses bool) *ArgumentNode {
+func NewArgument(typ TypeNode, name string, ellipses bool) *ArgumentNode {
 	if typ == nil {
 		panic(" no variable type")
 	}

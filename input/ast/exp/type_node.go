@@ -7,61 +7,88 @@ import (
 	"github.com/dragonfax/java_converter/input/parser"
 )
 
-// used when defining the type of variable/return value/parameter/etc
-type TypeNode struct {
-	Class         string
-	TypeArguments []*TypeNode
+type TypeNode []*TypeElementNode
+
+func (tn TypeNode) String() string {
+	list := make([]string, 0)
+	for _, ten := range tn {
+		list = append(list, ten.String())
+	}
+	return strings.Join(list, ".")
 }
 
-func (tn *TypeNode) String() string {
+// used when defining the type of variable/return value/parameter/etc
+type TypeElementNode struct {
+	Class         string
+	TypeArguments []TypeNode
+}
+
+func (tn *TypeElementNode) String() string {
 	if len(tn.TypeArguments) > 0 {
-		typArgs := make([]string, 0)
-		for _, ta := range tn.TypeArguments {
-			typArgs = append(typArgs, ta.String())
+
+		list := make([]string, 0)
+		for _, s := range tn.TypeArguments {
+			list = append(list, s.String())
 		}
-		return fmt.Sprintf("%s[%s]", tn.Class, strings.Join(typArgs, ","))
+
+		return fmt.Sprintf("%s[%s]", tn.Class, strings.Join(list, ","))
 	}
 	return tn.Class
 }
 
-func NewTypeNode(typ parser.ITypeTypeContext) *TypeNode {
+func NewTypeNode(typ parser.ITypeTypeContext) TypeNode {
 	ctx := typ.(*parser.TypeTypeContext)
 	if ctx.PrimitiveType() != nil {
-		return &TypeNode{
-			Class: ctx.PrimitiveType().GetText(),
+		return TypeNode([]*TypeElementNode{
+			&TypeElementNode{
+				Class: ctx.PrimitiveType().GetText(),
+			},
+		})
+	}
+
+	classCtx := ctx.ClassOrInterfaceType().(*parser.ClassOrInterfaceTypeContext)
+
+	typeElements := make(TypeNode, 0)
+	for i, typID := range classCtx.AllIDENTIFIER() {
+		class := typID.GetText()
+
+		typeComp := classCtx.TypeArguments(i)
+		if typeComp == nil {
+			// no typ arguments for this element of the type
+			typeElements = append(typeElements, &TypeElementNode{
+				Class: class,
+			})
+			continue
 		}
-	}
+		typeCompCtx := typeComp.(*parser.TypeArgumentsContext)
 
-	ctx2 := ctx.ClassOrInterfaceType().(*parser.ClassOrInterfaceTypeContext)
-	if len(ctx2.AllIDENTIFIER()) != 1 {
-		panic("wrong number of identifers in type type: " + typ.GetText() + "\n\n" + typ.ToStringTree(parser.RuleNames, nil))
-	}
+		countTypArgs := len(typeCompCtx.AllTypeArgument())
 
-	class := ctx2.IDENTIFIER(0).GetText()
+		if countTypArgs > 1 {
+			panic("too many sets of type arguments")
+		}
 
-	countTypArgs := len(ctx2.AllTypeArguments())
+		var thisTypeArguments []TypeNode
+		if countTypArgs == 1 {
+			thisTypeArguments = make([]TypeNode, 0)
+			typArgsCtx := classCtx.TypeArguments(0).(*parser.TypeArgumentsContext)
+			for _, typArg := range typArgsCtx.AllTypeArgument() {
+				typArgCtx := typArg.(*parser.TypeArgumentContext)
 
-	if countTypArgs > 1 {
-		panic("too many sets of type arguments")
-	}
+				if typArgCtx.QUESTION() != nil {
+					panic("unknown")
+				}
 
-	var typeArguments []*TypeNode
-	if countTypArgs == 1 {
-		typeArguments = make([]*TypeNode, 0)
-		typArgsCtx := ctx2.TypeArguments(0).(*parser.TypeArgumentsContext)
-		for _, typArg := range typArgsCtx.AllTypeArgument() {
-			typArgCtx := typArg.(*parser.TypeArgumentContext)
-
-			if typArgCtx.QUESTION() != nil {
-				panic("unknown")
+				thisTypeArguments = append(thisTypeArguments, NewTypeNode(typArgCtx.TypeType()))
 			}
-
-			typeArguments = append(typeArguments, NewTypeNode(typArgCtx.TypeType()))
 		}
+		node := &TypeElementNode{
+			Class:         class,
+			TypeArguments: thisTypeArguments,
+		}
+
+		typeElements = append(typeElements, node)
 	}
 
-	return &TypeNode{
-		Class:         class,
-		TypeArguments: typeArguments,
-	}
+	return typeElements
 }

@@ -1,4 +1,4 @@
-.PHONY = run
+.PHONY: run test
 
 GRAMMAR_FILES = input/grammar/JavaLexer.g4 input/grammar/JavaParser.g4
 GO_SOURCE_FILES = $(shell find ./ -type f -name '*.go')
