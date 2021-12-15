@@ -36,11 +36,24 @@ func (tn *TypeElementNode) String() string {
 	return tn.Class
 }
 
+func NewTypeOrVoidNode(typ parser.ITypeTypeOrVoidContext) TypeNode {
+	typCtx := typ.(*parser.TypeTypeOrVoidContext)
+	if typCtx.VOID() != nil {
+		return TypeNode([]*TypeElementNode{{Class: "void"}})
+	} else {
+		return NewTypeNode(typCtx.TypeType())
+	}
+}
+
 func NewTypeNode(typ parser.ITypeTypeContext) TypeNode {
+	if typ == nil {
+		return nil
+	}
 	ctx := typ.(*parser.TypeTypeContext)
 	if ctx.PrimitiveType() != nil {
+		// simple primitive type, easy to parse
 		return TypeNode([]*TypeElementNode{
-			&TypeElementNode{
+			{
 				Class: ctx.PrimitiveType().GetText(),
 			},
 		})
@@ -48,47 +61,36 @@ func NewTypeNode(typ parser.ITypeTypeContext) TypeNode {
 
 	classCtx := ctx.ClassOrInterfaceType().(*parser.ClassOrInterfaceTypeContext)
 
-	typeElements := make(TypeNode, 0)
+	// multile components to one type. Say Car.WheelEnum
+	typeNode := make(TypeNode, 0)
 	for i, typID := range classCtx.AllIDENTIFIER() {
 		class := typID.GetText()
 
 		typeComp := classCtx.TypeArguments(i)
 		if typeComp == nil {
 			// no typ arguments for this element of the type
-			typeElements = append(typeElements, &TypeElementNode{
+			typeNode = append(typeNode, &TypeElementNode{
 				Class: class,
 			})
 			continue
 		}
+
 		typeCompCtx := typeComp.(*parser.TypeArgumentsContext)
 
-		countTypArgs := len(typeCompCtx.AllTypeArgument())
+		// (typeArguments) multiple type args between <> seperated by commas
+		thisTypeArguments := make([]TypeNode, 0)
+		for _, typCompArg := range typeCompCtx.AllTypeArgument() {
 
-		if countTypArgs > 1 {
-			panic("too many sets of type arguments")
+			childTypeNode := NewTypeNode(typCompArg.(*parser.TypeArgumentContext).TypeType())
+			thisTypeArguments = append(thisTypeArguments, childTypeNode)
 		}
 
-		var thisTypeArguments []TypeNode
-		if countTypArgs == 1 {
-			thisTypeArguments = make([]TypeNode, 0)
-			typArgsCtx := classCtx.TypeArguments(0).(*parser.TypeArgumentsContext)
-			for _, typArg := range typArgsCtx.AllTypeArgument() {
-				typArgCtx := typArg.(*parser.TypeArgumentContext)
-
-				if typArgCtx.QUESTION() != nil {
-					panic("unknown")
-				}
-
-				thisTypeArguments = append(thisTypeArguments, NewTypeNode(typArgCtx.TypeType()))
-			}
-		}
 		node := &TypeElementNode{
 			Class:         class,
 			TypeArguments: thisTypeArguments,
 		}
-
-		typeElements = append(typeElements, node)
+		typeNode = append(typeNode, node)
 	}
 
-	return typeElements
+	return typeNode
 }

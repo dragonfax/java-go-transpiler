@@ -26,7 +26,7 @@ func NewEnhancedForNode(statementCtx *parser.StatementContext) *EnhancedForNode 
 	enhancedCtx := forControlCtx.EnhancedForControl().(*parser.EnhancedForControlContext)
 
 	instance := ExpressionProcessor(enhancedCtx.Expression())
-	variable := NewVariableDecl(enhancedCtx.TypeType().GetText(), enhancedCtx.VariableDeclaratorId().GetText(), nil)
+	variable := NewVariableDecl(NewTypeNode(enhancedCtx.TypeType()), enhancedCtx.VariableDeclaratorId().GetText(), nil)
 
 	body := StatementProcessor(statementCtx.Statement(0).(*parser.StatementContext))
 	return &EnhancedForNode{

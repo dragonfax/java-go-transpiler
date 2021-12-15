@@ -247,7 +247,7 @@ func (in *IdentifierNode) String() string {
 
 type ConstructorCall struct {
 	Class         string
-	TypeArguments []string
+	TypeArguments []TypeNode
 	Arguments     []ExpressionNode
 }
 
@@ -267,12 +267,13 @@ func NewConstructorCall(creator parser.ICreatorContext) *ConstructorCall {
 		panic("constructor call with no class name")
 	}
 
-	typeArguments := make([]string, 0)
+	typeArguments := make([]TypeNode, 0)
 	if creatorNameCtx.TypeArgumentsOrDiamond(0) != nil {
 		if creatorNameCtx.TypeArgumentsOrDiamond(0).(*parser.TypeArgumentsOrDiamondContext).TypeArguments() != nil {
 			for _, typeArg := range creatorNameCtx.TypeArgumentsOrDiamond(0).(*parser.TypeArgumentsOrDiamondContext).TypeArguments().(*parser.TypeArgumentsContext).AllTypeArgument() {
 				typeArgCtx := typeArg.(*parser.TypeArgumentContext)
-				typeArguments = append(typeArguments, typeArgCtx.GetText())
+				node := NewTypeNode(typeArgCtx.TypeType())
+				typeArguments = append(typeArguments, node)
 			}
 		}
 	}
@@ -297,7 +298,12 @@ func (cc *ConstructorCall) String() string {
 	if len(cc.TypeArguments) == 0 {
 		return fmt.Sprintf("New%s(%s)", cc.Class, expressionListToString(cc.Arguments))
 	}
-	return fmt.Sprintf("New%s[%s](%s)", cc.Class, strings.Join(cc.TypeArguments, ",'"), expressionListToString(cc.Arguments))
+
+	list := make([]string, 0)
+	for _, ta := range cc.TypeArguments {
+		list = append(list, ta.String())
+	}
+	return fmt.Sprintf("New%s[%s](%s)", cc.Class, strings.Join(list, ","), expressionListToString(cc.Arguments))
 }
 
 type ClassReference struct {
@@ -383,7 +389,7 @@ func NewMethodReference(expression parser.IExpressionContext) ExpressionNode {
 	if ctx.Expression(0) != nil {
 		instance = ExpressionProcessor(ctx.Expression(0))
 	} else if ctx.TypeType(0) != nil {
-		instance = NewIdentifierNode(ctx.TypeType(0).GetText())
+		instance = NewTypeNode(ctx.TypeType(0))
 	} else if ctx.ClassType() != nil {
 		instance = NewIdentifierNode(ctx.ClassType().GetText())
 	}

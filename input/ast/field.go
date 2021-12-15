@@ -12,7 +12,7 @@ type Field struct {
 func NewFields(ctx *parser.FieldDeclarationContext) []Member {
 	members := make([]Member, 0)
 
-	typ := ctx.TypeType().GetText()
+	typ := exp.NewTypeNode(ctx.TypeType())
 
 	for _, varDec := range ctx.VariableDeclarators().(*parser.VariableDeclaratorsContext).AllVariableDeclarator() {
 		varDecCtx := varDec.(*parser.VariableDeclaratorContext)

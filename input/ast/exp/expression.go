@@ -73,7 +73,7 @@ func ExpressionProcessor(expressionI parser.IExpressionContext) ExpressionNode {
 		}
 		if expression.INSTANCEOF() != nil {
 			left := ExpressionProcessor(expression.Expression(0))
-			right := NewIdentifierNode(expression.TypeType(0).GetText())
+			right := NewTypeNode(expression.TypeType(0))
 			return NewBinaryOperatorNode("instanceof", left, right)
 		}
 		left := ExpressionProcessor(expression.Expression(0))
@@ -110,7 +110,7 @@ func ExpressionProcessor(expressionI parser.IExpressionContext) ExpressionNode {
 
 	if expression.LPAREN() != nil {
 		// cast
-		left := NewLiteralNode(expression.TypeType(0).GetText())
+		left := NewTypeNode(expression.TypeType(0))
 		right := ExpressionProcessor(expression.Expression(0))
 		return NewBinaryOperatorNode("(", left, right)
 	}

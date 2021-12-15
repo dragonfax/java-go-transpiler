@@ -1,17 +1,21 @@
 package test
 
 import (
-	"io/ioutil"
 	"testing"
 
-	"github.com/dragonfax/java_converter/output/trans"
+	"github.com/antlr/antlr4/runtime/Go/antlr"
+	"github.com/dragonfax/java_converter/input/ast/exp"
+	"github.com/dragonfax/java_converter/input/parser"
 	"github.com/stretchr/testify/assert"
 )
 
+/*
 const casesDir = "./cases"
 const exampleFileSuffix = ".example"
 
 func TestFileParser(t *testing.T) {
+
+	t.Skip()
 
 	testPrefixes := []string{"implements", "interface", "static_variable", "math"}
 
@@ -28,4 +32,24 @@ func TestFileParser(t *testing.T) {
 		assert.Equal(t, string(expectedGoCode), translatedGoCode)
 	}
 
+}
+*/
+
+func TestTypeNode(t *testing.T) {
+
+	var lexer = parser.NewJavaLexer(nil)
+	var p = parser.NewJavaParser(nil)
+
+	content := `Level.Source`
+
+	input := antlr.NewInputStream(content)
+	lexer.SetInputStream(input)
+	stream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
+	p.SetInputStream(stream)
+	p.BuildParseTrees = true
+	ptree := p.TypeType()
+
+	source := exp.NewTypeNode(ptree)
+
+	assert.Equal(t, "Level.Source", source.String())
 }

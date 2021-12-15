@@ -30,7 +30,7 @@ func NewClassListener(sl *StackListener, file *ast.File, ctx *parser.ClassDeclar
 	if ctx.TypeList() != nil {
 		for _, typeType := range ctx.TypeList().(*parser.TypeListContext).AllTypeType() {
 			typeTypeCtx := typeType.(*parser.TypeTypeContext)
-			s.class.Interfaces = append(s.class.Interfaces, typeTypeCtx.GetText())
+			s.class.Interfaces = append(s.class.Interfaces, exp.NewTypeNode(typeTypeCtx))
 		}
 	}
 

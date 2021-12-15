@@ -23,14 +23,14 @@ func NewFile() *File {
 type Class struct {
 	Name       string
 	BaseClass  string
-	Interfaces []string
+	Interfaces []exp.TypeNode
 	Members    []Member
 }
 
 func NewClass() *Class {
 	c := &Class{}
 	c.Members = make([]Member, 0)
-	c.Interfaces = make([]string, 0)
+	c.Interfaces = make([]exp.TypeNode, 0)
 	return c
 }
 

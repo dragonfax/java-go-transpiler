@@ -7,7 +7,7 @@ import (
 )
 
 type VariableDeclNode struct {
-	Type       string
+	Type       TypeNode
 	Name       string
 	Expression ExpressionNode // for now
 }
@@ -19,8 +19,8 @@ func (vn *VariableDeclNode) String() string {
 	return fmt.Sprintf("var %s = %s", vn.Name, vn.Expression) // we'll assume the type matches the expression.
 }
 
-func NewVariableDecl(typ string, name string, expression ExpressionNode) *VariableDeclNode {
-	if typ == "" {
+func NewVariableDecl(typ TypeNode, name string, expression ExpressionNode) *VariableDeclNode {
+	if typ == nil {
 		panic(" no variable type")
 	}
 	if name == "" {
@@ -33,7 +33,7 @@ func NewVariableDeclNodeList(decl *parser.LocalVariableDeclarationContext) []Exp
 
 	l := make([]ExpressionNode, 0)
 
-	typ := decl.TypeType().GetText()
+	typ := NewTypeNode(decl.TypeType())
 
 	for _, varDecl := range decl.VariableDeclarators().(*parser.VariableDeclaratorsContext).AllVariableDeclarator() {
 
