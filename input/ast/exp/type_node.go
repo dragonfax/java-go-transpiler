@@ -7,6 +7,13 @@ import (
 	"github.com/dragonfax/java_converter/input/parser"
 )
 
+var primitiveTranslation = map[string]string{
+	"float":   "float64",
+	"double":  "float64",
+	"boolean": "bool",
+	"long":    "int64",
+}
+
 type TypeNode []*TypeElementNode
 
 func (tn TypeNode) String() string {
@@ -24,6 +31,11 @@ type TypeElementNode struct {
 }
 
 func (tn *TypeElementNode) String() string {
+	class := tn.Class
+	if tClass, ok := primitiveTranslation[class]; ok {
+		class = tClass
+	}
+
 	if len(tn.TypeArguments) > 0 {
 
 		list := make([]string, 0)
@@ -31,9 +43,10 @@ func (tn *TypeElementNode) String() string {
 			list = append(list, s.String())
 		}
 
-		return fmt.Sprintf("%s[%s]", tn.Class, strings.Join(list, ","))
+		return fmt.Sprintf("%s[%s]", class, strings.Join(list, ","))
 	}
-	return tn.Class
+
+	return class
 }
 
 func NewTypeOrVoidNode(typ parser.ITypeTypeOrVoidContext) TypeNode {

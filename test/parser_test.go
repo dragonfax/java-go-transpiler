@@ -6,7 +6,6 @@ import (
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 	"github.com/dragonfax/java_converter/input/ast/exp"
 	"github.com/dragonfax/java_converter/input/parser"
-	"github.com/stretchr/testify/assert"
 )
 
 /*
@@ -51,5 +50,7 @@ func TestTypeNode(t *testing.T) {
 
 	source := exp.NewTypeNode(ptree)
 
-	assert.Equal(t, "Level.Source", source.String())
+	if "Level.Source" != source.String() {
+		t.Fatal("differnces")
+	}
 }

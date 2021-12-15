@@ -19,7 +19,9 @@ func New{{Name}}() *{{Name}}{
     this := &{{Name}}{}
 
     {{#each Fields}}
-        this.{{{ Initializer }}}
+        {{#if HasInitializer}}
+            this.{{{ Initializer }}}
+        {{/if}}
     {{/each}}
 
     return this

@@ -5,6 +5,7 @@ import (
 
 	"github.com/dragonfax/java_converter/input/ast/exp"
 	"github.com/dragonfax/java_converter/input/parser"
+	"github.com/dragonfax/java_converter/tool"
 )
 
 type Field struct {
@@ -40,6 +41,10 @@ func NewFields(ctx *parser.FieldDeclarationContext) []*Field {
 
 func (f *Field) Declaration() string {
 	return fmt.Sprintf("%s %s", f.Name, f.Type)
+}
+
+func (f *Field) HasInitializer() bool {
+	return !tool.IsNilInterface(f.Expression)
 }
 
 func (f *Field) Initializer() string {

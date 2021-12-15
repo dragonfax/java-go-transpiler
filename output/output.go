@@ -24,25 +24,32 @@ func walkFunc(filename string, entry fs.DirEntry, err error) error {
 	return nil
 }
 
-func TranslateOneFile(filename string) {
-	targetFilename := GenerateTargetFilename(filename)
-
+func RemoveFileIfExists(filename string) {
 	// remove target file if its already there.
-	_, err := os.Stat(targetFilename)
+	_, err := os.Stat(filename)
 	if err != nil {
 		if !errors.Is(err, os.ErrNotExist) {
-			panic(fmt.Sprintf("%T %v %s", err, err, err))
+			panic(err)
 		}
 	} else {
 		// file exists. thats a problem.
-		err = os.Remove(targetFilename)
+		err = os.Remove(filename)
 		if err != nil {
 			panic(err)
 		}
 	}
 
+}
+
+func TranslateOneFile(filename string) {
+	targetFilename := GenerateTargetFilename(filename)
+
+	RemoveFileIfExists(targetFilename)
+	RemoveFileIfExists(targetFilename + ".json")
+	RemoveFileIfExists(targetFilename + ".err.txt")
+
 	targetDirectory := filepath.Dir(targetFilename)
-	err = os.MkdirAll(targetDirectory, 0775)
+	err := os.MkdirAll(targetDirectory, 0775)
 	if err != nil {
 		panic(err)
 	}

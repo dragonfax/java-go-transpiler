@@ -104,5 +104,5 @@ func (m *Method) String() string {
 		arguments = exp.ArgumentListToString(m.Arguments)
 	}
 
-	return fmt.Sprintf("func (this *%s) %s(%s) *%s{\n%s\n}\n\n", m.Class, m.Name, arguments, m.ReturnType, body)
+	return fmt.Sprintf("func (this *%s) %s(%s) %s{\n%s\n}\n\n", m.Class, m.Name, arguments, m.ReturnType, body)
 }
