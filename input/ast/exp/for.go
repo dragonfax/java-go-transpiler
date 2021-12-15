@@ -25,7 +25,7 @@ func NewEnhancedForNode(statementCtx *parser.StatementContext) *EnhancedForNode 
 	forControlCtx := statementCtx.ForControl().(*parser.ForControlContext)
 	enhancedCtx := forControlCtx.EnhancedForControl().(*parser.EnhancedForControlContext)
 
-	instance := expressionProcessor(enhancedCtx.Expression())
+	instance := ExpressionProcessor(enhancedCtx.Expression())
 	variable := NewVariableDecl(enhancedCtx.TypeType().GetText(), enhancedCtx.VariableDeclaratorId().GetText(), nil, false)
 
 	body := StatementProcessor(statementCtx.Statement(0).(*parser.StatementContext))
@@ -68,13 +68,13 @@ func classicForControlProcessor(forControlCtx *parser.ForControlContext) (init [
 	if forControlCtx.GetForUpdate() != nil {
 		increment = make([]ExpressionNode, 0)
 		for _, exp := range forControlCtx.GetForUpdate().(*parser.ExpressionListContext).AllExpression() {
-			node := expressionProcessor(exp.(*parser.ExpressionContext))
+			node := ExpressionProcessor(exp.(*parser.ExpressionContext))
 			increment = append(increment, node)
 		}
 	}
 
 	if forControlCtx.Expression() != nil {
-		condition = expressionProcessor(forControlCtx.Expression().(*parser.ExpressionContext))
+		condition = ExpressionProcessor(forControlCtx.Expression().(*parser.ExpressionContext))
 	}
 
 	if forControlCtx.ForInit() != nil {
@@ -87,7 +87,7 @@ func classicForControlProcessor(forControlCtx *parser.ForControlContext) (init [
 		} else {
 			// expression list
 			for _, exp := range initCtx.ExpressionList().(*parser.ExpressionListContext).AllExpression() {
-				node := expressionProcessor(exp.(*parser.ExpressionContext))
+				node := ExpressionProcessor(exp.(*parser.ExpressionContext))
 				init = append(init, node)
 			}
 		}

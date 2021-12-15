@@ -11,7 +11,7 @@ type File struct {
 	Filename    string
 	PackageName string
 	Imports     []string
-	Class       *Class
+	Classes     []*Class
 }
 
 func NewFile() *File {

@@ -6,7 +6,7 @@ import (
 )
 
 // deal with the recursive expression tree.
-func expressionProcessor(expressionI parser.IExpressionContext) ExpressionNode {
+func ExpressionProcessor(expressionI parser.IExpressionContext) ExpressionNode {
 	if tool.IsNilInterface(expressionI) {
 		return nil
 	}
@@ -32,7 +32,7 @@ func expressionProcessor(expressionI parser.IExpressionContext) ExpressionNode {
 
 	if expression.DOT() != nil {
 		if expression.IDENTIFIER() != nil {
-			return NewInstanceAttributeReference(expression.IDENTIFIER().GetText(), expressionProcessor(expression.Expression(0)))
+			return NewInstanceAttributeReference(expression.IDENTIFIER().GetText(), ExpressionProcessor(expression.Expression(0)))
 		}
 	}
 
@@ -47,7 +47,7 @@ func expressionProcessor(expressionI parser.IExpressionContext) ExpressionNode {
 				panic("expression with dot and 1 expression, but no identifier (not method call?\n" + expression.GetText() + "\n")
 			}
 
-			instance := expressionProcessor(expression.Expression(0))
+			instance := ExpressionProcessor(expression.Expression(0))
 
 			return NewMethodCall(instance, methodCall)
 		} else {
@@ -57,27 +57,27 @@ func expressionProcessor(expressionI parser.IExpressionContext) ExpressionNode {
 
 	if expression.GetPrefix() != nil {
 		// prefix operator
-		return NewUnaryOperatorNode(true, expression.GetPrefix().GetText(), expressionProcessor(expression.Expression(0)))
+		return NewUnaryOperatorNode(true, expression.GetPrefix().GetText(), ExpressionProcessor(expression.Expression(0)))
 	}
 
 	if expression.GetPostfix() != nil {
-		return NewUnaryOperatorNode(false, expression.GetPostfix().GetText(), expressionProcessor(expression.Expression(0)))
+		return NewUnaryOperatorNode(false, expression.GetPostfix().GetText(), ExpressionProcessor(expression.Expression(0)))
 	}
 
 	if expression.GetBop() != nil {
 		if expression.COLON() != nil {
-			left := expressionProcessor(expression.Expression(0))
-			middle := expressionProcessor(expression.Expression(1))
-			right := expressionProcessor(expression.Expression(2))
+			left := ExpressionProcessor(expression.Expression(0))
+			middle := ExpressionProcessor(expression.Expression(1))
+			right := ExpressionProcessor(expression.Expression(2))
 			return NewTernaryOperatorNode(expression.GetBop().GetText(), left, middle, right)
 		}
 		if expression.INSTANCEOF() != nil {
-			left := expressionProcessor(expression.Expression(0))
+			left := ExpressionProcessor(expression.Expression(0))
 			right := NewIdentifierNode(expression.TypeType(0).GetText())
 			return NewBinaryOperatorNode("instanceof", left, right)
 		}
-		left := expressionProcessor(expression.Expression(0))
-		right := expressionProcessor(expression.Expression(1))
+		left := ExpressionProcessor(expression.Expression(0))
+		right := ExpressionProcessor(expression.Expression(1))
 		if right == nil {
 			panic("missing right for binary: " + expression.GetText() + "\n\n" + expression.ToStringTree(parser.RuleNames, nil))
 		}
@@ -86,16 +86,16 @@ func expressionProcessor(expressionI parser.IExpressionContext) ExpressionNode {
 
 	if expression.LBRACK() != nil {
 		// array index
-		left := expressionProcessor(expression.Expression(0))
-		right := expressionProcessor(expression.Expression(1))
+		left := ExpressionProcessor(expression.Expression(0))
+		right := ExpressionProcessor(expression.Expression(1))
 		return NewBinaryOperatorNode("[", left, right)
 	}
 
 	if len(expression.AllGT())+len(expression.AllLT()) > 0 {
 		// shifting binary operator
 
-		left := expressionProcessor(expression.Expression(0))
-		right := expressionProcessor(expression.Expression(1))
+		left := ExpressionProcessor(expression.Expression(0))
+		right := ExpressionProcessor(expression.Expression(1))
 
 		operator := ""
 		for _, t := range expression.AllGT() {
@@ -111,7 +111,7 @@ func expressionProcessor(expressionI parser.IExpressionContext) ExpressionNode {
 	if expression.LPAREN() != nil {
 		// cast
 		left := NewLiteralNode(expression.TypeType(0).GetText())
-		right := expressionProcessor(expression.Expression(0))
+		right := ExpressionProcessor(expression.Expression(0))
 		return NewBinaryOperatorNode("(", left, right)
 	}
 
@@ -136,7 +136,7 @@ func expressionFromPrimary(primary parser.IPrimaryContext) ExpressionNode {
 	}
 
 	if primaryCtx.Expression() != nil {
-		return expressionProcessor(primaryCtx.Expression())
+		return ExpressionProcessor(primaryCtx.Expression())
 	}
 
 	if primaryCtx.Literal() != nil {

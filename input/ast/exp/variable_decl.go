@@ -64,7 +64,7 @@ func NewVariableDeclNodeList(decl *parser.LocalVariableDeclarationContext) []Exp
 func variableInitializerProcessor(ctx *parser.VariableInitializerContext) ExpressionNode {
 	var exp ExpressionNode
 	if ctx.Expression() != nil {
-		exp = expressionProcessor(ctx.Expression().(*parser.ExpressionContext))
+		exp = ExpressionProcessor(ctx.Expression().(*parser.ExpressionContext))
 	}
 	if ctx.ArrayInitializer() != nil {
 		exp = NewArrayLiteral(ctx.ArrayInitializer().(*parser.ArrayInitializerContext))

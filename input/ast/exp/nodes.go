@@ -207,7 +207,7 @@ func NewMethodCall(instance ExpressionNode, methodCall parser.IMethodCallContext
 
 	if methodCallCtx.ExpressionList() != nil {
 		for _, expression := range methodCallCtx.ExpressionList().(*parser.ExpressionListContext).AllExpression() {
-			arguments = append(arguments, expressionProcessor(expression))
+			arguments = append(arguments, ExpressionProcessor(expression))
 		}
 	}
 
@@ -270,7 +270,7 @@ func NewConstructorCall(creator parser.ICreatorContext) *ConstructorCall {
 	if creatorCtx.ClassCreatorRest() != nil {
 		if creatorCtx.ClassCreatorRest().(*parser.ClassCreatorRestContext).Arguments().(*parser.ArgumentsContext).ExpressionList() != nil {
 			for _, expression := range creatorCtx.ClassCreatorRest().(*parser.ClassCreatorRestContext).Arguments().(*parser.ArgumentsContext).ExpressionList().(*parser.ExpressionListContext).AllExpression() {
-				arguments = append(arguments, expressionProcessor(expression))
+				arguments = append(arguments, ExpressionProcessor(expression))
 			}
 		}
 	}
@@ -315,7 +315,7 @@ func NewLambdaNode(lambda parser.ILambdaExpressionContext) *LambdaNode {
 	bodyCtx := lambdaCtx.LambdaBody().(*parser.LambdaBodyContext)
 	var body ExpressionNode
 	if bodyCtx.Expression() != nil {
-		body = expressionProcessor(bodyCtx.Expression())
+		body = ExpressionProcessor(bodyCtx.Expression())
 	} else if bodyCtx.Block() != nil {
 		body = NewBlockNode(bodyCtx.Block())
 	} else {
@@ -370,7 +370,7 @@ func NewMethodReference(expression parser.IExpressionContext) ExpressionNode {
 
 	var instance ExpressionNode
 	if ctx.Expression(0) != nil {
-		instance = expressionProcessor(ctx.Expression(0))
+		instance = ExpressionProcessor(ctx.Expression(0))
 	} else if ctx.TypeType(0) != nil {
 		instance = NewIdentifierNode(ctx.TypeType(0).GetText())
 	} else if ctx.ClassType() != nil {

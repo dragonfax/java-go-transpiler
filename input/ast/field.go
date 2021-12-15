@@ -1,0 +1,37 @@
+package ast
+
+import (
+	"github.com/dragonfax/java_converter/input/ast/exp"
+	"github.com/dragonfax/java_converter/input/parser"
+)
+
+type Field struct {
+	exp.VariableDeclNode
+}
+
+func NewFields(ctx *parser.FieldDeclarationContext) []Member {
+	members := make([]Member, 0)
+
+	typ := ctx.TypeType().GetText()
+
+	for _, varDec := range ctx.VariableDeclarators().(*parser.VariableDeclaratorsContext).AllVariableDeclarator() {
+		varDecCtx := varDec.(*parser.VariableDeclaratorContext)
+
+		name := varDecCtx.VariableDeclaratorId().GetText()
+
+		var init exp.ExpressionNode
+		if varDecCtx.VariableInitializer() != nil {
+			initCtx := varDecCtx.VariableInitializer().(*parser.VariableInitializerContext)
+			if initCtx.Expression() != nil {
+				init = exp.ExpressionProcessor(initCtx.Expression())
+			} else if initCtx.ArrayInitializer() != nil {
+				init = exp.NewArrayLiteral(initCtx.ArrayInitializer())
+			}
+		}
+
+		node := exp.NewVariableDecl(typ, name, init, false)
+		members = append(members, &Field{VariableDeclNode: *node})
+	}
+
+	return members
+}

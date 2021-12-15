@@ -21,7 +21,7 @@ func StatementProcessor(statementCtxI parser.IStatementContext) ExpressionNode {
 
 	if statementCtx.IF() != nil {
 		return NewIfNode(
-			expressionProcessor(statementCtx.ParExpression().(*parser.ParExpressionContext).Expression()),
+			ExpressionProcessor(statementCtx.ParExpression().(*parser.ParExpressionContext).Expression()),
 			StatementProcessor(statementCtx.Statement(0)),
 			StatementProcessor(statementCtx.Statement(1)),
 		)
@@ -33,25 +33,25 @@ func StatementProcessor(statementCtxI parser.IStatementContext) ExpressionNode {
 
 	if statementCtx.WHILE() != nil {
 		return &ClassicForNode{
-			Condition: expressionProcessor(statementCtx.ParExpression().(*parser.ParExpressionContext).Expression().(*parser.ExpressionContext)),
+			Condition: ExpressionProcessor(statementCtx.ParExpression().(*parser.ParExpressionContext).Expression().(*parser.ExpressionContext)),
 			Body:      StatementProcessor(statementCtx.Statement(0).(*parser.StatementContext)),
 		}
 	}
 
 	if statementCtx.DO() != nil {
 		return &ClassicForNode{
-			Condition:     expressionProcessor(statementCtx.ParExpression().(*parser.ParExpressionContext).Expression().(*parser.ExpressionContext)),
+			Condition:     ExpressionProcessor(statementCtx.ParExpression().(*parser.ParExpressionContext).Expression().(*parser.ExpressionContext)),
 			Body:          StatementProcessor(statementCtx.Statement(0).(*parser.StatementContext)),
 			ConditionLast: true,
 		}
 	}
 
 	if statementCtx.RETURN() != nil {
-		return NewReturnNode(expressionProcessor(statementCtx.Expression(0)))
+		return NewReturnNode(ExpressionProcessor(statementCtx.Expression(0)))
 	}
 
 	if statementCtx.THROW() != nil {
-		return NewThrowNode(expressionProcessor(statementCtx.Expression(0).(*parser.ExpressionContext)))
+		return NewThrowNode(ExpressionProcessor(statementCtx.Expression(0).(*parser.ExpressionContext)))
 	}
 
 	if statementCtx.BREAK() != nil {
@@ -113,7 +113,7 @@ func StatementProcessor(statementCtxI parser.IStatementContext) ExpressionNode {
 		}
 
 		// common scenario.
-		return expressionProcessor(statementCtx.Expression(0).(*parser.ExpressionContext))
+		return ExpressionProcessor(statementCtx.Expression(0).(*parser.ExpressionContext))
 	}
 
 	// ignore unknown structures.

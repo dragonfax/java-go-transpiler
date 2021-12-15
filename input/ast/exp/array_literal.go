@@ -20,7 +20,8 @@ func (al *ArrayLiteral) String() string {
 	return fmt.Sprintf("[]%s{%s}", al.Type, strings.Join(l, ","))
 }
 
-func NewArrayLiteral(ctx *parser.ArrayInitializerContext) *ArrayLiteral {
+func NewArrayLiteral(lit parser.IArrayInitializerContext) *ArrayLiteral {
+	ctx := lit.(*parser.ArrayInitializerContext)
 
 	if len(ctx.AllVariableInitializer()) == 0 {
 		return &ArrayLiteral{}
