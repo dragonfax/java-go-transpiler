@@ -69,20 +69,14 @@ type Method struct {
 	BaseMember
 
 	Body       exp.ExpressionNode
-	Arguments  string
+	Arguments  []exp.ExpressionNode
 	ReturnType string
 	Class      string
 }
 
-func NewMethod(modifier string, name string, class string, arguments, returnType string, body exp.ExpressionNode) *Method {
+func NewMethod(modifier string, name string, class string, arguments []exp.ExpressionNode, returnType string, body exp.ExpressionNode) *Method {
 	if class == "" {
 		panic("no class")
-	}
-	if returnType == "" {
-		panic("no return type")
-	}
-	if arguments == "" {
-		panic("no arguments")
 	}
 	return &Method{
 		BaseMember: BaseMember{Modifier: modifier, Name: name},
@@ -102,5 +96,11 @@ func (m *Method) String() string {
 	if m.Body != nil {
 		body = m.Body.String()
 	}
-	return fmt.Sprintf("func (this *%s) %s(%s) *%s{\n%s\n}\n\n", m.Class, m.Name, m.Arguments, m.ReturnType, body)
+
+	arguments := ""
+	if len(m.Arguments) > 0 {
+		arguments = exp.ArgumentListToString(m.Arguments)
+	}
+
+	return fmt.Sprintf("func (this *%s) %s(%s) *%s{\n%s\n}\n\n", m.Class, m.Name, arguments, m.ReturnType, body)
 }

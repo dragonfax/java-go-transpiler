@@ -29,7 +29,7 @@ func NewFields(ctx *parser.FieldDeclarationContext) []Member {
 			}
 		}
 
-		node := exp.NewVariableDecl(typ, name, init, false)
+		node := exp.NewVariableDecl(typ, name, init)
 		members = append(members, &Field{VariableDeclNode: *node})
 	}
 

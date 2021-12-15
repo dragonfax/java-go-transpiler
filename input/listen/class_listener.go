@@ -81,7 +81,7 @@ func (s *ClassListener) EnterMethodDeclaration(ctx *parser.MethodDeclarationCont
 	name := ctx.IDENTIFIER().GetText()
 
 	body := exp.NewBlockNode(ctx.MethodBody().(*parser.MethodBodyContext).Block())
-	m := ast.NewMethod(s.lastModifier, name, s.class.Name, ctx.FormalParameters().GetText(), ctx.TypeTypeOrVoid().GetText(), body)
+	m := ast.NewMethod(s.lastModifier, name, s.class.Name, exp.FormalParameterListProcessor(ctx.FormalParameters().(*parser.FormalParametersContext).FormalParameterList()), ctx.TypeTypeOrVoid().GetText(), body)
 
 	s.class.Members = append(s.class.Members, m)
 }

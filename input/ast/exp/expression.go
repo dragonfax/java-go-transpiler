@@ -151,7 +151,7 @@ func expressionFromPrimary(primary parser.IPrimaryContext) ExpressionNode {
 	panic("unknown primary type: " + primary.GetText() + "\n\n" + primary.ToStringTree(parser.RuleNames, nil))
 }
 
-func formalParameterListProcessor(formal parser.IFormalParameterListContext) []ExpressionNode {
+func FormalParameterListProcessor(formal parser.IFormalParameterListContext) []ExpressionNode {
 	if tool.IsNilInterface(formal) {
 		return nil
 	}
@@ -160,16 +160,16 @@ func formalParameterListProcessor(formal parser.IFormalParameterListContext) []E
 	parameters := make([]ExpressionNode, 0)
 	for _, formalParam := range ctx.AllFormalParameter() {
 		formalParamCtx := formalParam.(*parser.FormalParameterContext)
-		t := formalParamCtx.TypeType().GetText()
+		t := NewTypeNode(formalParamCtx.TypeType())
 		name := formalParamCtx.VariableDeclaratorId().GetText()
-		parameters = append(parameters, NewVariableDecl(t, name, nil, false))
+		parameters = append(parameters, NewArgument(t, name, false))
 	}
 
 	if ctx.LastFormalParameter() != nil {
 		lastParameterCtx := ctx.LastFormalParameter().(*parser.LastFormalParameterContext)
-		t := lastParameterCtx.TypeType().GetText()
+		t := NewTypeNode(lastParameterCtx.TypeType())
 		name := lastParameterCtx.VariableDeclaratorId().GetText()
-		parameters = append(parameters, NewVariableDecl(t, name, nil, true))
+		parameters = append(parameters, NewArgument(t, name, true))
 	}
 
 	return parameters

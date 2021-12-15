@@ -12,7 +12,7 @@ type ExpressionNode interface {
 	String() string
 }
 
-func argumentListToString(list []ExpressionNode) string {
+func ArgumentListToString(list []ExpressionNode) string {
 	s := make([]string, 0)
 	for _, node := range list {
 		if tool.IsNilInterface(node) {
@@ -228,9 +228,9 @@ func NewMethodCall(instance ExpressionNode, methodCall parser.IMethodCallContext
 
 func (mc *MethodCall) String() string {
 	if mc.Instance == nil {
-		return fmt.Sprintf("%s(%s)", mc.MethodName, argumentListToString(mc.Arguments))
+		return fmt.Sprintf("%s(%s)", mc.MethodName, ArgumentListToString(mc.Arguments))
 	}
-	return fmt.Sprintf("%s.%s(%s)", mc.Instance, mc.MethodName, argumentListToString(mc.Arguments))
+	return fmt.Sprintf("%s.%s(%s)", mc.Instance, mc.MethodName, ArgumentListToString(mc.Arguments))
 }
 
 type IdentifierNode struct {
@@ -346,7 +346,7 @@ func NewLambdaNode(lambda parser.ILambdaExpressionContext) *LambdaNode {
 		}
 	} else {
 		// must have formal parameters list
-		arguments = formalParameterListProcessor(parametersCtx.FormalParameterList())
+		arguments = FormalParameterListProcessor(parametersCtx.FormalParameterList())
 	}
 
 	return &LambdaNode{Arguments: arguments, Body: body}
@@ -355,7 +355,7 @@ func NewLambdaNode(lambda parser.ILambdaExpressionContext) *LambdaNode {
 func (ln *LambdaNode) String() string {
 	arguments := ""
 	if ln.Arguments != nil {
-		arguments = expressionListToString(ln.Arguments)
+		arguments = ArgumentListToString(ln.Arguments)
 	}
 	return fmt.Sprintf("func (%s) {%s}", arguments, ln.Body)
 }

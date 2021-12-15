@@ -11,7 +11,7 @@ import (
 const casesDir = "./cases"
 const exampleFileSuffix = ".example"
 
-func TestParser(t *testing.T) {
+func TestFileParser(t *testing.T) {
 
 	testPrefixes := []string{"implements", "interface", "static_variable", "math"}
 
