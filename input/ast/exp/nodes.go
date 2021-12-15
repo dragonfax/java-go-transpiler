@@ -12,6 +12,17 @@ type ExpressionNode interface {
 	String() string
 }
 
+func argumentListToString(list []ExpressionNode) string {
+	s := make([]string, 0)
+	for _, node := range list {
+		if tool.IsNilInterface(node) {
+			panic("nil node in expression list")
+		}
+		s = append(s, node.String())
+	}
+	return strings.Join(s, ",")
+}
+
 func expressionListToString(list []ExpressionNode) string {
 	if list == nil {
 		panic("list expression list")
@@ -217,9 +228,9 @@ func NewMethodCall(instance ExpressionNode, methodCall parser.IMethodCallContext
 
 func (mc *MethodCall) String() string {
 	if mc.Instance == nil {
-		return fmt.Sprintf("%s(%s)", mc.MethodName, expressionListToString(mc.Arguments))
+		return fmt.Sprintf("%s(%s)", mc.MethodName, argumentListToString(mc.Arguments))
 	}
-	return fmt.Sprintf("%s.%s(%s)", mc.Instance, mc.MethodName, expressionListToString(mc.Arguments))
+	return fmt.Sprintf("%s.%s(%s)", mc.Instance, mc.MethodName, argumentListToString(mc.Arguments))
 }
 
 type IdentifierNode struct {

@@ -3,16 +3,15 @@ package trans
 import (
 	"fmt"
 	"io"
-	"os"
 	"strings"
 )
 
 type lineNumberWriter struct {
 	lineNumber int
-	output     *os.File
+	output     io.StringWriter
 }
 
-func newLineNumberWriter(output *os.File) io.StringWriter {
+func newLineNumberWriter(output io.StringWriter) io.StringWriter {
 	return &lineNumberWriter{lineNumber: 1, output: output}
 }
 

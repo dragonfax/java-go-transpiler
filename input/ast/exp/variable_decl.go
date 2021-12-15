@@ -18,9 +18,9 @@ func (vn *VariableDeclNode) String() string {
 		if vn.Ellipses {
 			return fmt.Sprintf("%s %s...", vn.Name, vn.Type)
 		}
-		return fmt.Sprintf("%s %s", vn.Name, vn.Type)
+		return fmt.Sprintf("var %s %s", vn.Name, vn.Type)
 	}
-	return fmt.Sprintf("%s := %s", vn.Name, vn.Expression) // we'll assume the type matches the expression.
+	return fmt.Sprintf("var %s = %s", vn.Name, vn.Expression) // we'll assume the type matches the expression.
 }
 
 func NewVariableDecl(typ string, name string, expression ExpressionNode, ellipses bool) *VariableDeclNode {

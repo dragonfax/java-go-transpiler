@@ -60,7 +60,7 @@ func GenerateTargetFilename(filename string) string {
 
 	// change suffix
 	baseFilename := strings.TrimSuffix(filename, ".java")
-	goFilename := baseFilename + ".json" // TODO .go
+	goFilename := baseFilename + ".go"
 
 	//take first real component, and change its name.
 	components := strings.Split(goFilename, "/")
