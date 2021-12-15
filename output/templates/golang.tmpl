@@ -3,7 +3,7 @@ package main // {{ PackageName }}
 {{#each Classes}}
 
 {{#each Interfaces }}
-var _ {{ this }} = &{{Name}}{}
+var _ {{ this }} = &{{ ../Name}}{}
 {{/each}}
 
 type {{ Name }} struct {

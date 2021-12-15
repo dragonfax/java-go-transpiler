@@ -37,21 +37,6 @@ func expressionListToString(list []ExpressionNode) string {
 	return s
 }
 
-type LiteralNode struct {
-	Value string
-}
-
-func NewLiteralNode(value string) *LiteralNode {
-	if value == "" {
-		panic("no value")
-	}
-	return &LiteralNode{Value: value}
-}
-
-func (ln *LiteralNode) String() string {
-	return ln.Value
-}
-
 type VariableNode struct {
 	Name string
 }
