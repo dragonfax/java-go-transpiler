@@ -98,5 +98,9 @@ func (m *Method) String() string {
 		panic("nil method")
 	}
 
-	return fmt.Sprintf("func (this *%s) %s(%s) *%s{\n%s\n}\n\n", m.Class, m.Name, m.Arguments, m.ReturnType, m.Body)
+	body := ""
+	if m.Body != nil {
+		body = m.Body.String()
+	}
+	return fmt.Sprintf("func (this *%s) %s(%s) *%s{\n%s\n}\n\n", m.Class, m.Name, m.Arguments, m.ReturnType, body)
 }

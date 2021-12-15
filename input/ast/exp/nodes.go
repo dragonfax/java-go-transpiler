@@ -241,10 +241,20 @@ type ConstructorCall struct {
 }
 
 func NewConstructorCall(creator parser.ICreatorContext) *ConstructorCall {
+	if creator == nil {
+		panic("empty creator call")
+	}
 	creatorCtx := creator.(*parser.CreatorContext)
 
 	creatorNameCtx := creatorCtx.CreatedName().(*parser.CreatedNameContext)
-	class := creatorNameCtx.IDENTIFIER(0).GetText()
+	class := ""
+	if creatorNameCtx.IDENTIFIER(0) != nil {
+		class = creatorNameCtx.IDENTIFIER(0).GetText()
+	} else if creatorNameCtx.PrimitiveType() != nil {
+		class = creatorNameCtx.PrimitiveType().GetText()
+	} else {
+		panic("constructor call with no class name")
+	}
 
 	typeArguments := make([]string, 0)
 	if creatorNameCtx.TypeArgumentsOrDiamond(0) != nil {
@@ -292,4 +302,88 @@ func NewClassReference(class string) *ClassReference {
 
 func (cr *ClassReference) String() string {
 	return cr.Class + ".class"
+}
+
+type LambdaNode struct {
+	Arguments []ExpressionNode
+	Body      ExpressionNode
+}
+
+func NewLambdaNode(lambda parser.ILambdaExpressionContext) *LambdaNode {
+	lambdaCtx := lambda.(*parser.LambdaExpressionContext)
+
+	bodyCtx := lambdaCtx.LambdaBody().(*parser.LambdaBodyContext)
+	var body ExpressionNode
+	if bodyCtx.Expression() != nil {
+		body = expressionProcessor(bodyCtx.Expression())
+	} else if bodyCtx.Block() != nil {
+		body = NewBlockNode(bodyCtx.Block())
+	} else {
+		panic("no body for lambda")
+	}
+
+	if body == nil {
+		panic("no body for lambda")
+	}
+
+	arguments := make([]ExpressionNode, 0)
+	parametersCtx := lambdaCtx.LambdaParameters().(*parser.LambdaParametersContext)
+	if len(parametersCtx.AllIDENTIFIER()) > 0 {
+		// java lambda can have just parameter names, without types. thats valid
+		for _, id := range parametersCtx.AllIDENTIFIER() {
+			arguments = append(arguments, NewIdentifierNode(id.GetText()))
+		}
+	} else {
+		// must have formal parameters list
+		arguments = formalParameterListProcessor(parametersCtx.FormalParameterList())
+	}
+
+	return &LambdaNode{Arguments: arguments, Body: body}
+}
+
+func (ln *LambdaNode) String() string {
+	arguments := ""
+	if ln.Arguments != nil {
+		arguments = expressionListToString(ln.Arguments)
+	}
+	return fmt.Sprintf("func (%s) {%s}", arguments, ln.Body)
+}
+
+type MethodReference struct {
+	Instance ExpressionNode
+	Method   string
+}
+
+func NewMethodReference(expression parser.IExpressionContext) ExpressionNode {
+	ctx := expression.(*parser.ExpressionContext)
+
+	method := ""
+	if ctx.IDENTIFIER() != nil {
+		method = ctx.IDENTIFIER().GetText()
+	} else if ctx.NEW() != nil {
+		method = "new"
+	}
+
+	if method == "" {
+		panic("no method name in method reference")
+	}
+
+	var instance ExpressionNode
+	if ctx.Expression(0) != nil {
+		instance = expressionProcessor(ctx.Expression(0))
+	} else if ctx.TypeType(0) != nil {
+		instance = NewIdentifierNode(ctx.TypeType(0).GetText())
+	} else if ctx.ClassType() != nil {
+		instance = NewIdentifierNode(ctx.ClassType().GetText())
+	}
+
+	if instance == nil {
+		panic("no instance/expression for method reference")
+	}
+
+	return &MethodReference{Method: method, Instance: instance}
+}
+
+func (mf *MethodReference) String() string {
+	return fmt.Sprintf("%s.%s", mf.Instance, mf.Method)
 }

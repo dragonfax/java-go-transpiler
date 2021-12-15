@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/dragonfax/java_converter/input/parser"
+	"github.com/dragonfax/java_converter/tool"
 )
 
 type BlockNode struct {
@@ -18,6 +19,9 @@ func (bn *BlockNode) String() string {
 }
 
 func NewBlockNode(block parser.IBlockContext) *BlockNode {
+	if tool.IsNilInterface(block) {
+		return nil
+	}
 	ctx := block.(*parser.BlockContext)
 
 	l := make([]ExpressionNode, 0)

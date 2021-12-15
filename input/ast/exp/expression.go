@@ -13,8 +13,17 @@ func expressionProcessor(expressionI parser.IExpressionContext) ExpressionNode {
 
 	expression := expressionI.(*parser.ExpressionContext)
 
+	if expression.LambdaExpression() != nil {
+		return NewLambdaNode(expression.LambdaExpression())
+	}
+
 	if expression.Primary() != nil {
 		return expressionFromPrimary(expression.Primary())
+	}
+
+	if expression.COLONCOLON() != nil {
+		// method reference
+		return NewMethodReference(expression)
 	}
 
 	if expression.NEW() != nil {
@@ -140,4 +149,28 @@ func expressionFromPrimary(primary parser.IPrimaryContext) ExpressionNode {
 	}
 
 	panic("unknown primary type: " + primary.GetText() + "\n\n" + primary.ToStringTree(parser.RuleNames, nil))
+}
+
+func formalParameterListProcessor(formal parser.IFormalParameterListContext) []ExpressionNode {
+	if tool.IsNilInterface(formal) {
+		return nil
+	}
+	ctx := formal.(*parser.FormalParameterListContext)
+
+	parameters := make([]ExpressionNode, 0)
+	for _, formalParam := range ctx.AllFormalParameter() {
+		formalParamCtx := formalParam.(*parser.FormalParameterContext)
+		t := formalParamCtx.TypeType().GetText()
+		name := formalParamCtx.VariableDeclaratorId().GetText()
+		parameters = append(parameters, NewVariableDecl(t, name, nil, false))
+	}
+
+	if ctx.LastFormalParameter() != nil {
+		lastParameterCtx := ctx.LastFormalParameter().(*parser.LastFormalParameterContext)
+		t := lastParameterCtx.TypeType().GetText()
+		name := lastParameterCtx.VariableDeclaratorId().GetText()
+		parameters = append(parameters, NewVariableDecl(t, name, nil, true))
+	}
+
+	return parameters
 }
