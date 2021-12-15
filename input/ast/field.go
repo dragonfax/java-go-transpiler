@@ -1,6 +1,8 @@
 package ast
 
 import (
+	"fmt"
+
 	"github.com/dragonfax/java_converter/input/ast/exp"
 	"github.com/dragonfax/java_converter/input/parser"
 )
@@ -9,8 +11,8 @@ type Field struct {
 	exp.VariableDeclNode
 }
 
-func NewFields(ctx *parser.FieldDeclarationContext) []Member {
-	members := make([]Member, 0)
+func NewFields(ctx *parser.FieldDeclarationContext) []*Field {
+	members := make([]*Field, 0)
 
 	typ := exp.NewTypeNode(ctx.TypeType())
 
@@ -34,4 +36,12 @@ func NewFields(ctx *parser.FieldDeclarationContext) []Member {
 	}
 
 	return members
+}
+
+func (f *Field) Declaration() string {
+	return fmt.Sprintf("%s %s", f.Name, f.Type)
+}
+
+func (f *Field) Initializer() string {
+	return fmt.Sprintf("%s = %s", f.Name, f.Expression)
 }

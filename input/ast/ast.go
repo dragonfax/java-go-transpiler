@@ -25,12 +25,14 @@ type Class struct {
 	BaseClass  string
 	Interfaces []exp.TypeNode
 	Members    []Member
+	Fields     []*Field
 }
 
 func NewClass() *Class {
 	c := &Class{}
 	c.Members = make([]Member, 0)
 	c.Interfaces = make([]exp.TypeNode, 0)
+	c.Fields = make([]*Field, 0)
 	return c
 }
 

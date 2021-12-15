@@ -8,9 +8,25 @@ var _ {{ this }} = &{{Name}}{}
 
 type {{ Name }} struct {
     {{#if BaseClass}}*{{ BaseClass }}{{/if}}
+
+    {{#each Fields}}
+        {{{ Declaration }}}
+    {{/each}}
+
 }
 
-{{#each Members}}{{{ this }}}
+func New{{Name}}() *{{Name}}{
+    this := &{{Name}}{}
+
+    {{#each Fields}}
+        this.{{{ Initializer }}}
+    {{/each}}
+
+    return this
+}
+
+{{#each Members}}
+    {{{ this }}}
 {{/each}}
 
 {{/each}}

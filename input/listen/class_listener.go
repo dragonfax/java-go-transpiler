@@ -88,7 +88,7 @@ func (s *ClassListener) EnterMethodDeclaration(ctx *parser.MethodDeclarationCont
 
 func (s *ClassListener) EnterFieldDeclaration(ctx *parser.FieldDeclarationContext) {
 
-	s.class.Members = append(s.class.Members, ast.NewFields(ctx)...)
+	s.class.Fields = append(s.class.Fields, ast.NewFields(ctx)...)
 
 }
 

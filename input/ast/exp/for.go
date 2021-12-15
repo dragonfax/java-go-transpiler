@@ -2,6 +2,7 @@ package exp
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/dragonfax/java_converter/input/parser"
 )
@@ -37,7 +38,7 @@ func NewEnhancedForNode(statementCtx *parser.StatementContext) *EnhancedForNode 
 }
 
 func (ef *EnhancedForNode) String() string {
-	return fmt.Sprintf("for ( %s : %s ) %s", ef.Variable, ef.Instance, ef.Body)
+	return fmt.Sprintf("for %s := range %s %s", ef.Variable, ef.Instance, ef.Body)
 }
 
 type ClassicForNode struct {
@@ -51,7 +52,18 @@ type ClassicForNode struct {
 func (fn *ClassicForNode) String() string {
 	// TODO ConditionLast
 	// TODO remove unnecessary semicolons
-	return fmt.Sprintf("for %s;%s;%s {\n%s}\n", fn.Init, fn.Condition, fn.Increment, fn.Body)
+
+	init := make([]string, 0)
+	for _, i := range fn.Init {
+		init = append(init, i.String())
+	}
+
+	incr := make([]string, 0)
+	for _, i := range fn.Increment {
+		incr = append(incr, i.String())
+	}
+
+	return fmt.Sprintf("for %s;%s;%s {\n%s}\n", strings.Join(init, ",'"), fn.Condition, strings.Join(incr, ","), fn.Body)
 }
 
 func NewClassicForNode(statementCtx *parser.StatementContext) *ClassicForNode {
