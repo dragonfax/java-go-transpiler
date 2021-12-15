@@ -40,7 +40,7 @@ func (bo *BinaryOperatorNode) String() string {
 	}
 	if bo.Operator == "(" {
 		// cast operator
-		return fmt.Sprintf("(%s)%s", bo.Left, bo.Right)
+		return fmt.Sprintf("%s(%s)", bo.Left, bo.Right)
 	}
 	return fmt.Sprintf("%s%s%s", bo.Left, bo.Operator, bo.Right)
 }
@@ -61,13 +61,16 @@ func NewUnaryOperatorNode(prefix bool, operator string, left ExpressionNode) *Un
 	if tool.IsNilInterface(left) {
 		panic("no expression")
 	}
-	this := &UnaryOperatorNode{Left: left}
+	this := &UnaryOperatorNode{Left: left, Prefix: prefix}
 	this.Operator = operator
 	return this
 }
 
 func (uo *UnaryOperatorNode) String() string {
-	return fmt.Sprintf("%s%s", uo.Operator, uo.Left)
+	if uo.Prefix {
+		return fmt.Sprintf("%s%s", uo.Operator, uo.Left)
+	}
+	return fmt.Sprintf("%s%s", uo.Left, uo.Operator)
 }
 
 type TernaryOperatorNode struct {
@@ -97,5 +100,5 @@ func NewTernaryOperatorNode(operator string, left ExpressionNode, middle Express
 }
 
 func (bo *TernaryOperatorNode) String() string {
-	return fmt.Sprintf("%s%s%s:%s", bo.Left, bo.Operator, bo.Middle, bo.Right)
+	return fmt.Sprintf("ternary(%s,%s,%s)", bo.Left, bo.Middle, bo.Right)
 }

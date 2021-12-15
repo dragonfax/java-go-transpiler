@@ -16,7 +16,7 @@ func (vn *VariableDeclNode) String() string {
 	if vn.Expression == nil {
 		return fmt.Sprintf("var %s %s", vn.Name, vn.Type)
 	}
-	return fmt.Sprintf("var %s = %s", vn.Name, vn.Expression) // we'll assume the type matches the expression.
+	return fmt.Sprintf("%s := %s", vn.Name, vn.Expression) // we'll assume the type matches the expression.
 }
 
 func NewVariableDecl(typ TypeNode, name string, expression ExpressionNode) *VariableDeclNode {
