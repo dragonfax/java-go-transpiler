@@ -281,14 +281,14 @@ func NewConstructorCall(creator parser.ICreatorContext) *ConstructorCall {
 
 func (cc *ConstructorCall) String() string {
 	if len(cc.TypeArguments) == 0 {
-		return fmt.Sprintf("New%s(%s)", cc.Class, expressionListToString(cc.Arguments))
+		return fmt.Sprintf("New%s(%s)", cc.Class, ArgumentListToString(cc.Arguments))
 	}
 
 	list := make([]string, 0)
 	for _, ta := range cc.TypeArguments {
 		list = append(list, ta.String())
 	}
-	return fmt.Sprintf("New%s[%s](%s)", cc.Class, strings.Join(list, ","), expressionListToString(cc.Arguments))
+	return fmt.Sprintf("New%s[%s](%s)", cc.Class, strings.Join(list, ","), ArgumentListToString(cc.Arguments))
 }
 
 type ClassReference struct {
