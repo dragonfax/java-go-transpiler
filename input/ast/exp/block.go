@@ -31,10 +31,20 @@ func NewBlockNode(block parser.IBlockContext) *BlockNode {
 
 		if blockStatementCtx.LocalVariableDeclaration() != nil {
 			localVarCtx := blockStatementCtx.LocalVariableDeclaration().(*parser.LocalVariableDeclarationContext)
-			l = append(l, NewVariableDeclNodeList(localVarCtx)...)
+			nodes := NewVariableDeclNodeList(localVarCtx)
+			for _, n := range nodes {
+				if n == nil {
+					panic("nil in expression list")
+				}
+			}
+			l = append(l, nodes...)
 		} else if blockStatementCtx.Statement() != nil {
 			statementCtx := blockStatementCtx.Statement().(*parser.StatementContext)
-			l = append(l, StatementProcessor(statementCtx))
+			node := StatementProcessor(statementCtx)
+			if node == nil {
+				tool.PanicDebug("adding nil to expression list: ", blockStatementCtx)
+			}
+			l = append(l, node)
 		} else if blockStatementCtx.LocalTypeDeclaration() != nil {
 			panic("didn't anticipate this")
 		}

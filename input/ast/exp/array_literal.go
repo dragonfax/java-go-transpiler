@@ -33,6 +33,10 @@ func NewArrayLiteral(lit parser.IArrayInitializerContext) *ArrayLiteral {
 
 		exp := variableInitializerProcessor(varInitCtx)
 
+		if exp == nil {
+			panic("almost added nil expression to expression list.")
+		}
+
 		l = append(l, exp)
 	}
 

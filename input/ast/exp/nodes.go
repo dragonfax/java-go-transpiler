@@ -2,6 +2,7 @@ package exp
 
 import (
 	"fmt"
+	"runtime/debug"
 	"strings"
 
 	"github.com/dragonfax/java_converter/input/parser"
@@ -16,9 +17,10 @@ func ArgumentListToString(list []ExpressionNode) string {
 	s := make([]string, 0)
 	for _, node := range list {
 		if tool.IsNilInterface(node) {
-			panic("nil node in expression list")
+			s = append(s, "nil node in argument list\n"+string(debug.Stack()))
+		} else {
+			s = append(s, node.String())
 		}
-		s = append(s, node.String())
 	}
 	return strings.Join(s, ",")
 }
@@ -30,9 +32,10 @@ func expressionListToString(list []ExpressionNode) string {
 	s := ""
 	for _, node := range list {
 		if tool.IsNilInterface(node) {
-			panic("nil node in expression list")
+			s += "nil node in expression list\n" + string(debug.Stack())
+		} else {
+			s += node.String() + "\n"
 		}
-		s += node.String() + "\n"
 	}
 	return s
 }
@@ -203,7 +206,11 @@ func NewMethodCall(instance ExpressionNode, methodCall parser.IMethodCallContext
 
 	if methodCallCtx.ExpressionList() != nil {
 		for _, expression := range methodCallCtx.ExpressionList().(*parser.ExpressionListContext).AllExpression() {
-			arguments = append(arguments, ExpressionProcessor(expression))
+			node := ExpressionProcessor(expression)
+			if node == nil {
+				panic("nil in node list")
+			}
+			arguments = append(arguments, node)
 		}
 	}
 
@@ -267,7 +274,11 @@ func NewConstructorCall(creator parser.ICreatorContext) *ConstructorCall {
 	if creatorCtx.ClassCreatorRest() != nil {
 		if creatorCtx.ClassCreatorRest().(*parser.ClassCreatorRestContext).Arguments().(*parser.ArgumentsContext).ExpressionList() != nil {
 			for _, expression := range creatorCtx.ClassCreatorRest().(*parser.ClassCreatorRestContext).Arguments().(*parser.ArgumentsContext).ExpressionList().(*parser.ExpressionListContext).AllExpression() {
-				arguments = append(arguments, ExpressionProcessor(expression))
+				node := ExpressionProcessor(expression)
+				if node == nil {
+					panic("nil in node list")
+				}
+				arguments = append(arguments, node)
 			}
 		}
 	}

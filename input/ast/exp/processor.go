@@ -68,13 +68,11 @@ func StatementProcessor(statementCtxI parser.IStatementContext) ExpressionNode {
 		return NewContinueNode("")
 	}
 
-	/*
-	   | TRY block (catchClause+ finallyBlock? | finallyBlock)
-	   | TRY resourceSpecification block catchClause* finallyBlock?
-	   | SWITCH parExpression '{' switchBlockStatementGroup* switchLabel* '}'
+	if statementCtx.TRY() != nil {
+		return NewTryCatchNode(statementCtx)
+	}
 
-	   | statementExpression=expression ';'
-	*/
+	// TODO | SWITCH parExpression '{' switchBlockStatementGroup* switchLabel* '}'
 
 	if statementCtx.GetIdentifierLabel() != nil {
 		// must be a statement, with a label
@@ -103,8 +101,7 @@ func StatementProcessor(statementCtxI parser.IStatementContext) ExpressionNode {
 	// joined by commas, such as multi assignment.
 	expressionCount := len(statementCtx.AllExpression())
 	if expressionCount == 0 {
-		// TODO warn, I dont' expect this to happen.
-		return nil
+		// unimplemented
 	}
 	if expressionCount >= 1 {
 
@@ -118,5 +115,5 @@ func StatementProcessor(statementCtxI parser.IStatementContext) ExpressionNode {
 
 	// ignore unknown structures.
 	// TODO log them
-	return nil
+	return NewUnimplementedNode("unimplemented code: " + statementCtxI.GetText() + "\n\n" + statementCtxI.ToStringTree(parser.RuleNames, nil))
 }
