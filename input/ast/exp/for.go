@@ -16,7 +16,7 @@ func NewForNode(statementCtx *parser.StatementContext) ExpressionNode {
 }
 
 type EnhancedForNode struct {
-	Variable ExpressionNode
+	Variable *VariableDeclNode
 	Instance ExpressionNode
 	Body     ExpressionNode
 }
@@ -38,7 +38,7 @@ func NewEnhancedForNode(statementCtx *parser.StatementContext) *EnhancedForNode 
 }
 
 func (ef *EnhancedForNode) String() string {
-	return fmt.Sprintf("for %s := range %s %s", ef.Variable, ef.Instance, ef.Body)
+	return fmt.Sprintf("for %s := range %s %s", ef.Variable.Name, ef.Instance, ef.Body)
 }
 
 type ClassicForNode struct {
