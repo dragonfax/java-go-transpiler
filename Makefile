@@ -1,4 +1,4 @@
-.PHONY: run
+.PHONY: run parser
 
 GRAMMAR_FILES = JavaLexer.g4 JavaParser.g4
 GO_SOURCE_FILES = $(shell find ./ -type f -name '*.go')
@@ -13,7 +13,7 @@ debug:
 $(BINARY): go.* $(GO_SOURCE_FILES)
 	go build -o java_visitor main.go
 
-parser/*: $(GRAMMAR_FILES)
+parser: $(GRAMMAR_FILES)
 	antlr -o parser -Dlanguage=Go JavaLexer.g4 JavaParser.g4
 
 test:
