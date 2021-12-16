@@ -15,7 +15,7 @@
             "name": "Debug ANTLR4 grammar",
             "type": "antlr-debug",
             "request": "launch",
-            "input": "../delverengine/Dungeoneer/src/com/interrupt/api/steam/NullSteamApi.java",
+            "input": "../delverengine/Dungeoneer/src/com/interrupt/dungeoneer/Art.java",
             "grammar": "input/grammar/JavaParser.g4",
             "startRule": "compilationUnit",
             "printParseTree": true,
