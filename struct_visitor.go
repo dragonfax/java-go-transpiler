@@ -12,7 +12,7 @@ func (sv *StructVisitor) VisitClassDeclaration(ctx *parser.ClassDeclarationConte
 
 	fieldsList := sv.VisitClassBody(ctx.ClassBody()).(FieldListNode).([]*FieldNode)
 
-	return ClassNode{Name: className, Fields: fields}
+	return &ClassNode{Name: className, Fields: fieldsList}
 
 }
 

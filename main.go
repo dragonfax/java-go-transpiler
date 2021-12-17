@@ -21,7 +21,8 @@ func main() {
 	tree := p.CompilationUnit()
 
 	structVisitor := &StructVisitor{}
-	ast := structVisitor.Visit(tree)
+	visitor := NewJavaVisitor(structVisitor)
+	ast := visitor.Visit(tree)
 
 	fmt.Println(ast)
 }
