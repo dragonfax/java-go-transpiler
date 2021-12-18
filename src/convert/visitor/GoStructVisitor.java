@@ -20,6 +20,8 @@ public class GoStructVisitor extends JavaParserBaseVisitor<Node> {
             return aggregate;
         }
     
+        // this should be replaced with visitMemberDeclaration(), 
+        // but I wanted an example aggregate function.
         if ( aggregate instanceof FieldListNode && nextResult instanceof FieldListNode ) {
             return ((FieldListNode)aggregate).append((FieldListNode)nextResult);
         }
@@ -37,8 +39,6 @@ public class GoStructVisitor extends JavaParserBaseVisitor<Node> {
     
         return new ClassNode(className, fieldsList);
     }
-    
-    /* defaultResult is just null */
     
 
     @Override
