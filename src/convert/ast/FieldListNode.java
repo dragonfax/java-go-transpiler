@@ -18,6 +18,10 @@ public class FieldListNode implements Node {
         this.fields = fields;
     }
 
+    public FieldListNode(FieldNode nextResult) {
+        this.fields = new FieldNode[]{nextResult};
+    }
+
     public FieldListNode append(FieldListNode nextFieldList) {
         var list = new ArrayList<FieldNode>(fields.length + nextFieldList.fields.length);
         Collections.addAll(list, this.fields);

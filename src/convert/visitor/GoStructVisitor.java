@@ -22,6 +22,12 @@ public class GoStructVisitor extends JavaParserBaseVisitor<Node> {
         }
     
         // with this design the only time we see multiple non-nil children is FieldLists
+
+        var aggFieldOk = aggregate instanceof FieldNode;
+        var nextFieldOk = nextResult instanceof FieldNode;
+        if (aggFieldOk &&  nextFieldOk ) {
+            return new FieldNode(((FieldNode)nextResult).name, ((FieldNode)aggregate).type);
+        }
     
         FieldListNode aggFieldList = null;
         FieldListNode nextFieldList = null;
@@ -35,8 +41,12 @@ public class GoStructVisitor extends JavaParserBaseVisitor<Node> {
         if ( aggFieldList != null &&  nextFieldList != null )  {
             return aggFieldList.append(nextFieldList);
         }
+
+        if ( aggFieldList != null && nextFieldOk ) {
+            return aggFieldList.append(new FieldListNode((FieldNode)nextResult));
+        }
     
-        throw new RuntimeException("unknown aggregation situation");
+        throw new RuntimeException(String.format("unknown aggregation situation: %s(%s) and %s(%s)", aggregate.getClass(), aggregate, nextResult.getClass(), nextResult));
     }
 
 
