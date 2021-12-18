@@ -1,4 +1,4 @@
-.PHONY: run debug test
+.PHONY: run debug test generate
 
 GENERATED_PARSER_FILES= parser/JavaLexer.interp parser/JavaLexer.tokens parser/JavaParser.interp parser/JavaParser.tokens parser/java_lexer.go parser/java_parser.go parser/javaparser_base_listener.go parser/javaparser_listener.go
 GRAMMAR_FILES = JavaLexer.g4 JavaParser.g4
@@ -16,8 +16,13 @@ debug:
 $(BINARY): go.* $(GO_SOURCE_FILES) $(GENERATED_PARSER_FILES)
 	go build -o $(BINARY) main.go
 
+generate: $(GENERATED_PARSER_FILES)
+
 $(GENERATED_PARSER_FILES): stg.jar $(GRAMMAR_FILES)
-	antlr -o parser -Dlanguage=Go JavaLexer.g4 JavaParser.g4
+	CLASSPATH="stg.jar:/usr/local/Cellar/antlr/4.9.3/antlr-4.9.3-complete.jar:." \
+		/usr/local/opt/openjdk/bin/java \
+		-jar /usr/local/Cellar/antlr/4.9.3/antlr-4.9.3-complete.jar \
+		-o parser -Dlanguage=Go -visitor -cp stg.jar JavaLexer.g4 JavaParser.g4
 
 test:
 	go test ./...
