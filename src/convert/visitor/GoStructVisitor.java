@@ -12,41 +12,33 @@ public class GoStructVisitor extends JavaParserBaseVisitor<Node> {
         // send a single value up the line.
         // only merge and send FieldLists
         // anything else is a panic.
-    
+
+        if (aggregate == null) {
+            return nextResult;
+        }
+
         if (nextResult == null) {
             return aggregate;
         }
     
-        if (aggregate == null && nextResult != null ) {
-            return nextResult;
-        }
-    
-        // with this design the only time we see multiple non-nil children is FieldLists
-
         var aggFieldOk = aggregate instanceof FieldNode;
-        var nextFieldOk = nextResult instanceof FieldNode;
-        if (aggFieldOk &&  nextFieldOk ) {
+        if (aggFieldOk) {
             return new FieldNode(((FieldNode)nextResult).name, ((FieldNode)aggregate).type);
         }
     
-        FieldListNode aggFieldList = null;
-        FieldListNode nextFieldList = null;
-        if (aggregate instanceof FieldListNode) {
-            aggFieldList = (FieldListNode)aggregate;
-        }
-        if ( nextResult instanceof FieldListNode) {
-            nextFieldList = (FieldListNode)nextResult;
-        }
-    
-        if ( aggFieldList != null &&  nextFieldList != null )  {
-            return aggFieldList.append(nextFieldList);
+        if (! (aggregate instanceof FieldListNode )) {
+            return super.aggregateResult(aggregate, nextResult);
         }
 
-        if ( aggFieldList != null && nextFieldOk ) {
+        var aggFieldList = (FieldListNode)aggregate;
+
+        if ( nextResult instanceof FieldListNode) {
+            return aggFieldList.append((FieldListNode)nextResult);
+        } else if ( nextResult instanceof FieldNode ) {
             return aggFieldList.append(new FieldListNode((FieldNode)nextResult));
         }
     
-        throw new RuntimeException(String.format("unknown aggregation situation: %s(%s) and %s(%s)", aggregate.getClass(), aggregate, nextResult.getClass(), nextResult));
+        return super.aggregateResult(aggregate, nextResult);
     }
 
 
