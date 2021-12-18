@@ -8,10 +8,9 @@ public class GoStructVisitor extends JavaParserBaseVisitor<Node> {
 
     @Override
     protected  Node aggregateResult(Node aggregate, Node nextResult) {
-        // drop nils.
-        // send a single value up the line.
-        // only merge and send FieldLists
-        // anything else is a panic.
+        /* 1. drop nils
+         * 2. merge FieldLists and Fields
+         */
 
         if (aggregate == null) {
             return nextResult;
@@ -19,11 +18,6 @@ public class GoStructVisitor extends JavaParserBaseVisitor<Node> {
 
         if (nextResult == null) {
             return aggregate;
-        }
-    
-        var aggFieldOk = aggregate instanceof FieldNode;
-        if (aggFieldOk) {
-            return new FieldNode(((FieldNode)nextResult).name, ((FieldNode)aggregate).type);
         }
     
         if (! (aggregate instanceof FieldListNode )) {
