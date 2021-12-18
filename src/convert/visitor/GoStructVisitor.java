@@ -51,11 +51,6 @@ public class GoStructVisitor extends JavaParserBaseVisitor<Node> {
 
 
     @Override
-    protected boolean shouldVisitNextChild(org.antlr.v4.runtime.tree.RuleNode node, Node currentResult) {
-        return true;
-    }
-
-    @Override
     public Node visitClassDeclaration(JavaParser.ClassDeclarationContext ctx) {
 
         var className = ctx.IDENTIFIER().getText();
