@@ -21,7 +21,7 @@ func main() {
 	tree := p.CompilationUnit()
 
 	structVisitor := &StructVisitor{}
-	visitor := NewJavaVisitor(structVisitor)
+	visitor := antlr.NewParseTreeVisitor(structVisitor)
 	ast := visitor.Visit(tree)
 
 	fmt.Println(ast)
