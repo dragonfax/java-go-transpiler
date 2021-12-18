@@ -1,84 +1,58 @@
 /* visit a parse tree and build a golang struct from the java fields within the class in the file */
 package main
 
-import "github.com/dragonfax/java_converter/parser"
+import (
+	"github.com/dragonfax/java_converter/ast"
+	"github.com/dragonfax/java_converter/parser"
+)
 
-type StructVisitor struct {
-}
+type StructVisitor struct{}
 
-func (sv *StructVisitor) VisitClassDeclaration(ctx *parser.ClassDeclarationContext) Node {
+func (sv *StructVisitor) AggregateResult(aggregate ast.Node, nextResult ast.Node) ast.Node {
+	/* 1. drop nils
+	 * 2. merge FieldLists and Fields
+	 */
 
-	className := ctx.IDENTIFIER().GetText()
+	if aggregate == nil {
+		return nextResult
+	}
 
-	fieldsList := sv.VisitClassBody(ctx.ClassBody()).(FieldListNode).([]*FieldNode)
-
-	return &ClassNode{Name: className, Fields: fieldsList}
-
-}
-
-func (sv *StructVisitor) Aggregator(aggregate, next Node) Node {
-	// drop nils.
-	// send a single value up the line.
-	// only merge and send FieldLists
-	// anything else is a panic.
-
-	if next == nil {
+	if nextResult == nil {
 		return aggregate
 	}
 
-	if aggregate == nil && next != nil {
-		return next
+	// this should be replaced with visitMemberDeclaration(),
+	// but I wanted an example aggregate function.
+	aggFieldList, ok := aggregate.(ast.FieldListNode)
+	nextFieldList, ok2 := nextResult.(ast.FieldListNode)
+	if ok && ok2 {
+		aggFieldList = append(aggFieldList, nextFieldList...)
+		return aggFieldList
 	}
 
-	// with this design the only time we see multiple non-nil children is FieldLists
-
-	aggFieldList, aggOk := aggregate.(FieldListNode)
-	nextFieldList, nextOk := next.(FieldListNode)
-
-	if aggOk && nextOk {
-		return append(aggFieldList, nextFieldList...)
-	}
-
-	panic("unknown")
+	return super.aggregateResult(aggregate, nextResult)
 }
 
-/* default node is just nil */
+func (sv *StructVisitor) VisitClassDeclaration(ctx *parser.ClassDeclarationContext) ast.Node {
 
-func (sv *StructVisitor) VisitFieldDeclaraction(ctx *parser.FieldDeclarationContext) Node {
+	className := ctx.IDENTIFIER().GetText()
 
-	typ := sv.VisitTypeType(ctx.TypeType()).(*FieldNode).Type
+	fieldsList := super.visitClassBody(ctx.ClassBody())
 
-	fieldList := make([]*FieldNode, 0)
-	for _, varDecl := range ctx.VariableDeclarators().(*parser.VariableDeclaratorsContext).AllVariableDeclarator() {
-		varDeclNode := sv.VisitVariableDeclarator(varDecl)
-
-		fieldList = append(fieldList,
-			&FieldNode{
-				Type: typ,
-				Name: varDeclNode.(*FieldNode).Name,
-			})
-	}
-
-	return FieldListNode(fieldList)
+	return &ast.ClassNode{Name: className, Fields: fieldsList}
 }
 
-func (sv *StructVisitor) VisitVariableDeclaratorId(ctx *parser.VariableDeclaratorIdContext) Node {
-	// partial field node, just used to send part of the data up the line.
-	return &FieldNode{Name: ctx.IDENTIFIER().GetText()}
+func (sv *StructVisitor) VisitFieldDeclaration(ctx *parser.FieldDeclarationContext) ast.Node {
 
-}
+	typ := ctx.TypeType().GetText()
 
-func (sv *StructVisitor) VisitTypeType(ctx *parser.TypeTypeContext) Node {
-	// send partial field node, they get combined up the line.
+	varDecls := ctx.VariableDeclarators().(*parser.VariableDeclaratorsContext).AllVariableDeclarator()
 
-	if ctx.PrimitiveType() != nil {
-		return &FieldNode{Type: ctx.PrimitiveType().GetText()}
+	fieldList := make([]*ast.FieldNode, len(varDecls), 0)
+	for _, varDecl := range varDecls {
+		name := varDecl.(*parser.VariableDeclaratorContext).VariableDeclaratorId().GetText()
+		fieldList = append(fieldList, &ast.FieldNode{Name: name, Type: typ})
 	}
 
-	if ctx.ClassOrInterfaceType() != nil {
-		typ := ctx.ClassOrInterfaceType().(*parser.ClassOrInterfaceTypeContext).IDENTIFIER().GetText()
-		return &FieldNode{Type: typ}
-	}
-
-	panic("unknown")
+	return ast.FieldListNode(fieldList)
 }
