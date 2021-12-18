@@ -21,8 +21,8 @@ generate: $(GENERATED_PARSER_FILES)
 $(GENERATED_PARSER_FILES): stg.jar $(GRAMMAR_FILES)
 	CLASSPATH="stg.jar:/usr/local/Cellar/antlr/4.9.3/antlr-4.9.3-complete.jar:." \
 		/usr/local/opt/openjdk/bin/java \
-		-jar /usr/local/Cellar/antlr/4.9.3/antlr-4.9.3-complete.jar \
-		-o parser -Dlanguage=Go -visitor -cp stg.jar JavaLexer.g4 JavaParser.g4
+		org.antlr.v4.Tool \
+		-o parser -Dlanguage=Go -visitor JavaLexer.g4 JavaParser.g4
 
 test:
 	go test ./...
