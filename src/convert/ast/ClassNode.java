@@ -2,8 +2,8 @@ package convert.ast;
 
 public class ClassNode implements Node {
 
-    String name;
-    FieldListNode fields;
+    public String name;
+    public FieldListNode fields;
 
     @Override
     public String toString() {

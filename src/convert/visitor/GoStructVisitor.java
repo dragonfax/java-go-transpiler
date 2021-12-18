@@ -2,6 +2,7 @@ package convert.visitor;
 
 import convert.ast.*;
 import parser.*;
+import java.util.ArrayList;
 
 public class GoStructVisitor extends JavaParserBaseVisitor<Node> {
 
@@ -22,8 +23,8 @@ public class GoStructVisitor extends JavaParserBaseVisitor<Node> {
     
         // with this design the only time we see multiple non-nil children is FieldLists
     
-        FieldListNode aggFieldList;
-        FieldListNode nextFieldList;
+        FieldListNode aggFieldList = null;
+        FieldListNode nextFieldList = null;
         if (aggregate instanceof FieldListNode) {
             aggFieldList = (FieldListNode)aggregate;
         }
@@ -56,43 +57,45 @@ public class GoStructVisitor extends JavaParserBaseVisitor<Node> {
     
     /* defaultResult is just null */
     
-    func (sv *StructVisitor) VisitFieldDeclaraction(ctx *parser.FieldDeclarationContext) Node {
+
+    @Override
+    public Node visitFieldDeclaration(JavaParser.FieldDeclarationContext ctx) {
     
-        typ := sv.VisitTypeType(ctx.TypeType()).(*FieldNode).Type
+        var type = ((FieldNode)visitTypeType(ctx.typeType())).type;
+
+        var varDecls = ctx.variableDeclarators().variableDeclarator();
+
+        var fieldList = new ArrayList<FieldNode>(varDecls.size());
     
-        fieldList := make([]*FieldNode, 0)
-        for _, varDecl := range ctx.VariableDeclarators().(*parser.VariableDeclaratorsContext).AllVariableDeclarator() {
-            varDeclNode := sv.VisitVariableDeclarator(varDecl)
+        for ( var varDecl : varDecls )  {
+            var varDeclNode = visitVariableDeclarator(varDecl);
     
-            fieldList = append(fieldList,
-                &FieldNode{
-                    Type: typ,
-                    Name: varDeclNode.(*FieldNode).Name,
-                })
+            fieldList.add(new FieldNode( ((FieldNode)varDeclNode).name, type ));
         }
     
-        return FieldListNode(fieldList)
+        return new FieldListNode(fieldList.toArray(new FieldNode[]{}));
     }
     
-    func (sv *StructVisitor) VisitVariableDeclaratorId(ctx *parser.VariableDeclaratorIdContext) Node {
+    @Override
+    public Node visitVariableDeclaratorId(JavaParser.VariableDeclaratorIdContext ctx) {
         // partial field node, just used to send part of the data up the line.
-        return &FieldNode{Name: ctx.IDENTIFIER().GetText()}
-    
+        return new FieldNode(ctx.IDENTIFIER().getText(), null);
     }
     
-    func (sv *StructVisitor) VisitTypeType(ctx *parser.TypeTypeContext) Node {
+    @Override
+    public Node visitTypeType(JavaParser.TypeTypeContext ctx) {
         // send partial field node, they get combined up the line.
     
-        if ctx.PrimitiveType() != nil {
-            return &FieldNode{Type: ctx.PrimitiveType().GetText()}
+        if ( ctx.primitiveType() != null ) {
+            return new FieldNode(null, ctx.primitiveType().getText());
         }
     
-        if ctx.ClassOrInterfaceType() != nil {
-            typ := ctx.ClassOrInterfaceType().(*parser.ClassOrInterfaceTypeContext).IDENTIFIER().GetText()
-            return &FieldNode{Type: typ}
+        if ( ctx.classOrInterfaceType() != null ) {
+            var type = ctx.classOrInterfaceType().IDENTIFIER().get(0).getText();
+            return new FieldNode(null, type);
         }
     
-        panic("unknown")
+        throw new RuntimeException("unknown");
     }
     
 }

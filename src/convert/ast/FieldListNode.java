@@ -6,7 +6,7 @@ import java.util.Collections;
 
 public class FieldListNode implements Node {
 
-    FieldNode[] fields;
+    public FieldNode[] fields;
 
     @Override
     public String toString() {
@@ -22,7 +22,8 @@ public class FieldListNode implements Node {
         var list = new ArrayList<FieldNode>(fields.length + nextFieldList.fields.length);
         Collections.addAll(list, this.fields);
         Collections.addAll(list, nextFieldList.fields);
-        return new FieldListNode(list.toArray<FieldNode>());
+
+        return new FieldListNode(list.toArray(new FieldNode[]{}));
     }
     
 }

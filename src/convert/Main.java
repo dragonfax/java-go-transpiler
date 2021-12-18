@@ -1,7 +1,6 @@
 package convert;
 
 import org.antlr.v4.runtime.*;
-import org.antlr.v4.runtime.tree.*;
 
 import convert.ast.Node;
 import convert.visitor.GoStructVisitor;
