@@ -16,24 +16,24 @@ type Node interface {
 type File struct {
 	Filename    string
 	PackageName string
-	Imports     []string
+	Imports     []*Import
 	Classes     []*Class
 }
 
 func NewFile() *File {
 	f := &File{}
-	f.Imports = make([]string, 0)
+	f.Imports = make([]*Import, 0)
 	return f
 }
 
 func (f *File) String() string {
 	return fmt.Sprintf(`
-package %s;
+package main // %s;
 
 %s
 
 %s
-`, f.PackageName, strings.Join(f.Imports, "\n"), strings.Join(NodeListToStringList(f.Classes), "\n"))
+`, f.PackageName, strings.Join(NodeListToStringList(f.Imports), "\n"), strings.Join(NodeListToStringList(f.Classes), "\n"))
 }
 
 type Class struct {
@@ -174,4 +174,16 @@ func (m *Method) String() string {
 	}
 
 	return fmt.Sprintf("func (this *%s) %s(%s) %s{\n%s\n}\n\n", m.Class, m.Name, arguments, m.ReturnType, body)
+}
+
+type Import struct {
+	Name string
+}
+
+func NewImport(name string) *Import {
+	return &Import{Name: name}
+}
+
+func (i *Import) String() string {
+	return fmt.Sprintf("import \"%s\"", i.Name)
 }

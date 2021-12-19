@@ -34,7 +34,7 @@ func (gv *GoVisitor) VisitCompilationUnit(ctx *parser.CompilationUnitContext) as
 	file.PackageName = ctx.PackageDeclaration().QualifiedName().GetText()
 
 	for _, importCtx := range ctx.AllImportDeclaration() {
-		file.Imports = append(file.Imports, importCtx.QualifiedName().GetText())
+		file.Imports = append(file.Imports, ast.NewImport(importCtx.QualifiedName().GetText()))
 	}
 
 	class := gv.VisitChildren(ctx)
