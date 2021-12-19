@@ -6,6 +6,7 @@ GO_SOURCE_FILES = $(shell find ./ -type f -name '*.go')
 ANTLR_GO_RUNTIME=../antlr4/runtime/Go
 ANTLR_GO_FILES = $(shell find $(ANTLR_GO_RUNTIME) type f -name '*.go')
 BINARY=java_visitor
+GO=go1.18beta1
 
 run: $(BINARY)
 	./$(BINARY)
@@ -14,7 +15,7 @@ debug:
 	dlv --api-version 2 --headless --listen :40000 debug main.go
 
 $(BINARY): go.* $(GO_SOURCE_FILES) $(GENERATED_PARSER_FILES)
-	go build -o $(BINARY)
+	$(GO) build -o $(BINARY)
 
 generate: $(GENERATED_PARSER_FILES)
 
@@ -25,7 +26,7 @@ $(GENERATED_PARSER_FILES): stg.jar $(GRAMMAR_FILES)
 		-o parser -Dlanguage=Go -visitor JavaLexer.g4 JavaParser.g4
 
 test:
-	go test ./...
+	$(GO) test ./...
 
 
 ANTLR_GO_STG=../antlr4/tool/resources/org/antlr/v4/tool/templates/codegen/Go/Go.stg

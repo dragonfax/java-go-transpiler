@@ -7,16 +7,16 @@ import (
 )
 
 type StructVisitor struct {
-	*parser.BaseJavaParserVisitor
+	*parser.BaseJavaParserVisitor[ast.Node]
 }
 
 func NewStructVisitor() *StructVisitor {
 	sv := &StructVisitor{}
-	sv.BaseJavaParserVisitor = parser.NewBaseJavaParserVisitor(sv)
+	sv.BaseJavaParserVisitor = parser.NewBaseJavaParserVisitor[ast.Node](sv)
 	return sv
 }
 
-func (sv *StructVisitor) AggregateResult(aggregate interface{}, nextResult interface{}) interface{} {
+func (sv *StructVisitor) AggregateResult(aggregate ast.Node, nextResult ast.Node) ast.Node {
 	/* 1. drop nils
 	 * 2. merge FieldLists and Fields
 	 */
@@ -41,7 +41,7 @@ func (sv *StructVisitor) AggregateResult(aggregate interface{}, nextResult inter
 	return sv.AggregateResult(aggregate, nextResult)
 }
 
-func (sv *StructVisitor) VisitClassDeclaration(ctx *parser.ClassDeclarationContext) interface{} {
+func (sv *StructVisitor) VisitClassDeclaration(ctx *parser.ClassDeclarationContext) ast.Node {
 
 	className := ctx.IDENTIFIER().GetText()
 
@@ -50,7 +50,7 @@ func (sv *StructVisitor) VisitClassDeclaration(ctx *parser.ClassDeclarationConte
 	return &ast.ClassNode{Name: className, Fields: fieldsList.(ast.FieldListNode)}
 }
 
-func (sv *StructVisitor) VisitFieldDeclaration(ctx *parser.FieldDeclarationContext) interface{} {
+func (sv *StructVisitor) VisitFieldDeclaration(ctx *parser.FieldDeclarationContext) ast.Node {
 
 	typ := ctx.TypeType().GetText()
 
@@ -63,4 +63,8 @@ func (sv *StructVisitor) VisitFieldDeclaration(ctx *parser.FieldDeclarationConte
 	}
 
 	return ast.FieldListNode(fieldList)
+}
+
+func (sv *StructVisitor) DefaultValue() ast.Node {
+	return nil
 }
