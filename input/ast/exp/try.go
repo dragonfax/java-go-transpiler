@@ -32,9 +32,9 @@ type CatchClause struct {
 	Variable  string
 }
 
-func NewTryCatchNode(statement parser.IStatementContext) *TryCatchNode {
+func NewTryCatchNode(statement *parser.StatementContext) *TryCatchNode {
 
-	ctx := statement.(*parser.StatementContext)
+	ctx := statement
 
 	if ctx.ResourceSpecification() != nil {
 		panic("resource try/catch found.")
@@ -45,21 +45,21 @@ func NewTryCatchNode(statement parser.IStatementContext) *TryCatchNode {
 	var finallyBlock ExpressionNode
 	finally := ctx.FinallyBlock()
 	if finally != nil {
-		finallyBlock = NewBlockNode(finally.(*parser.FinallyBlockContext).Block())
+		finallyBlock = NewBlockNode(finally.Block())
 	}
 
 	clauses := make([]*CatchClause, 0)
 	for _, catch := range ctx.AllCatchClause() {
-		catchCtx := catch.(*parser.CatchClauseContext)
+		catchCtx := catch
 		variable := catchCtx.IDENTIFIER().GetText()
 
-		typeCtx := catchCtx.CatchType().(*parser.CatchTypeContext)
+		typeCtx := catchCtx.CatchType()
 		if len(typeCtx.AllQualifiedName()) > 1 {
 			panic("too many catch types.")
 		}
 
 		catchType := make([]string, 0)
-		for _, ct := range typeCtx.QualifiedName(0).(*parser.QualifiedNameContext).AllIDENTIFIER() {
+		for _, ct := range typeCtx.QualifiedName(0).AllIDENTIFIER() {
 			catchType = append(catchType, ct.GetText())
 		}
 

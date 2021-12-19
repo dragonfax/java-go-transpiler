@@ -49,8 +49,8 @@ func (tn *TypeElementNode) String() string {
 	return class
 }
 
-func NewTypeOrVoidNode(typ parser.ITypeTypeOrVoidContext) TypeNode {
-	typCtx := typ.(*parser.TypeTypeOrVoidContext)
+func NewTypeOrVoidNode(typ *parser.TypeTypeOrVoidContext) TypeNode {
+	typCtx := typ
 	if typCtx.VOID() != nil {
 		return TypeNode([]*TypeElementNode{{Class: "void"}})
 	} else {
@@ -58,11 +58,11 @@ func NewTypeOrVoidNode(typ parser.ITypeTypeOrVoidContext) TypeNode {
 	}
 }
 
-func NewTypeNode(typ parser.ITypeTypeContext) TypeNode {
+func NewTypeNode(typ *parser.TypeTypeContext) TypeNode {
 	if typ == nil {
 		return nil
 	}
-	ctx := typ.(*parser.TypeTypeContext)
+	ctx := typ
 	if ctx.PrimitiveType() != nil {
 		// simple primitive type, easy to parse
 		return TypeNode([]*TypeElementNode{
@@ -72,7 +72,7 @@ func NewTypeNode(typ parser.ITypeTypeContext) TypeNode {
 		})
 	}
 
-	classCtx := ctx.ClassOrInterfaceType().(*parser.ClassOrInterfaceTypeContext)
+	classCtx := ctx.ClassOrInterfaceType()
 
 	// multile components to one type. Say Car.WheelEnum
 	typeNode := make(TypeNode, 0)
@@ -88,13 +88,13 @@ func NewTypeNode(typ parser.ITypeTypeContext) TypeNode {
 			continue
 		}
 
-		typeCompCtx := typeComp.(*parser.TypeArgumentsContext)
+		typeCompCtx := typeComp
 
 		// (typeArguments) multiple type args between <> seperated by commas
 		thisTypeArguments := make([]TypeNode, 0)
 		for _, typCompArg := range typeCompCtx.AllTypeArgument() {
 
-			childTypeNode := NewTypeNode(typCompArg.(*parser.TypeArgumentContext).TypeType())
+			childTypeNode := NewTypeNode(typCompArg.TypeType())
 			thisTypeArguments = append(thisTypeArguments, childTypeNode)
 		}
 

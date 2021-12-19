@@ -20,8 +20,8 @@ func (al *ArrayLiteral) String() string {
 	return fmt.Sprintf("[]%s{%s}", al.Type, strings.Join(l, ","))
 }
 
-func NewArrayLiteral(lit parser.IArrayInitializerContext) *ArrayLiteral {
-	ctx := lit.(*parser.ArrayInitializerContext)
+func NewArrayLiteral(lit *parser.ArrayInitializerContext) *ArrayLiteral {
+	ctx := lit
 
 	if len(ctx.AllVariableInitializer()) == 0 {
 		return &ArrayLiteral{}
@@ -29,7 +29,7 @@ func NewArrayLiteral(lit parser.IArrayInitializerContext) *ArrayLiteral {
 
 	l := make([]ExpressionNode, 0)
 	for _, varInit := range ctx.AllVariableInitializer() {
-		varInitCtx := varInit.(*parser.VariableInitializerContext)
+		varInitCtx := varInit
 
 		exp := variableInitializerProcessor(varInitCtx)
 

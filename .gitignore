@@ -1,3 +1,4 @@
 parser/
 java_converter
 .antlr
+stg.jar

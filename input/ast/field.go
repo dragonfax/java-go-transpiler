@@ -17,14 +17,14 @@ func NewFields(ctx *parser.FieldDeclarationContext) []*Field {
 
 	typ := exp.NewTypeNode(ctx.TypeType())
 
-	for _, varDec := range ctx.VariableDeclarators().(*parser.VariableDeclaratorsContext).AllVariableDeclarator() {
-		varDecCtx := varDec.(*parser.VariableDeclaratorContext)
+	for _, varDec := range ctx.VariableDeclarators().AllVariableDeclarator() {
+		varDecCtx := varDec
 
 		name := varDecCtx.VariableDeclaratorId().GetText()
 
 		var init exp.ExpressionNode
 		if varDecCtx.VariableInitializer() != nil {
-			initCtx := varDecCtx.VariableInitializer().(*parser.VariableInitializerContext)
+			initCtx := varDecCtx.VariableInitializer()
 			if initCtx.Expression() != nil {
 				init = exp.ExpressionProcessor(initCtx.Expression())
 			} else if initCtx.ArrayInitializer() != nil {

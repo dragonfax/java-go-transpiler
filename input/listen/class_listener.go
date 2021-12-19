@@ -28,8 +28,8 @@ func NewClassListener(sl *StackListener, file *ast.File, ctx *parser.ClassDeclar
 	}
 
 	if ctx.TypeList() != nil {
-		for _, typeType := range ctx.TypeList().(*parser.TypeListContext).AllTypeType() {
-			typeTypeCtx := typeType.(*parser.TypeTypeContext)
+		for _, typeType := range ctx.TypeList().AllTypeType() {
+			typeTypeCtx := typeType
 			s.class.Interfaces = append(s.class.Interfaces, exp.NewTypeNode(typeTypeCtx))
 		}
 	}
@@ -54,7 +54,7 @@ func (s *ClassListener) EnterConstructorDeclaration(ctx *parser.ConstructorDecla
 
 	// ctx.FormalPameters()
 
-	node := exp.NewBlockNode(ctx.Block().(*parser.BlockContext))
+	node := exp.NewBlockNode(ctx.Block())
 	c.Body = node
 
 	s.class.Members = append(s.class.Members, c)
@@ -80,8 +80,8 @@ func (s *ClassListener) EnterMethodDeclaration(ctx *parser.MethodDeclarationCont
 
 	name := ctx.IDENTIFIER().GetText()
 
-	body := exp.NewBlockNode(ctx.MethodBody().(*parser.MethodBodyContext).Block())
-	m := ast.NewMethod(s.lastModifier, name, s.class.Name, exp.FormalParameterListProcessor(ctx.FormalParameters().(*parser.FormalParametersContext).FormalParameterList()), ctx.TypeTypeOrVoid().GetText(), body)
+	body := exp.NewBlockNode(ctx.MethodBody().Block())
+	m := ast.NewMethod(s.lastModifier, name, s.class.Name, exp.FormalParameterListProcessor(ctx.FormalParameters().FormalParameterList()), ctx.TypeTypeOrVoid().GetText(), body)
 
 	s.class.Members = append(s.class.Members, m)
 }

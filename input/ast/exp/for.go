@@ -9,7 +9,7 @@ import (
 
 func NewForNode(statementCtx *parser.StatementContext) ExpressionNode {
 
-	if statementCtx.ForControl().(*parser.ForControlContext).EnhancedForControl() != nil {
+	if statementCtx.ForControl().EnhancedForControl() != nil {
 		return NewEnhancedForNode(statementCtx)
 	}
 	return NewClassicForNode(statementCtx)
@@ -23,13 +23,13 @@ type EnhancedForNode struct {
 
 func NewEnhancedForNode(statementCtx *parser.StatementContext) *EnhancedForNode {
 
-	forControlCtx := statementCtx.ForControl().(*parser.ForControlContext)
-	enhancedCtx := forControlCtx.EnhancedForControl().(*parser.EnhancedForControlContext)
+	forControlCtx := statementCtx.ForControl()
+	enhancedCtx := forControlCtx.EnhancedForControl()
 
 	instance := ExpressionProcessor(enhancedCtx.Expression())
 	variable := NewVariableDecl(NewTypeNode(enhancedCtx.TypeType()), enhancedCtx.VariableDeclaratorId().GetText(), nil)
 
-	body := StatementProcessor(statementCtx.Statement(0).(*parser.StatementContext))
+	body := StatementProcessor(statementCtx.Statement(0))
 	return &EnhancedForNode{
 		Variable: variable,
 		Instance: instance,
@@ -67,20 +67,20 @@ func (fn *ClassicForNode) String() string {
 }
 
 func NewClassicForNode(statementCtx *parser.StatementContext) *ClassicForNode {
-	init, condition, increment := classicForControlProcessor(statementCtx.ForControl().(*parser.ForControlContext))
+	init, condition, increment := classicForControlProcessor(statementCtx.ForControl())
 	return &ClassicForNode{
 		Condition: condition,
 		Init:      init,
 		Increment: increment,
-		Body:      StatementProcessor(statementCtx.Statement(0).(*parser.StatementContext)),
+		Body:      StatementProcessor(statementCtx.Statement(0)),
 	}
 }
 
 func classicForControlProcessor(forControlCtx *parser.ForControlContext) (init []ExpressionNode, condition ExpressionNode, increment []ExpressionNode) {
 	if forControlCtx.GetForUpdate() != nil {
 		increment = make([]ExpressionNode, 0)
-		for _, exp := range forControlCtx.GetForUpdate().(*parser.ExpressionListContext).AllExpression() {
-			node := ExpressionProcessor(exp.(*parser.ExpressionContext))
+		for _, exp := range forControlCtx.GetForUpdate().AllExpression() {
+			node := ExpressionProcessor(exp)
 			if node == nil {
 				panic("nil into node list")
 			}
@@ -89,15 +89,15 @@ func classicForControlProcessor(forControlCtx *parser.ForControlContext) (init [
 	}
 
 	if forControlCtx.Expression() != nil {
-		condition = ExpressionProcessor(forControlCtx.Expression().(*parser.ExpressionContext))
+		condition = ExpressionProcessor(forControlCtx.Expression())
 	}
 
 	if forControlCtx.ForInit() != nil {
-		initCtx := forControlCtx.ForInit().(*parser.ForInitContext)
+		initCtx := forControlCtx.ForInit()
 		init = make([]ExpressionNode, 0)
 		if initCtx.LocalVariableDeclaration() != nil {
 			// variable declaractions
-			declCtx := initCtx.LocalVariableDeclaration().(*parser.LocalVariableDeclarationContext)
+			declCtx := initCtx.LocalVariableDeclaration()
 			init = NewVariableDeclNodeList(declCtx)
 			for _, n := range init {
 				if n == nil {
@@ -106,8 +106,8 @@ func classicForControlProcessor(forControlCtx *parser.ForControlContext) (init [
 			}
 		} else {
 			// expression list
-			for _, exp := range initCtx.ExpressionList().(*parser.ExpressionListContext).AllExpression() {
-				node := ExpressionProcessor(exp.(*parser.ExpressionContext))
+			for _, exp := range initCtx.ExpressionList().AllExpression() {
+				node := ExpressionProcessor(exp)
 				if node == nil {
 					panic("nil into node list")
 				}

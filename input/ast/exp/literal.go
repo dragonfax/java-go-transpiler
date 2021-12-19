@@ -22,11 +22,11 @@ type LiteralNode struct {
 	Value string
 }
 
-func NewLiteralNode(literal parser.ILiteralContext) *LiteralNode {
+func NewLiteralNode(literal *parser.LiteralContext) *LiteralNode {
 	if literal == nil {
 		panic("no literal value")
 	}
-	literalCtx := literal.(*parser.LiteralContext)
+	literalCtx := literal
 
 	var typ LiteralType
 	if literalCtx.CHAR_LITERAL() != nil {

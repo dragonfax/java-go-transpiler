@@ -35,13 +35,13 @@ func NewVariableDeclNodeList(decl *parser.LocalVariableDeclarationContext) []Exp
 
 	typ := NewTypeNode(decl.TypeType())
 
-	for _, varDecl := range decl.VariableDeclarators().(*parser.VariableDeclaratorsContext).AllVariableDeclarator() {
+	for _, varDecl := range decl.VariableDeclarators().AllVariableDeclarator() {
 
-		varDeclCtx := varDecl.(*parser.VariableDeclaratorContext)
+		varDeclCtx := varDecl
 
 		var exp ExpressionNode
 		if varDeclCtx.VariableInitializer() != nil {
-			varInitCtx := varDeclCtx.VariableInitializer().(*parser.VariableInitializerContext)
+			varInitCtx := varDeclCtx.VariableInitializer()
 			exp = variableInitializerProcessor(varInitCtx)
 		}
 
@@ -60,10 +60,10 @@ func NewVariableDeclNodeList(decl *parser.LocalVariableDeclarationContext) []Exp
 func variableInitializerProcessor(ctx *parser.VariableInitializerContext) ExpressionNode {
 	var exp ExpressionNode
 	if ctx.Expression() != nil {
-		exp = ExpressionProcessor(ctx.Expression().(*parser.ExpressionContext))
+		exp = ExpressionProcessor(ctx.Expression())
 	}
 	if ctx.ArrayInitializer() != nil {
-		exp = NewArrayLiteral(ctx.ArrayInitializer().(*parser.ArrayInitializerContext))
+		exp = NewArrayLiteral(ctx.ArrayInitializer())
 	}
 
 	return exp

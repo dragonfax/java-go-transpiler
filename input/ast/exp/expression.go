@@ -6,12 +6,12 @@ import (
 )
 
 // deal with the recursive expression tree.
-func ExpressionProcessor(expressionI parser.IExpressionContext) ExpressionNode {
+func ExpressionProcessor(expressionI *parser.ExpressionContext) ExpressionNode {
 	if tool.IsNilInterface(expressionI) {
 		return nil
 	}
 
-	expression := expressionI.(*parser.ExpressionContext)
+	expression := expressionI
 
 	if expression.LambdaExpression() != nil {
 		return NewLambdaNode(expression.LambdaExpression())
@@ -120,8 +120,8 @@ func ExpressionProcessor(expressionI parser.IExpressionContext) ExpressionNode {
 	// return nil
 }
 
-func expressionFromPrimary(primary parser.IPrimaryContext) ExpressionNode {
-	primaryCtx := primary.(*parser.PrimaryContext)
+func expressionFromPrimary(primary *parser.PrimaryContext) ExpressionNode {
+	primaryCtx := primary
 
 	if primaryCtx.IDENTIFIER() != nil {
 		return NewIdentifierNode(primaryCtx.IDENTIFIER().GetText())
@@ -140,7 +140,7 @@ func expressionFromPrimary(primary parser.IPrimaryContext) ExpressionNode {
 	}
 
 	if primaryCtx.Literal() != nil {
-		literal := primaryCtx.Literal().(*parser.LiteralContext)
+		literal := primaryCtx.Literal()
 		return NewLiteralNode(literal)
 	}
 
@@ -151,22 +151,22 @@ func expressionFromPrimary(primary parser.IPrimaryContext) ExpressionNode {
 	panic("unknown primary type: " + primary.GetText() + "\n\n" + primary.ToStringTree(parser.RuleNames, nil))
 }
 
-func FormalParameterListProcessor(formal parser.IFormalParameterListContext) []ExpressionNode {
+func FormalParameterListProcessor(formal *parser.FormalParameterListContext) []ExpressionNode {
 	if tool.IsNilInterface(formal) {
 		return nil
 	}
-	ctx := formal.(*parser.FormalParameterListContext)
+	ctx := formal
 
 	parameters := make([]ExpressionNode, 0)
 	for _, formalParam := range ctx.AllFormalParameter() {
-		formalParamCtx := formalParam.(*parser.FormalParameterContext)
+		formalParamCtx := formalParam
 		t := NewTypeNode(formalParamCtx.TypeType())
 		name := formalParamCtx.VariableDeclaratorId().GetText()
 		parameters = append(parameters, NewArgument(t, name, false))
 	}
 
 	if ctx.LastFormalParameter() != nil {
-		lastParameterCtx := ctx.LastFormalParameter().(*parser.LastFormalParameterContext)
+		lastParameterCtx := ctx.LastFormalParameter()
 		t := NewTypeNode(lastParameterCtx.TypeType())
 		name := lastParameterCtx.VariableDeclaratorId().GetText()
 		parameters = append(parameters, NewArgument(t, name, true))

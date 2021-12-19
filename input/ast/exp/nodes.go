@@ -184,12 +184,12 @@ type MethodCall struct {
 	Arguments  []ExpressionNode
 }
 
-func NewMethodCall(instance ExpressionNode, methodCall parser.IMethodCallContext) *MethodCall {
+func NewMethodCall(instance ExpressionNode, methodCall *parser.MethodCallContext) *MethodCall {
 	if tool.IsNilInterface(methodCall) {
 		panic("no method call")
 	}
 
-	methodCallCtx := methodCall.(*parser.MethodCallContext)
+	methodCallCtx := methodCall
 
 	methodName := ""
 	if methodCallCtx.SUPER() != nil {
@@ -205,7 +205,7 @@ func NewMethodCall(instance ExpressionNode, methodCall parser.IMethodCallContext
 	arguments := make([]ExpressionNode, 0)
 
 	if methodCallCtx.ExpressionList() != nil {
-		for _, expression := range methodCallCtx.ExpressionList().(*parser.ExpressionListContext).AllExpression() {
+		for _, expression := range methodCallCtx.ExpressionList().AllExpression() {
 			node := ExpressionProcessor(expression)
 			if node == nil {
 				panic("nil in node list")
@@ -243,13 +243,13 @@ type ConstructorCall struct {
 	Arguments     []ExpressionNode
 }
 
-func NewConstructorCall(creator parser.ICreatorContext) *ConstructorCall {
+func NewConstructorCall(creator *parser.CreatorContext) *ConstructorCall {
 	if creator == nil {
 		panic("empty creator call")
 	}
-	creatorCtx := creator.(*parser.CreatorContext)
+	creatorCtx := creator
 
-	creatorNameCtx := creatorCtx.CreatedName().(*parser.CreatedNameContext)
+	creatorNameCtx := creatorCtx.CreatedName()
 	class := ""
 	if creatorNameCtx.IDENTIFIER(0) != nil {
 		class = creatorNameCtx.IDENTIFIER(0).GetText()
@@ -261,9 +261,9 @@ func NewConstructorCall(creator parser.ICreatorContext) *ConstructorCall {
 
 	typeArguments := make([]TypeNode, 0)
 	if creatorNameCtx.TypeArgumentsOrDiamond(0) != nil {
-		if creatorNameCtx.TypeArgumentsOrDiamond(0).(*parser.TypeArgumentsOrDiamondContext).TypeArguments() != nil {
-			for _, typeArg := range creatorNameCtx.TypeArgumentsOrDiamond(0).(*parser.TypeArgumentsOrDiamondContext).TypeArguments().(*parser.TypeArgumentsContext).AllTypeArgument() {
-				typeArgCtx := typeArg.(*parser.TypeArgumentContext)
+		if creatorNameCtx.TypeArgumentsOrDiamond(0).TypeArguments() != nil {
+			for _, typeArg := range creatorNameCtx.TypeArgumentsOrDiamond(0).TypeArguments().AllTypeArgument() {
+				typeArgCtx := typeArg
 				node := NewTypeNode(typeArgCtx.TypeType())
 				typeArguments = append(typeArguments, node)
 			}
@@ -272,8 +272,8 @@ func NewConstructorCall(creator parser.ICreatorContext) *ConstructorCall {
 
 	arguments := make([]ExpressionNode, 0)
 	if creatorCtx.ClassCreatorRest() != nil {
-		if creatorCtx.ClassCreatorRest().(*parser.ClassCreatorRestContext).Arguments().(*parser.ArgumentsContext).ExpressionList() != nil {
-			for _, expression := range creatorCtx.ClassCreatorRest().(*parser.ClassCreatorRestContext).Arguments().(*parser.ArgumentsContext).ExpressionList().(*parser.ExpressionListContext).AllExpression() {
+		if creatorCtx.ClassCreatorRest().Arguments().ExpressionList() != nil {
+			for _, expression := range creatorCtx.ClassCreatorRest().Arguments().ExpressionList().AllExpression() {
 				node := ExpressionProcessor(expression)
 				if node == nil {
 					panic("nil in node list")
@@ -322,10 +322,10 @@ type LambdaNode struct {
 	Body      ExpressionNode
 }
 
-func NewLambdaNode(lambda parser.ILambdaExpressionContext) *LambdaNode {
-	lambdaCtx := lambda.(*parser.LambdaExpressionContext)
+func NewLambdaNode(lambda *parser.LambdaExpressionContext) *LambdaNode {
+	lambdaCtx := lambda
 
-	bodyCtx := lambdaCtx.LambdaBody().(*parser.LambdaBodyContext)
+	bodyCtx := lambdaCtx.LambdaBody()
 	var body ExpressionNode
 	if bodyCtx.Expression() != nil {
 		body = ExpressionProcessor(bodyCtx.Expression())
@@ -340,7 +340,7 @@ func NewLambdaNode(lambda parser.ILambdaExpressionContext) *LambdaNode {
 	}
 
 	arguments := make([]ExpressionNode, 0)
-	parametersCtx := lambdaCtx.LambdaParameters().(*parser.LambdaParametersContext)
+	parametersCtx := lambdaCtx.LambdaParameters()
 	if len(parametersCtx.AllIDENTIFIER()) > 0 {
 		// java lambda can have just parameter names, without types. thats valid
 		for _, id := range parametersCtx.AllIDENTIFIER() {
@@ -367,8 +367,8 @@ type MethodReference struct {
 	Method   string
 }
 
-func NewMethodReference(expression parser.IExpressionContext) ExpressionNode {
-	ctx := expression.(*parser.ExpressionContext)
+func NewMethodReference(expression *parser.ExpressionContext) ExpressionNode {
+	ctx := expression
 
 	method := ""
 	if ctx.IDENTIFIER() != nil {

@@ -5,7 +5,7 @@ import (
 	"github.com/dragonfax/java_converter/tool"
 )
 
-func StatementProcessor(statementCtxI parser.IStatementContext) ExpressionNode {
+func StatementProcessor(statementCtxI *parser.StatementContext) ExpressionNode {
 	// TODO only one expression per block? no this isn't complicated enough.
 	// but okay for a first of expression parsing
 
@@ -13,15 +13,15 @@ func StatementProcessor(statementCtxI parser.IStatementContext) ExpressionNode {
 		return nil
 	}
 
-	statementCtx := statementCtxI.(*parser.StatementContext)
+	statementCtx := statementCtxI
 
 	if statementCtx.GetBlockLabel() != nil {
-		return NewBlockNode(statementCtx.GetBlockLabel().(*parser.BlockContext))
+		return NewBlockNode(statementCtx.GetBlockLabel())
 	}
 
 	if statementCtx.IF() != nil {
 		return NewIfNode(
-			ExpressionProcessor(statementCtx.ParExpression().(*parser.ParExpressionContext).Expression()),
+			ExpressionProcessor(statementCtx.ParExpression().Expression()),
 			StatementProcessor(statementCtx.Statement(0)),
 			StatementProcessor(statementCtx.Statement(1)),
 		)
@@ -33,15 +33,15 @@ func StatementProcessor(statementCtxI parser.IStatementContext) ExpressionNode {
 
 	if statementCtx.WHILE() != nil {
 		return &ClassicForNode{
-			Condition: ExpressionProcessor(statementCtx.ParExpression().(*parser.ParExpressionContext).Expression().(*parser.ExpressionContext)),
-			Body:      StatementProcessor(statementCtx.Statement(0).(*parser.StatementContext)),
+			Condition: ExpressionProcessor(statementCtx.ParExpression().Expression()),
+			Body:      StatementProcessor(statementCtx.Statement(0)),
 		}
 	}
 
 	if statementCtx.DO() != nil {
 		return &ClassicForNode{
-			Condition:     ExpressionProcessor(statementCtx.ParExpression().(*parser.ParExpressionContext).Expression().(*parser.ExpressionContext)),
-			Body:          StatementProcessor(statementCtx.Statement(0).(*parser.StatementContext)),
+			Condition:     ExpressionProcessor(statementCtx.ParExpression().Expression()),
+			Body:          StatementProcessor(statementCtx.Statement(0)),
 			ConditionLast: true,
 		}
 	}
@@ -51,7 +51,7 @@ func StatementProcessor(statementCtxI parser.IStatementContext) ExpressionNode {
 	}
 
 	if statementCtx.THROW() != nil {
-		return NewThrowNode(ExpressionProcessor(statementCtx.Expression(0).(*parser.ExpressionContext)))
+		return NewThrowNode(ExpressionProcessor(statementCtx.Expression(0)))
 	}
 
 	if statementCtx.BREAK() != nil {
@@ -78,7 +78,7 @@ func StatementProcessor(statementCtxI parser.IStatementContext) ExpressionNode {
 		// must be a statement, with a label
 		return NewLabelNode(
 			statementCtx.GetIdentifierLabel().GetText(),
-			StatementProcessor(statementCtx.Statement(0).(*parser.StatementContext)),
+			StatementProcessor(statementCtx.Statement(0)),
 		)
 	}
 
@@ -94,7 +94,7 @@ func StatementProcessor(statementCtxI parser.IStatementContext) ExpressionNode {
 		}
 
 		// TODO log warning, didn't expect this. missing grammar element?
-		return StatementProcessor(statementCtx.Statement(0).(*parser.StatementContext))
+		return StatementProcessor(statementCtx.Statement(0))
 	}
 
 	// multiple expressions are possible in a single statement,
@@ -110,7 +110,7 @@ func StatementProcessor(statementCtxI parser.IStatementContext) ExpressionNode {
 		}
 
 		// common scenario.
-		return ExpressionProcessor(statementCtx.Expression(0).(*parser.ExpressionContext))
+		return ExpressionProcessor(statementCtx.Expression(0))
 	}
 
 	// ignore unknown structures.
