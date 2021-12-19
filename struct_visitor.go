@@ -6,9 +6,17 @@ import (
 	"github.com/dragonfax/java_converter/parser"
 )
 
-type StructVisitor struct{}
+type StructVisitor struct {
+	*parser.BaseJavaParserVisitor
+}
 
-func (sv *StructVisitor) AggregateResult(aggregate ast.Node, nextResult ast.Node) ast.Node {
+func NewStructVisitor() *StructVisitor {
+	sv := &StructVisitor{}
+	sv.BaseJavaParserVisitor = parser.NewBaseJavaParserVisitor(sv)
+	return sv
+}
+
+func (sv *StructVisitor) AggregateResult(aggregate interface{}, nextResult interface{}) interface{} {
 	/* 1. drop nils
 	 * 2. merge FieldLists and Fields
 	 */
@@ -30,25 +38,25 @@ func (sv *StructVisitor) AggregateResult(aggregate ast.Node, nextResult ast.Node
 		return aggFieldList
 	}
 
-	return super.aggregateResult(aggregate, nextResult)
+	return sv.AggregateResult(aggregate, nextResult)
 }
 
-func (sv *StructVisitor) VisitClassDeclaration(ctx *parser.ClassDeclarationContext) ast.Node {
+func (sv *StructVisitor) VisitClassDeclaration(ctx *parser.ClassDeclarationContext) interface{} {
 
 	className := ctx.IDENTIFIER().GetText()
 
-	fieldsList := super.visitClassBody(ctx.ClassBody())
+	fieldsList := sv.VisitClassBody(ctx.ClassBody().(*parser.ClassBodyContext))
 
-	return &ast.ClassNode{Name: className, Fields: fieldsList}
+	return &ast.ClassNode{Name: className, Fields: fieldsList.(ast.FieldListNode)}
 }
 
-func (sv *StructVisitor) VisitFieldDeclaration(ctx *parser.FieldDeclarationContext) ast.Node {
+func (sv *StructVisitor) VisitFieldDeclaration(ctx *parser.FieldDeclarationContext) interface{} {
 
 	typ := ctx.TypeType().GetText()
 
 	varDecls := ctx.VariableDeclarators().(*parser.VariableDeclaratorsContext).AllVariableDeclarator()
 
-	fieldList := make([]*ast.FieldNode, len(varDecls), 0)
+	fieldList := make([]*ast.FieldNode, 0, len(varDecls))
 	for _, varDecl := range varDecls {
 		name := varDecl.(*parser.VariableDeclaratorContext).VariableDeclaratorId().GetText()
 		fieldList = append(fieldList, &ast.FieldNode{Name: name, Type: typ})

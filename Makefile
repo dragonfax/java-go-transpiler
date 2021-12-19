@@ -14,7 +14,7 @@ debug:
 	dlv --api-version 2 --headless --listen :40000 debug main.go
 
 $(BINARY): go.* $(GO_SOURCE_FILES) $(GENERATED_PARSER_FILES)
-	go build -o $(BINARY) main.go
+	go build -o $(BINARY)
 
 generate: $(GENERATED_PARSER_FILES)
 

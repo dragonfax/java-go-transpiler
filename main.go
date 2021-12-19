@@ -16,13 +16,14 @@ func main() {
 	lexer := parser.NewJavaLexer(input)
 	stream := antlr.NewCommonTokenStream(lexer, 0)
 	p := parser.NewJavaParser(stream)
-	p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
+	// p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
 	p.BuildParseTrees = true
+
 	tree := p.CompilationUnit()
+	// fmt.Println(tree.ToStringTree(parser.RuleNames, nil))
 
-	structVisitor := &StructVisitor{}
-	visitor := antlr.NewParseTreeVisitor(structVisitor)
-	ast := visitor.Visit(tree)
+	structVisitor := NewStructVisitor()
 
+	ast := structVisitor.Visit(tree)
 	fmt.Println(ast)
 }
