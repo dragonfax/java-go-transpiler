@@ -2,17 +2,32 @@ package ast
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/dragonfax/java_converter/input/ast/exp"
 	"github.com/dragonfax/java_converter/input/parser"
 	"github.com/dragonfax/java_converter/tool"
 )
 
+func NodeListToStringLisT[T Node](list []T) []string {
+	s := make([]string, 0, len(list))
+	for _, n := range list {
+		s = append(s, n.String())
+	}
+	return s
+}
+
+type FieldList []*Field
+
+func (fl FieldList) String() string {
+	return strings.Join(NodeListToStringLisT(fl), ",")
+}
+
 type Field struct {
 	exp.VariableDeclNode
 }
 
-func NewFields(ctx *parser.FieldDeclarationContext) []*Field {
+func NewFields(ctx *parser.FieldDeclarationContext) FieldList {
 	members := make([]*Field, 0)
 
 	typ := exp.NewTypeNode(ctx.TypeType())

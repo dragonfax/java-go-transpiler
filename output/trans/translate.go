@@ -2,7 +2,6 @@ package trans
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"go/format"
 	"io/ioutil"
@@ -11,8 +10,8 @@ import (
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 	"github.com/aymerick/raymond"
 	"github.com/dragonfax/java_converter/input/ast"
-	"github.com/dragonfax/java_converter/input/listen"
 	"github.com/dragonfax/java_converter/input/parser"
+	"github.com/dragonfax/java_converter/input/visitor"
 	"github.com/dragonfax/java_converter/tool"
 )
 
@@ -29,35 +28,16 @@ var golangTemplate = tool.MustByteListErr(ioutil.ReadFile(golangTemplateFilename
 
 func parseAST(path string) (*ast.File, error) {
 
-	stackListener := listen.NewStackListener()
-
-	fileListener := listen.NewFileListener(stackListener, path)
-	stackListener.Push(fileListener)
+	goVisitor := visitor.NewGoVisitor()
 
 	input, _ := antlr.NewFileStream(path)
 	lexer.SetInputStream(input)
 	stream := antlr.NewCommonTokenStream(lexer, antlr.TokenDefaultChannel)
 	p.SetInputStream(stream)
-	// p.AddErrorListener(antlr.NewDiagnosticErrorListener(true))
 	p.BuildParseTrees = true
-	antlr.ParseTreeWalkerDefault.Walk(stackListener, p.CompilationUnit())
+	file := goVisitor.Visit(p.CompilationUnit())
 
-	if stackListener.Len() != 1 {
-		if stackListener.Len() == 2 {
-			panic(fmt.Sprintf("left over listener %T", stackListener.Peek()))
-		}
-		return nil, errors.New("wrong number of listeners left over, " + fmt.Sprintf("%d", stackListener.Len()))
-	}
-
-	/*
-		js, err := json.MarshalIndent(p.CompilationUnit(), "", "  ")
-		if err != nil {
-			panic(err)
-		}
-	*/
-	// fmt.Println(p.CompilationUnit().ToStringTree())
-
-	return fileListener.File, nil
+	return file.(*ast.File), nil
 }
 
 func dumpAST(file *ast.File) (string, error) {

@@ -1,6 +1,6 @@
 module github.com/dragonfax/java_converter
 
-go 1.17
+go 1.18
 
 require (
 	github.com/antlr/antlr4/runtime/Go/antlr v0.0.0-20211208212222-82c441726976
@@ -14,3 +14,5 @@ require (
 	gopkg.in/yaml.v2 v2.2.8 // indirect
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c // indirect
 )
+
+replace github.com/antlr/antlr4/runtime/Go/antlr => ../antlr4/runtime/Go/antlr

@@ -7,6 +7,10 @@ import (
 	"github.com/dragonfax/java_converter/tool"
 )
 
+type Node interface {
+	String() string
+}
+
 type File struct {
 	Filename    string
 	PackageName string
@@ -20,12 +24,23 @@ func NewFile() *File {
 	return f
 }
 
+func (f *File) String() string {
+	return fmt.Sprintf("file %s", f.Filename)
+}
+
 type Class struct {
 	Name       string
 	BaseClass  string
 	Interfaces []exp.TypeNode
 	Members    []Member
 	Fields     []*Field
+}
+
+func (c *Class) String() string {
+	if c.BaseClass != "" {
+		return fmt.Sprintf("class %s(%s)", c.Name, c.BaseClass)
+	}
+	return fmt.Sprintf("class %s", c.Name)
 }
 
 func NewClass() *Class {
@@ -40,15 +55,23 @@ type Member interface {
 	String() string
 }
 
+type HasSetModifier interface {
+	SetModifier(modifier string)
+}
+
 type BaseMember struct {
 	Name     string
 	Modifier string
 }
 
+func (bm *BaseMember) SetModifier(modifier string) {
+	bm.Modifier = modifier
+}
+
 var _ Member = &Constructor{}
 
 type Constructor struct {
-	BaseMember
+	*BaseMember
 	Body exp.ExpressionNode
 }
 
@@ -68,7 +91,7 @@ func (c *Constructor) String() string {
 }
 
 type Method struct {
-	BaseMember
+	*BaseMember
 
 	Body       exp.ExpressionNode
 	Arguments  []exp.ExpressionNode
@@ -77,16 +100,21 @@ type Method struct {
 }
 
 func NewMethod(modifier string, name string, class string, arguments []exp.ExpressionNode, returnType string, body exp.ExpressionNode) *Method {
-	if class == "" {
-		panic("no class")
-	}
 	return &Method{
-		BaseMember: BaseMember{Modifier: modifier, Name: name},
+		BaseMember: &BaseMember{Modifier: modifier, Name: name},
 		Class:      class,
 		Arguments:  arguments,
 		ReturnType: returnType,
 		Body:       body,
 	}
+}
+
+type HasSetClass interface {
+	SetClass(class string)
+}
+
+func (m *Method) SetClass(class string) {
+	m.Class = class
 }
 
 func (m *Method) String() string {
