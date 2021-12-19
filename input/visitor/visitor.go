@@ -116,7 +116,9 @@ func (gv *GoVisitor) VisitMethodDeclaration(ctx *parser.MethodDeclarationContext
 	body := exp.NewBlockNode(ctx.MethodBody().Block())
 	m := ast.NewMethod("", name, "", exp.FormalParameterListProcessor(ctx.FormalParameters().FormalParameterList()), ctx.TypeTypeOrVoid().GetText(), body)
 
-	// TODO notify the method of its class name (or give it a back ref or something)
+	if ctx.THROWS() != nil {
+		m.Throws = ctx.QualifiedNameList().GetText()
+	}
 
 	return m
 }

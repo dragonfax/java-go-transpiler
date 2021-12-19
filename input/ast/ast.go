@@ -138,6 +138,7 @@ type Method struct {
 	Arguments  []exp.ExpressionNode
 	ReturnType string
 	Class      string
+	Throws     string
 }
 
 func NewMethod(modifier string, name string, class string, arguments []exp.ExpressionNode, returnType string, body exp.ExpressionNode) *Method {
@@ -173,7 +174,12 @@ func (m *Method) String() string {
 		arguments = exp.ArgumentListToString(m.Arguments)
 	}
 
-	return fmt.Sprintf("func (this *%s) %s(%s) %s{\n%s\n}\n\n", m.Class, m.Name, arguments, m.ReturnType, body)
+	throws := ""
+	if m.Throws != "" {
+		throws = " /* TODO throws " + m.Throws + "*/"
+	}
+
+	return fmt.Sprintf("func (this *%s) %s(%s) %s%s{\n%s\n}\n\n", m.Class, m.Name, arguments, m.ReturnType, throws, body)
 }
 
 type Import struct {
