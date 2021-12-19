@@ -45,7 +45,7 @@ func (sv *StructVisitor) VisitClassDeclaration(ctx *parser.ClassDeclarationConte
 
 	className := ctx.IDENTIFIER().GetText()
 
-	fieldsList := sv.VisitClassBody(ctx.ClassBody().(*parser.ClassBodyContext))
+	fieldsList := sv.VisitClassBody(ctx.ClassBody())
 
 	return &ast.ClassNode{Name: className, Fields: fieldsList.(ast.FieldListNode)}
 }
@@ -54,11 +54,11 @@ func (sv *StructVisitor) VisitFieldDeclaration(ctx *parser.FieldDeclarationConte
 
 	typ := ctx.TypeType().GetText()
 
-	varDecls := ctx.VariableDeclarators().(*parser.VariableDeclaratorsContext).AllVariableDeclarator()
+	varDecls := ctx.VariableDeclarators().AllVariableDeclarator()
 
 	fieldList := make([]*ast.FieldNode, 0, len(varDecls))
 	for _, varDecl := range varDecls {
-		name := varDecl.(*parser.VariableDeclaratorContext).VariableDeclaratorId().GetText()
+		name := varDecl.VariableDeclaratorId().GetText()
 		fieldList = append(fieldList, &ast.FieldNode{Name: name, Type: typ})
 	}
 
