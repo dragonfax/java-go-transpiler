@@ -9,7 +9,7 @@ import (
 	"github.com/dragonfax/java_converter/tool"
 )
 
-func NodeListToStringLisT[T Node](list []T) []string {
+func NodeListToStringList[T Node](list []T) []string {
 	s := make([]string, 0, len(list))
 	for _, n := range list {
 		s = append(s, n.String())
@@ -20,7 +20,7 @@ func NodeListToStringLisT[T Node](list []T) []string {
 type FieldList []*Field
 
 func (fl FieldList) String() string {
-	return strings.Join(NodeListToStringLisT(fl), ",")
+	return strings.Join(NodeListToStringList(fl), ",")
 }
 
 type Field struct {

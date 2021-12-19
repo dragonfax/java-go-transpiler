@@ -2,6 +2,8 @@ package ast
 
 import (
 	"fmt"
+	"strings"
+	"text/template"
 
 	"github.com/dragonfax/java_converter/input/ast/exp"
 	"github.com/dragonfax/java_converter/tool"
@@ -25,7 +27,13 @@ func NewFile() *File {
 }
 
 func (f *File) String() string {
-	return fmt.Sprintf("file %s", f.Filename)
+	return fmt.Sprintf(`
+package %s;
+
+%s
+
+%s
+`, f.PackageName, strings.Join(f.Imports, "\n"), strings.Join(NodeListToStringList(f.Classes), "\n"))
 }
 
 type Class struct {
@@ -36,11 +44,44 @@ type Class struct {
 	Fields     []*Field
 }
 
+var classTemplate = `
+{{ $className := .Name }}
+{{range .Interfaces }}var _ {{ . }} = &{{ $className}}{}
+{{end}}
+type {{ .Name }} struct {
+    {{if .BaseClass}}*{{ .BaseClass }}{{end}}
+
+    {{range .Fields}}{{ .Declaration }}
+	{{end}}
+}
+
+func New{{.Name}}() *{{.Name}}{
+    this := &{{.Name}}{}
+
+    {{range .Fields}} {{if .HasInitializer}}this.{{ .Initializer }}{{end}}
+    {{end}}
+
+    return this
+}
+
+{{range .Members}}{{ . }}
+{{end}}
+`
+
+var classTpl = template.Must(template.New("name").Parse(classTemplate))
+
 func (c *Class) String() string {
-	if c.BaseClass != "" {
-		return fmt.Sprintf("class %s(%s)", c.Name, c.BaseClass)
+	for _, m := range c.Members {
+		if m == c {
+			panic("recursion")
+		}
 	}
-	return fmt.Sprintf("class %s", c.Name)
+	b := &strings.Builder{}
+	err := classTpl.Execute(b, c)
+	if err != nil {
+		return err.Error()
+	}
+	return b.String()
 }
 
 func NewClass() *Class {

@@ -8,14 +8,10 @@ import (
 	"strings"
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
-	"github.com/aymerick/raymond"
 	"github.com/dragonfax/java_converter/input/ast"
 	"github.com/dragonfax/java_converter/input/parser"
 	"github.com/dragonfax/java_converter/input/visitor"
-	"github.com/dragonfax/java_converter/tool"
 )
-
-const golangTemplateFilename = "output/templates/golang.tmpl"
 
 var lexer = parser.NewJavaLexer(nil)
 var p = parser.NewJavaParser(nil)
@@ -23,8 +19,6 @@ var p = parser.NewJavaParser(nil)
 func init() {
 	parser.RuleNames = p.RuleNames
 }
-
-var golangTemplate = tool.MustByteListErr(ioutil.ReadFile(golangTemplateFilename))
 
 func parseAST(path string) (*ast.File, error) {
 
@@ -59,10 +53,7 @@ func TranslateFile(filename string) (js string, goCode string, err error) {
 		return
 	}
 
-	goCode, err = generateGo(goAST)
-	if err != nil {
-		return
-	}
+	goCode = goAST.String()
 
 	goCode, err = goFmt(goCode)
 	if err != nil {
@@ -91,10 +82,6 @@ func outputFile(filename, code string) {
 	if err != nil {
 		panic(err)
 	}
-}
-
-func generateGo(file *ast.File) (string, error) {
-	return raymond.Render(string(golangTemplate), file)
 }
 
 type FormatingError struct {
