@@ -136,12 +136,12 @@ type Method struct {
 
 	Body       exp.ExpressionNode
 	Arguments  []exp.ExpressionNode
-	ReturnType string
+	ReturnType exp.ExpressionNode
 	Class      string
 	Throws     string
 }
 
-func NewMethod(modifier string, name string, class string, arguments []exp.ExpressionNode, returnType string, body exp.ExpressionNode) *Method {
+func NewMethod(modifier string, name string, class string, arguments []exp.ExpressionNode, returnType exp.ExpressionNode, body exp.ExpressionNode) *Method {
 	return &Method{
 		BaseMember: &BaseMember{Modifier: modifier, Name: name},
 		Class:      class,

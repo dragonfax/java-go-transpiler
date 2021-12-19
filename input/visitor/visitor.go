@@ -75,6 +75,9 @@ func (gv *GoVisitor) VisitClassBody(ctx *parser.ClassBodyContext) ast.Node {
 
 	for _, decl := range ctx.AllClassBodyDeclaration() {
 		member := gv.VisitClassBodyDeclaration(decl)
+		if member == nil {
+			continue
+		}
 		if fl, ok := member.(ast.FieldList); ok {
 			class.Fields = append(class.Fields, fl...)
 		} else {
@@ -114,7 +117,7 @@ func (gv *GoVisitor) VisitMethodDeclaration(ctx *parser.MethodDeclarationContext
 	name := ctx.IDENTIFIER().GetText()
 
 	body := exp.NewBlockNode(ctx.MethodBody().Block())
-	m := ast.NewMethod("", name, "", exp.FormalParameterListProcessor(ctx.FormalParameters().FormalParameterList()), ctx.TypeTypeOrVoid().GetText(), body)
+	m := ast.NewMethod("", name, "", exp.FormalParameterListProcessor(ctx.FormalParameters().FormalParameterList()), exp.NewTypeOrVoidNode(ctx.TypeTypeOrVoid()), body)
 
 	if ctx.THROWS() != nil {
 		m.Throws = ctx.QualifiedNameList().GetText()
