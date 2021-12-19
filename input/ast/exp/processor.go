@@ -51,7 +51,7 @@ func StatementProcessor(statementCtxI *parser.StatementContext) ExpressionNode {
 	}
 
 	if statementCtx.THROW() != nil {
-		return NewThrowNode(ExpressionProcessor(statementCtx.Expression(0)))
+		return NewThrowNode(statementCtx.Expression(0).GetText())
 	}
 
 	if statementCtx.BREAK() != nil {

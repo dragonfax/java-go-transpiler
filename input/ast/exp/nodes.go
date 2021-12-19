@@ -3,6 +3,7 @@ package exp
 import (
 	"fmt"
 	"runtime/debug"
+	"strconv"
 	"strings"
 
 	"github.com/dragonfax/java_converter/input/parser"
@@ -101,18 +102,15 @@ func (rn *ReturnNode) String() string {
 }
 
 type ThrowNode struct {
-	Expression ExpressionNode
+	Expression string
 }
 
-func NewThrowNode(exp ExpressionNode) *ThrowNode {
-	if tool.IsNilInterface(exp) {
-		panic("missing expression")
-	}
+func NewThrowNode(exp string) *ThrowNode {
 	return &ThrowNode{Expression: exp}
 }
 
 func (tn *ThrowNode) String() string {
-	return fmt.Sprintf("panic(%s)\n", tn.Expression.String())
+	return fmt.Sprintf("panic(%s) // TODO\n", strconv.Quote(tn.Expression))
 }
 
 type BreakNode struct {
