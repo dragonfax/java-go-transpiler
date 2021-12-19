@@ -20,10 +20,32 @@ func (tn *TryCatchNode) String() string {
 		clauses = append(clauses, s)
 	}
 
+	finally := ""
 	if tn.Finally != nil {
-		return fmt.Sprintf("try %s\n%sfinally %s", tn.Body, strings.Join(clauses, "\n"), tn.Finally)
+		finally = fmt.Sprintf("// finally\n%s\n", tn.Finally.String())
 	}
-	return fmt.Sprintf("try %s %s", tn.Body, strings.Join(clauses, "\n"))
+
+	catches := ""
+
+	if len(tn.CatchClauses) == 1 && len(tn.CatchClauses[0].CatchType) == 1 && tn.CatchClauses[0].CatchType[0] == "Exception" {
+		// common case
+
+		clause := tn.CatchClauses[0]
+
+		catches = fmt.Sprintf(`
+if err != nil {
+	%s := err
+	%s
+}
+`, clause.Variable, clause.Body)
+	} else {
+		for _, c := range tn.CatchClauses {
+			catches += fmt.Sprintf("catch %s %s\n", c.CatchType, c.Body)
+		}
+		catches = "/* TODO\n" + catches + "\n*/"
+	}
+
+	return fmt.Sprintf("// try\n%s\n%s\n%s\n", tn.Body, catches, finally)
 }
 
 type CatchClause struct {
