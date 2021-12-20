@@ -82,7 +82,10 @@ func (gv *GoVisitor) VisitClassBody(ctx *parser.ClassBodyContext) ast.Node {
 		if member == nil {
 			continue
 		}
-		if fl, ok := member.(ast.FieldList); ok {
+		if subClass, ok := member.(*ast.Class); ok {
+			// We don't do subclasses
+			class.Members = append(class.Members, ast.NewSubClassTODO(subClass.Name))
+		} else if fl, ok := member.(ast.FieldList); ok {
 			class.Fields = append(class.Fields, fl...)
 		} else {
 			class.Members = append(class.Members, member)

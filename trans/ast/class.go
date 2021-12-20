@@ -80,3 +80,15 @@ func NewClass() *Class {
 	c.Fields = make([]*Field, 0)
 	return c
 }
+
+type SubClassTODO struct {
+	Name string
+}
+
+func NewSubClassTODO(name string) *SubClassTODO {
+	return &SubClassTODO{Name: name}
+}
+
+func (sc *SubClassTODO) String() string {
+	return fmt.Sprintf("\n// TODO elevate subclass %s (pre-translation)\n\n", sc.Name)
+}
