@@ -27,28 +27,33 @@ func NewBlockNode(block *parser.BlockContext) *BlockNode {
 	l := make([]ExpressionNode, 0)
 
 	for _, blockStatement := range ctx.AllBlockStatement() {
-		blockStatementCtx := blockStatement
-
-		if blockStatementCtx.LocalVariableDeclaration() != nil {
-			localVarCtx := blockStatementCtx.LocalVariableDeclaration()
-			nodes := NewVariableDeclNodeList(localVarCtx)
-			for _, n := range nodes {
-				if n == nil {
-					panic("nil in expression list")
-				}
-			}
-			l = append(l, nodes...)
-		} else if blockStatementCtx.Statement() != nil {
-			statementCtx := blockStatementCtx.Statement()
-			node := StatementProcessor(statementCtx)
-			if node == nil {
-				tool.PanicDebug("adding nil to expression list: ", blockStatementCtx)
-			}
-			l = append(l, node)
-		} else if blockStatementCtx.LocalTypeDeclaration() != nil {
-			panic("didn't anticipate this")
-		}
+		s := BlockStatementProcessor(blockStatement)
+		l = append(l, s...)
 	}
 
 	return &BlockNode{Body: l}
+}
+
+func BlockStatementProcessor(ctx *parser.BlockStatementContext) []ExpressionNode {
+	if ctx.LocalVariableDeclaration() != nil {
+		localVarCtx := ctx.LocalVariableDeclaration()
+		nodes := NewVariableDeclNodeList(localVarCtx)
+		for _, n := range nodes {
+			if n == nil {
+				panic("nil in expression list")
+			}
+		}
+		return nodes
+	} else if ctx.Statement() != nil {
+		statementCtx := ctx.Statement()
+		node := StatementProcessor(statementCtx)
+		if node == nil {
+			tool.PanicDebug("adding nil to expression list: ", ctx)
+		}
+		return []ExpressionNode{node}
+	} else if ctx.LocalTypeDeclaration() != nil {
+		panic("didn't anticipate this")
+	}
+
+	panic("unknown block statement type")
 }

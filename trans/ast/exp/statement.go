@@ -76,6 +76,10 @@ func StatementProcessor(statementCtxI *parser.StatementContext) ExpressionNode {
 
 	// TODO | SWITCH parExpression '{' switchBlockStatementGroup* switchLabel* '}'
 
+	if statementCtx.SWITCH() != nil {
+		return NewSwitch(statementCtx)
+	}
+
 	if statementCtx.GetIdentifierLabel() != nil {
 		// must be a statement, with a label
 		return NewLabelNode(
