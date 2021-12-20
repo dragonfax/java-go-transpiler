@@ -1,7 +1,6 @@
 package ast
 
 import (
-	"fmt"
 	"text/template"
 
 	"github.com/dragonfax/java_converter/input/parser"
@@ -9,9 +8,10 @@ import (
 )
 
 type Enum struct {
-	Name       string
-	Interfaces []exp.TypeNode
-	Constants  []*EnumConstant
+	Name        string
+	Interfaces  []exp.TypeNode
+	Constants   []*EnumConstant
+	BodyWarning bool
 }
 
 type EnumConstant struct {
@@ -19,6 +19,7 @@ type EnumConstant struct {
 }
 
 var enumTemplate = `
+{{if .BodyWarning}}// TODO this enum has a body, fix pre-translation{{end}}
 type {{.Name}} int
 {{ $name := .Name }}
 
@@ -64,7 +65,7 @@ func NewEnum(ctx *parser.EnumDeclarationContext) *Enum {
 	}
 
 	if ctx.EnumBodyDeclarations() != nil {
-		fmt.Println("WARNING: enum has body")
+		this.BodyWarning = true
 	}
 
 	return this

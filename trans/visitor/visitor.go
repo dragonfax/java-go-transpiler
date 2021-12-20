@@ -86,7 +86,7 @@ func (gv *GoVisitor) VisitClassBody(ctx *parser.ClassBodyContext) ast.Node {
 
 	for _, decl := range ctx.AllClassBodyDeclaration() {
 		member := gv.VisitClassBodyDeclaration(decl)
-		if member == nil {
+		if member == nil && decl.GetText() != ";" {
 			fmt.Printf("WARNING: skipping class member: %s\n", decl.GetText())
 			continue
 		}
@@ -104,6 +104,14 @@ func (gv *GoVisitor) VisitClassBody(ctx *parser.ClassBodyContext) ast.Node {
 }
 
 func (gv *GoVisitor) VisitClassBodyDeclaration(ctx *parser.ClassBodyDeclarationContext) ast.Node {
+
+	// static and non-static initializers
+	// wont' be processed by any of my other visit rules
+
+	if ctx.Block() != nil {
+		// acts as a member
+		return ast.NewInitializerBlock(ctx)
+	}
 
 	/* collect children and notify them of their modifiers */
 
