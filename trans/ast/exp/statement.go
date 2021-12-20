@@ -1,6 +1,8 @@
 package exp
 
 import (
+	"fmt"
+
 	"github.com/dragonfax/java_converter/input/parser"
 	"github.com/dragonfax/java_converter/tool"
 )
@@ -115,5 +117,7 @@ func StatementProcessor(statementCtxI *parser.StatementContext) ExpressionNode {
 
 	// ignore unknown structures.
 	// TODO log them
-	return NewUnimplementedNode("unimplemented code: " + statementCtxI.GetText() + "\n\n" + statementCtxI.ToStringTree(parser.RuleNames, nil))
+	msg := "unimplemented code: " + statementCtxI.GetText() + "\n\n" + statementCtxI.ToStringTree(parser.RuleNames, nil)
+	fmt.Printf("WARNING: %s\n", msg)
+	return NewUnimplementedNode(msg)
 }
