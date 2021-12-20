@@ -15,9 +15,10 @@ type Method struct {
 	Class      string
 	Throws     string
 
-	Public   bool
-	Abstract bool
-	Static   bool
+	Public       bool
+	Abstract     bool
+	Static       bool
+	Synchronized bool
 }
 
 func NewMethod(name string, class string, arguments []exp.ExpressionNode, returnType exp.ExpressionNode, body exp.ExpressionNode) *Method {
@@ -44,6 +45,10 @@ func (m *Method) SetAbstract(abstract bool) {
 
 func (m *Method) SetStatic(static bool) {
 	m.Static = static
+}
+
+func (m *Method) SetSynchronized(sync bool) {
+	m.Synchronized = sync
 }
 
 func (m *Method) String() string {

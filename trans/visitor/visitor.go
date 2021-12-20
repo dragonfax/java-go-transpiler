@@ -107,37 +107,30 @@ func (gv *GoVisitor) VisitClassBodyDeclaration(ctx *parser.ClassBodyDeclarationC
 		return nil
 	}
 
-	isPublic := false // java default
-	isTransient := false
-	isStatic := false
-	isAbstract := false
 	for _, modifier := range ctx.AllModifier() {
 		modifierText := modifier.GetText()
-		if modifierText == "public" || modifierText == "protected" {
-			isPublic = true
+		switch modifierText {
+		case "public", "protected":
+			if set, ok := member.(interface{ SetPublic(bool) }); ok {
+				set.SetPublic(true)
+			}
+		case "transient":
+			if set, ok := member.(interface{ SetTransient(bool) }); ok {
+				set.SetTransient(true)
+			}
+		case "static":
+			if set, ok := member.(interface{ SetStatic(bool) }); ok {
+				set.SetStatic(true)
+			}
+		case "abstract":
+			if set, ok := member.(interface{ SetAbstract(bool) }); ok {
+				set.SetAbstract(true)
+			}
+		case "synchronized":
+			if set, ok := member.(interface{ SetSynchronized(bool) }); ok {
+				set.SetSynchronized((true))
+			}
 		}
-		if modifierText == "transient" {
-			isTransient = true
-		}
-		if modifierText == "status" {
-			isStatic = true
-		}
-		if modifierText == "abstract" {
-			isAbstract = true
-		}
-	}
-
-	if set, ok := member.(interface{ SetPublic(bool) }); isPublic && ok {
-		set.SetPublic(isPublic)
-	}
-	if set, ok := member.(interface{ SetTransient(bool) }); isTransient && ok {
-		set.SetTransient(isTransient)
-	}
-	if set, ok := member.(interface{ SetStatic(bool) }); isStatic && ok {
-		set.SetStatic(isStatic)
-	}
-	if set, ok := member.(interface{ SetAbstract(bool) }); isAbstract && ok {
-		set.SetAbstract(isAbstract)
 	}
 
 	return member
