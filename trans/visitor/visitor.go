@@ -41,6 +41,11 @@ func (gv *GoVisitor) VisitCompilationUnit(ctx *parser.CompilationUnitContext) as
 
 	class := gv.VisitChildren(ctx)
 	if class != nil {
+
+		if _, ok := class.(*ast.Enum); ok {
+			panic("top level enum detected")
+		}
+
 		if file.Class != nil {
 			panic("more than one class per file")
 		}
@@ -82,7 +87,7 @@ func (gv *GoVisitor) VisitClassBody(ctx *parser.ClassBodyContext) ast.Node {
 	for _, decl := range ctx.AllClassBodyDeclaration() {
 		member := gv.VisitClassBodyDeclaration(decl)
 		if member == nil {
-			fmt.Printf("WARNING: skipping class member: %s", decl.GetText())
+			fmt.Printf("WARNING: skipping class member: %s\n", decl.GetText())
 			continue
 		}
 		if subClass, ok := member.(*ast.Class); ok {
@@ -156,4 +161,8 @@ func (v *GoVisitor) VisitFieldDeclaration(ctx *parser.FieldDeclarationContext) a
 func (v *GoVisitor) VisitConstructorDeclaration(ctx *parser.ConstructorDeclarationContext) ast.Node {
 	c := ast.NewConstructor(ctx)
 	return c
+}
+
+func (gv *GoVisitor) VisitEnumDeclaration(ctx *parser.EnumDeclarationContext) ast.Node {
+	return ast.NewEnum(ctx)
 }
