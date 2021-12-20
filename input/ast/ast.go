@@ -6,7 +6,6 @@ import (
 	"text/template"
 
 	"github.com/dragonfax/java_converter/input/ast/exp"
-	"github.com/dragonfax/java_converter/tool"
 )
 
 type Node interface {
@@ -107,79 +106,6 @@ type BaseMember struct {
 
 func (bm *BaseMember) SetModifier(modifier string) {
 	bm.Modifier = modifier
-}
-
-var _ Member = &Constructor{}
-
-type Constructor struct {
-	*BaseMember
-	Body exp.ExpressionNode
-}
-
-func NewConstructor() *Constructor {
-	return &Constructor{}
-}
-
-func (c *Constructor) String() string {
-	if c == nil {
-		panic("nil constructor")
-	}
-	if tool.IsNilInterface(c.Body) {
-		panic("nil constructor body")
-	}
-
-	return fmt.Sprintf("func New%s() *%s{\n%s\n}\n\n", c.Name, c.Name, c.Body)
-}
-
-type Method struct {
-	*BaseMember
-
-	Body       exp.ExpressionNode
-	Arguments  []exp.ExpressionNode
-	ReturnType exp.ExpressionNode
-	Class      string
-	Throws     string
-}
-
-func NewMethod(modifier string, name string, class string, arguments []exp.ExpressionNode, returnType exp.ExpressionNode, body exp.ExpressionNode) *Method {
-	return &Method{
-		BaseMember: &BaseMember{Modifier: modifier, Name: name},
-		Class:      class,
-		Arguments:  arguments,
-		ReturnType: returnType,
-		Body:       body,
-	}
-}
-
-type HasSetClass interface {
-	SetClass(class string)
-}
-
-func (m *Method) SetClass(class string) {
-	m.Class = class
-}
-
-func (m *Method) String() string {
-	if m == nil {
-		panic("nil method")
-	}
-
-	body := ""
-	if m.Body != nil {
-		body = m.Body.String()
-	}
-
-	arguments := ""
-	if len(m.Arguments) > 0 {
-		arguments = exp.ArgumentListToString(m.Arguments)
-	}
-
-	throws := ""
-	if m.Throws != "" {
-		throws = " /* TODO throws " + m.Throws + "*/"
-	}
-
-	return fmt.Sprintf("func (this *%s) %s(%s) %s%s{\n%s\n}\n\n", m.Class, m.Name, arguments, m.ReturnType, throws, body)
 }
 
 type Import struct {

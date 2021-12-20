@@ -61,7 +61,7 @@ func (gv *GoVisitor) VisitClassDeclaration(ctx *parser.ClassDeclarationContext) 
 	}
 
 	for _, member := range class.Members {
-		if setClass, ok := member.(ast.HasSetClass); ok {
+		if setClass, ok := member.(interface{ SetClass(string) }); ok {
 			setClass.SetClass(class.Name)
 		}
 	}
@@ -90,24 +90,44 @@ func (gv *GoVisitor) VisitClassBody(ctx *parser.ClassBodyContext) ast.Node {
 
 func (gv *GoVisitor) VisitClassBodyDeclaration(ctx *parser.ClassBodyDeclarationContext) ast.Node {
 
+	/* collect children and notify them of their modifiers */
+
 	member := gv.VisitChildren(ctx)
 	if member == nil {
 		return nil
 	}
 
-	lastModifier := "private" // java default
+	isPublic := false // java default
+	isTransient := false
+	isStatic := false
+	isAbstract := false
 	for _, modifier := range ctx.AllModifier() {
 		modifierText := modifier.GetText()
-		if modifierText == "public" || modifierText == "private" {
-			// these are all we care about right now.
-			// for each class member
-			lastModifier = modifierText
-			break
+		if modifierText == "public" || modifierText == "protected" {
+			isPublic = true
+		}
+		if modifierText == "transient" {
+			isTransient = true
+		}
+		if modifierText == "status" {
+			isStatic = true
+		}
+		if modifierText == "abstract" {
+			isAbstract = true
 		}
 	}
 
-	if setModifier, ok := member.(ast.HasSetModifier); ok {
-		setModifier.SetModifier(lastModifier)
+	if set, ok := member.(interface{ SetPublic(bool) }); isPublic && ok {
+		set.SetPublic(isPublic)
+	}
+	if set, ok := member.(interface{ SetTransient(bool) }); isTransient && ok {
+		set.SetTransient(isTransient)
+	}
+	if set, ok := member.(interface{ SetStatic(bool) }); isStatic && ok {
+		set.SetStatic(isStatic)
+	}
+	if set, ok := member.(interface{ SetAbstract(bool) }); isAbstract && ok {
+		set.SetAbstract(isAbstract)
 	}
 
 	return member
