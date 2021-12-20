@@ -20,9 +20,9 @@ type Method struct {
 	Static   bool
 }
 
-func NewMethod(modifier string, name string, class string, arguments []exp.ExpressionNode, returnType exp.ExpressionNode, body exp.ExpressionNode) *Method {
+func NewMethod(name string, class string, arguments []exp.ExpressionNode, returnType exp.ExpressionNode, body exp.ExpressionNode) *Method {
 	return &Method{
-		BaseMember: &BaseMember{Modifier: modifier, Name: name},
+		BaseMember: NewBaseMember(name),
 		Class:      class,
 		Arguments:  arguments,
 		ReturnType: returnType,

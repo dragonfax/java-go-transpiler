@@ -1,6 +1,8 @@
 package visitor
 
 import (
+	"fmt"
+
 	"github.com/dragonfax/java_converter/input/parser"
 	"github.com/dragonfax/java_converter/trans/ast"
 	"github.com/dragonfax/java_converter/trans/ast/exp"
@@ -80,6 +82,7 @@ func (gv *GoVisitor) VisitClassBody(ctx *parser.ClassBodyContext) ast.Node {
 	for _, decl := range ctx.AllClassBodyDeclaration() {
 		member := gv.VisitClassBodyDeclaration(decl)
 		if member == nil {
+			fmt.Printf("WARNING: skipping class member: %s", decl.GetText())
 			continue
 		}
 		if subClass, ok := member.(*ast.Class); ok {
@@ -144,7 +147,7 @@ func (gv *GoVisitor) VisitMethodDeclaration(ctx *parser.MethodDeclarationContext
 	name := ctx.IDENTIFIER().GetText()
 
 	body := exp.NewBlockNode(ctx.MethodBody().Block())
-	m := ast.NewMethod("", name, "", exp.FormalParameterListProcessor(ctx.FormalParameters().FormalParameterList()), exp.NewTypeOrVoidNode(ctx.TypeTypeOrVoid()), body)
+	m := ast.NewMethod(name, "", exp.FormalParameterListProcessor(ctx.FormalParameters().FormalParameterList()), exp.NewTypeOrVoidNode(ctx.TypeTypeOrVoid()), body)
 
 	if ctx.THROWS() != nil {
 		m.Throws = ctx.QualifiedNameList().GetText()
@@ -157,11 +160,7 @@ func (v *GoVisitor) VisitFieldDeclaration(ctx *parser.FieldDeclarationContext) a
 	return ast.NewFields(ctx)
 }
 
-func (v *GoVisitor) VisitConstantDeclaration(ctx *parser.ConstructorDeclarationContext) ast.Node {
-
-	c := ast.NewConstructor()
-	c.Name = ctx.IDENTIFIER().GetText()
-	c.Body = exp.NewBlockNode(ctx.Block())
-
+func (v *GoVisitor) VisitConstructorDeclaration(ctx *parser.ConstructorDeclarationContext) ast.Node {
+	c := ast.NewConstructor(ctx)
 	return c
 }

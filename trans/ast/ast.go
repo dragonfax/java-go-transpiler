@@ -37,12 +37,11 @@ type Member interface {
 }
 
 type BaseMember struct {
-	Name     string
-	Modifier string
+	Name string
 }
 
-func (bm *BaseMember) SetModifier(modifier string) {
-	bm.Modifier = modifier
+func NewBaseMember(name string) *BaseMember {
+	return &BaseMember{Name: name}
 }
 
 type Import struct {
