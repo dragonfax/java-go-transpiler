@@ -61,9 +61,7 @@ func Translate(path string) error {
 func parseFile(h *hier.Hierarchy, filename string) {
 	tree := input.ParseToTree(filename)
 
-	file := trans.BuildAST(tree)
-
-	h.AddFile(file)
+	trans.BuildAST(h, tree)
 }
 
 func outputStructures(h *hier.Hierarchy, outputRoot string) {

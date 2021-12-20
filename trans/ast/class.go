@@ -10,6 +10,7 @@ import (
 
 type Class struct {
 	Name       string
+	Imports    []*Import
 	BaseClass  string
 	Interfaces []exp.TypeNode
 	Members    []Member
@@ -78,6 +79,7 @@ func NewClass() *Class {
 	c.Members = make([]Member, 0)
 	c.Interfaces = make([]exp.TypeNode, 0)
 	c.Fields = make([]*Field, 0)
+	c.Imports = make([]*Import, 0)
 	return c
 }
 

@@ -6,14 +6,17 @@ import (
 	"github.com/dragonfax/java_converter/input/parser"
 	"github.com/dragonfax/java_converter/trans/ast"
 	"github.com/dragonfax/java_converter/trans/ast/exp"
+	"github.com/dragonfax/java_converter/trans/hier"
 )
 
 type GoVisitor struct {
 	*parser.BaseJavaParserVisitor[ast.Node]
+
+	Hierarchy *hier.Hierarchy
 }
 
-func NewGoVisitor() *GoVisitor {
-	this := &GoVisitor{}
+func NewGoVisitor(h *hier.Hierarchy) *GoVisitor {
+	this := &GoVisitor{Hierarchy: h}
 	this.BaseJavaParserVisitor = parser.NewBaseJavaParserVisitor[ast.Node](this)
 	return this
 }
@@ -31,29 +34,26 @@ func (gv *GoVisitor) AggregateResult(aggregate, nextResult ast.Node) ast.Node {
 }
 
 func (gv *GoVisitor) VisitCompilationUnit(ctx *parser.CompilationUnitContext) ast.Node {
-	file := ast.NewFile()
 
-	file.PackageName = ctx.PackageDeclaration().QualifiedName().GetText()
+	node := gv.VisitChildren(ctx)
+	if node == nil {
+		return nil
+	}
+
+	if _, ok := node.(*ast.Enum); ok {
+		panic("top level enum detected")
+	}
+
+	class := node.(*ast.Class)
+	class.Package = ctx.PackageDeclaration().QualifiedName().GetText()
 
 	for _, importCtx := range ctx.AllImportDeclaration() {
-		file.Imports = append(file.Imports, ast.NewImport(importCtx.QualifiedName().GetText()))
+		importedPackageName := importCtx.QualifiedName().GetText()
+		class.Imports = append(class.Imports, ast.NewImport(importedPackageName))
+		gv.Hierarchy.AddClass(importedPackageName, class)
 	}
 
-	class := gv.VisitChildren(ctx)
-	if class != nil {
-
-		if _, ok := class.(*ast.Enum); ok {
-			panic("top level enum detected")
-		}
-
-		if file.Class != nil {
-			panic("more than one class per file")
-		}
-		file.Class = class.(*ast.Class)
-		file.Class.Package = file.PackageName
-	}
-
-	return file
+	return class
 }
 
 func (gv *GoVisitor) VisitClassDeclaration(ctx *parser.ClassDeclarationContext) ast.Node {
