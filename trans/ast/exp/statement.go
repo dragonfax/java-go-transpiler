@@ -74,10 +74,12 @@ func StatementProcessor(statementCtxI *parser.StatementContext) ExpressionNode {
 		return NewTryCatchNode(statementCtx)
 	}
 
-	// TODO | SWITCH parExpression '{' switchBlockStatementGroup* switchLabel* '}'
-
 	if statementCtx.SWITCH() != nil {
 		return NewSwitch(statementCtx)
+	}
+
+	if statementCtx.SYNCHRONIZED() != nil {
+		return NewSynchronizedBlock(statementCtx)
 	}
 
 	if statementCtx.GetIdentifierLabel() != nil {
