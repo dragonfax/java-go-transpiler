@@ -2,6 +2,14 @@
     "version": "2.0.0",
     "configurations": [
         {
+            "name": "Launch converter",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "./cmd/main.go",
+            "args": ["../delverengine/Dungeoneer/src/com/interrupt/dungeoneer/"]
+        },
+        {
             "name": "Remote Golang Debug",
             "type": "go",
             "request": "attach",
