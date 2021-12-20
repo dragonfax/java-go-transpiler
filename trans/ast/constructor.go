@@ -3,8 +3,8 @@ package ast
 import (
 	"fmt"
 
-	"github.com/dragonfax/java_converter/input/ast/exp"
 	"github.com/dragonfax/java_converter/tool"
+	"github.com/dragonfax/java_converter/trans/ast/exp"
 )
 
 var _ Member = &Constructor{}

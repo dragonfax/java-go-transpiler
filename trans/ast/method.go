@@ -3,7 +3,7 @@ package ast
 import (
 	"fmt"
 
-	"github.com/dragonfax/java_converter/input/ast/exp"
+	"github.com/dragonfax/java_converter/trans/ast/exp"
 )
 
 type Method struct {

@@ -1,87 +1,132 @@
 package output
 
 import (
-	"errors"
-	"fmt"
+	"encoding/json"
 	"io/fs"
 	"os"
 	"path/filepath"
 	"strings"
 
-	"github.com/dragonfax/java_converter/output/trans"
+	"github.com/dragonfax/java_converter/input"
+	"github.com/dragonfax/java_converter/trans"
+	"github.com/dragonfax/java_converter/trans/ast"
+	"github.com/dragonfax/java_converter/trans/hier"
 )
 
-func walkFunc(filename string, entry fs.DirEntry, err error) error {
-	if err != nil {
-		return err
-	}
+func walkFunc(h *hier.Hierarchy) fs.WalkDirFunc {
+	return func(filename string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
 
-	if entry.IsDir() || !strings.HasSuffix(filename, ".java") {
+		if entry.IsDir() || !strings.HasSuffix(filename, ".java") {
+			return nil
+		}
+
+		parseFile(h, filename)
 		return nil
 	}
-
-	TranslateOneFile(filename)
-	return nil
 }
 
-func RemoveFileIfExists(filename string) {
-	// remove target file if its already there.
-	_, err := os.Stat(filename)
-	if err != nil {
-		if !errors.Is(err, os.ErrNotExist) {
-			panic(err)
-		}
-	} else {
-		// file exists. thats a problem.
-		err = os.Remove(filename)
-		if err != nil {
-			panic(err)
-		}
-	}
+func Translate(path string) error {
 
-}
+	h := hier.New()
 
-func TranslateOneFile(filename string) {
-	targetFilename := GenerateTargetFilename(filename)
-
-	RemoveFileIfExists(targetFilename)
-	RemoveFileIfExists(targetFilename + ".json")
-	RemoveFileIfExists(targetFilename + ".err.txt")
-
-	targetDirectory := filepath.Dir(targetFilename)
-	err := os.MkdirAll(targetDirectory, 0775)
+	info, err := os.Stat(path)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Printf("%s -> %s\n", filename, targetFilename)
-	trans.TranslateFiles(filename, targetFilename)
+	dir := path
+	if info.IsDir() {
+		err = filepath.WalkDir(path, walkFunc(h))
+	} else {
+		dir = filepath.Dir(path)
+		parseFile(h, path)
+	}
+	if err != nil {
+		return err
+	}
 
+	// process the global AST
+
+	outputRoot := generateOutputRoot(dir)
+
+	outputStructures(h, outputRoot)
+
+	return nil
 }
 
-func CrawlDir(path string) error {
-	return filepath.WalkDir(path, walkFunc)
+// input filename to go-code string
+func parseFile(h *hier.Hierarchy, filename string) {
+	tree := input.ParseToTree(filename)
+
+	file := trans.BuildAST(tree)
+
+	h.AddFile(file)
 }
 
-func GenerateTargetFilename(filename string) string {
+func outputStructures(h *hier.Hierarchy, outputRoot string) {
 
-	// change suffix
-	baseFilename := strings.TrimSuffix(filename, ".java")
-	goFilename := baseFilename + ".go"
+	for _, class := range h.Classes {
+		outputStructure(class, outputRoot)
+	}
+}
+
+func outputStructure(class *ast.Class, outputRoot string) {
+
+	targetFilename := outputRoot + "/" + class.OutputFilename()
+	targetJSONFilename := targetFilename + ".json"
+	targetErrorFilename := targetFilename + ".err.txt"
+
+	targetDir := filepath.Dir(targetFilename)
+	err := os.MkdirAll(targetDir, 0775)
+
+	removeFileIfExists(targetFilename)
+	removeFileIfExists(targetJSONFilename)
+	removeFileIfExists(targetErrorFilename)
+
+	goCode := class.AsFile()
+
+	goCode2, err := goFmt(goCode)
+	if err != nil {
+		outputFile(targetErrorFilename, goCode2)
+	} else {
+		goCode = goCode2
+	}
+
+	astJSON, err := dumpAST(class)
+	if err != nil {
+		outputFile(targetJSONFilename, astJSON)
+	}
+	outputFile(targetFilename, goCode)
+}
+
+func generateOutputRoot(dir string) string {
+	/* take the first path thats not ../
+	 * and add a "_converted" to it
+	 * then add the origin rest of the path back on.
+	 * so the new file structure starts at the base of the old one.
+	 */
 
 	//take first real component, and change its name.
-	components := strings.Split(goFilename, "/")
+	components := strings.Split(dir, "/")
 	for i, component := range components {
 		if component != "." && component != ".." {
 			components[i] = components[i] + "_converted"
 			break
 		}
 	}
-	targetFilename := strings.Join(components, "/")
+	targetDir := strings.Join(components, "/")
 
-	if filename == targetFilename {
+	if dir == targetDir {
 		panic("didn't generate a new filename")
 	}
 
-	return targetFilename
+	return targetDir
+}
+
+func dumpAST(node ast.Node) (string, error) {
+	js, err := json.MarshalIndent(node, "", "  ")
+	return string(js), err
 }

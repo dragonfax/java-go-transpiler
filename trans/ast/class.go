@@ -5,35 +5,8 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/dragonfax/java_converter/input/ast/exp"
+	"github.com/dragonfax/java_converter/trans/ast/exp"
 )
-
-type Node interface {
-	String() string
-}
-
-type File struct {
-	Filename    string
-	PackageName string
-	Imports     []*Import
-	Classes     []*Class
-}
-
-func NewFile() *File {
-	f := &File{}
-	f.Imports = make([]*Import, 0)
-	return f
-}
-
-func (f *File) String() string {
-	return fmt.Sprintf(`
-package main // %s;
-
-%s
-
-%s
-`, f.PackageName, strings.Join(NodeListToStringList(f.Imports), "\n"), strings.Join(NodeListToStringList(f.Classes), "\n"))
-}
 
 type Class struct {
 	Name       string
@@ -41,6 +14,14 @@ type Class struct {
 	Interfaces []exp.TypeNode
 	Members    []Member
 	Fields     []*Field
+	Package    string
+}
+
+func (c *Class) OutputFilename() string {
+	if c.Package == "" {
+		panic("no package for class")
+	}
+	return fmt.Sprintf("%s/%s/%s.go", strings.ReplaceAll(c.Package, ".", "/"), c.Name, c.Name)
 }
 
 var classTemplate = `
@@ -83,39 +64,19 @@ func (c *Class) String() string {
 	return b.String()
 }
 
+func (c *Class) PackageBasename() string {
+	last := strings.LastIndex(c.Package, ".")
+	return c.Package[last+1 : len(c.Package)]
+}
+
+func (c *Class) AsFile() string {
+	return fmt.Sprintf("package %s\n\n%s", c.PackageBasename(), c)
+}
+
 func NewClass() *Class {
 	c := &Class{}
 	c.Members = make([]Member, 0)
 	c.Interfaces = make([]exp.TypeNode, 0)
 	c.Fields = make([]*Field, 0)
 	return c
-}
-
-type Member interface {
-	String() string
-}
-
-type HasSetModifier interface {
-	SetModifier(modifier string)
-}
-
-type BaseMember struct {
-	Name     string
-	Modifier string
-}
-
-func (bm *BaseMember) SetModifier(modifier string) {
-	bm.Modifier = modifier
-}
-
-type Import struct {
-	Name string
-}
-
-func NewImport(name string) *Import {
-	return &Import{Name: name}
-}
-
-func (i *Import) String() string {
-	return fmt.Sprintf("import \"%s\"", i.Name)
 }

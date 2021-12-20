@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/dragonfax/java_converter/output"
@@ -9,18 +10,9 @@ import (
 func main() {
 
 	source := os.Args[1]
-
-	info, err := os.Stat(source)
+	err := output.Translate(source)
 	if err != nil {
-		panic(err)
-	}
-
-	if info.IsDir() {
-		err = output.CrawlDir(source)
-	} else {
-		output.TranslateOneFile(source)
-	}
-	if err != nil {
-		panic(err)
+		fmt.Println(err)
+		os.Exit(1)
 	}
 }

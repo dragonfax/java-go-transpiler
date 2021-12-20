@@ -1,9 +1,9 @@
 package visitor
 
 import (
-	"github.com/dragonfax/java_converter/input/ast"
-	"github.com/dragonfax/java_converter/input/ast/exp"
 	"github.com/dragonfax/java_converter/input/parser"
+	"github.com/dragonfax/java_converter/trans/ast"
+	"github.com/dragonfax/java_converter/trans/ast/exp"
 )
 
 type GoVisitor struct {
@@ -39,7 +39,11 @@ func (gv *GoVisitor) VisitCompilationUnit(ctx *parser.CompilationUnitContext) as
 
 	class := gv.VisitChildren(ctx)
 	if class != nil {
-		file.Classes = append(file.Classes, class.(*ast.Class))
+		if file.Class != nil {
+			panic("more than one class per file")
+		}
+		file.Class = class.(*ast.Class)
+		file.Class.Package = file.PackageName
 	}
 
 	return file
