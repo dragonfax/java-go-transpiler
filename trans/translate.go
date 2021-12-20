@@ -9,9 +9,9 @@ import (
 
 func BuildAST(h *hier.Hierarchy, tree antlr.RuleContext) ast.Node {
 
-	goVisitor := visitor.NewGoVisitor(h)
+	TreeVisitor := visitor.NewTreeVisitor(h)
 
-	file := goVisitor.Visit(tree)
+	file := TreeVisitor.Visit(tree)
 
 	return file
 }

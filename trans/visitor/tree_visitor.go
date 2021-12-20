@@ -9,19 +9,19 @@ import (
 	"github.com/dragonfax/java_converter/trans/hier"
 )
 
-type GoVisitor struct {
+type TreeVisitor struct {
 	*parser.BaseJavaParserVisitor[ast.Node]
 
 	Hierarchy *hier.Hierarchy
 }
 
-func NewGoVisitor(h *hier.Hierarchy) *GoVisitor {
-	this := &GoVisitor{Hierarchy: h}
+func NewTreeVisitor(h *hier.Hierarchy) *TreeVisitor {
+	this := &TreeVisitor{Hierarchy: h}
 	this.BaseJavaParserVisitor = parser.NewBaseJavaParserVisitor[ast.Node](this)
 	return this
 }
 
-func (gv *GoVisitor) AggregateResult(aggregate, nextResult ast.Node) ast.Node {
+func (gv *TreeVisitor) AggregateResult(aggregate, nextResult ast.Node) ast.Node {
 	if aggregate == nil {
 		return nextResult
 	}
@@ -33,7 +33,7 @@ func (gv *GoVisitor) AggregateResult(aggregate, nextResult ast.Node) ast.Node {
 	return gv.BaseJavaParserVisitor.AggregateResult(aggregate, nextResult)
 }
 
-func (gv *GoVisitor) VisitCompilationUnit(ctx *parser.CompilationUnitContext) ast.Node {
+func (gv *TreeVisitor) VisitCompilationUnit(ctx *parser.CompilationUnitContext) ast.Node {
 
 	node := gv.VisitChildren(ctx)
 	if node == nil {
@@ -56,7 +56,7 @@ func (gv *GoVisitor) VisitCompilationUnit(ctx *parser.CompilationUnitContext) as
 	return class
 }
 
-func (gv *GoVisitor) VisitClassDeclaration(ctx *parser.ClassDeclarationContext) ast.Node {
+func (gv *TreeVisitor) VisitClassDeclaration(ctx *parser.ClassDeclarationContext) ast.Node {
 	class := gv.VisitChildren(ctx).(*ast.Class)
 
 	class.Name = ctx.IDENTIFIER().GetText()
@@ -80,7 +80,7 @@ func (gv *GoVisitor) VisitClassDeclaration(ctx *parser.ClassDeclarationContext) 
 	return class
 }
 
-func (gv *GoVisitor) VisitClassBody(ctx *parser.ClassBodyContext) ast.Node {
+func (gv *TreeVisitor) VisitClassBody(ctx *parser.ClassBodyContext) ast.Node {
 
 	class := ast.NewClass()
 
@@ -103,7 +103,7 @@ func (gv *GoVisitor) VisitClassBody(ctx *parser.ClassBodyContext) ast.Node {
 	return class
 }
 
-func (gv *GoVisitor) VisitClassBodyDeclaration(ctx *parser.ClassBodyDeclarationContext) ast.Node {
+func (gv *TreeVisitor) VisitClassBodyDeclaration(ctx *parser.ClassBodyDeclarationContext) ast.Node {
 
 	// static and non-static initializers
 	// wont' be processed by any of my other visit rules
@@ -149,7 +149,7 @@ func (gv *GoVisitor) VisitClassBodyDeclaration(ctx *parser.ClassBodyDeclarationC
 	return member
 }
 
-func (gv *GoVisitor) VisitMethodDeclaration(ctx *parser.MethodDeclarationContext) ast.Node {
+func (gv *TreeVisitor) VisitMethodDeclaration(ctx *parser.MethodDeclarationContext) ast.Node {
 	name := ctx.IDENTIFIER().GetText()
 
 	body := exp.NewBlockNode(ctx.MethodBody().Block())
@@ -162,15 +162,15 @@ func (gv *GoVisitor) VisitMethodDeclaration(ctx *parser.MethodDeclarationContext
 	return m
 }
 
-func (v *GoVisitor) VisitFieldDeclaration(ctx *parser.FieldDeclarationContext) ast.Node {
+func (v *TreeVisitor) VisitFieldDeclaration(ctx *parser.FieldDeclarationContext) ast.Node {
 	return ast.NewFields(ctx)
 }
 
-func (v *GoVisitor) VisitConstructorDeclaration(ctx *parser.ConstructorDeclarationContext) ast.Node {
+func (v *TreeVisitor) VisitConstructorDeclaration(ctx *parser.ConstructorDeclarationContext) ast.Node {
 	c := ast.NewConstructor(ctx)
 	return c
 }
 
-func (gv *GoVisitor) VisitEnumDeclaration(ctx *parser.EnumDeclarationContext) ast.Node {
+func (gv *TreeVisitor) VisitEnumDeclaration(ctx *parser.EnumDeclarationContext) ast.Node {
 	return ast.NewEnum(ctx)
 }
