@@ -147,7 +147,11 @@ func (gv *TreeVisitor) VisitClassBodyDeclaration(ctx *parser.ClassBodyDeclaratio
 }
 
 func (gv *TreeVisitor) VisitGenericMethodDeclaration(ctx *parser.GenericMethodDeclarationContext) node.Node {
-	panic("generic method declaration")
+
+	method := gv.VisitMethodDeclaration(ctx.MethodDeclaration())
+	method.(*ast.Method).TypeParameters = exp.NewTypeParameterList(ctx.TypeParameters())
+
+	return method
 }
 
 func (gv *TreeVisitor) VisitGenericConstructorDeclaration(ctx *parser.GenericConstructorDeclarationContext) node.Node {

@@ -10,11 +10,12 @@ import (
 type Method struct {
 	Name string
 
-	Body       node.Node
-	Arguments  []node.Node
-	ReturnType node.Node
-	Class      string
-	Throws     string
+	TypeParameters exp.TypeParameterList // implies generic method
+	Body           node.Node
+	Arguments      []node.Node
+	ReturnType     node.Node
+	Class          string
+	Throws         string
 
 	Public       bool
 	Abstract     bool
