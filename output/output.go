@@ -1,7 +1,6 @@
 package output
 
 import (
-	"encoding/json"
 	"fmt"
 	"io/fs"
 	"os"
@@ -121,14 +120,12 @@ func outputStructures(classes []*ast.Class, outputRoot string) {
 func outputStructure(class *ast.Class, outputRoot string) {
 
 	targetFilename := outputRoot + "/" + class.OutputFilename()
-	targetJSONFilename := targetFilename + ".json"
 	targetErrorFilename := targetFilename + ".err.txt"
 
 	targetDir := filepath.Dir(targetFilename)
 	err := os.MkdirAll(targetDir, 0775)
 
 	removeFileIfExists(targetFilename)
-	removeFileIfExists(targetJSONFilename)
 	removeFileIfExists(targetErrorFilename)
 
 	goCode := class.AsFile()
@@ -140,10 +137,6 @@ func outputStructure(class *ast.Class, outputRoot string) {
 		goCode = goCode2
 	}
 
-	astJSON, err := dumpAST(class)
-	if err != nil {
-		outputFile(targetJSONFilename, astJSON)
-	}
 	outputFile(targetFilename, goCode)
 }
 
@@ -169,9 +162,4 @@ func generateOutputRoot(dir string) string {
 	}
 
 	return targetDir
-}
-
-func dumpAST(node node.Node) (string, error) {
-	js, err := json.MarshalIndent(node, "", "  ")
-	return string(js), err
 }

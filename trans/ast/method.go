@@ -71,5 +71,5 @@ func (m *Method) String() string {
 		throws = " /* TODO throws " + m.Throws + "*/"
 	}
 
-	return fmt.Sprintf("func (this *%s) %s(%s) %s%s{\n%s\n}\n\n", m.Class, m.Name, arguments, m.ReturnType, throws, body)
+	return fmt.Sprintf("func (this *%s) %s(%s) %s%s{\n%s\n}\n\n", m.Class.Name, m.Name, arguments, m.ReturnType, throws, body)
 }
