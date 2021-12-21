@@ -21,6 +21,27 @@ func (av *ASTVisitor[T]) VisitClass(class *ast.Class) T {
 	return av.VisitChildren(class)
 }
 
+func (av *ASTVisitor[T]) VisitImport(imp *ast.Import) T {
+
+	imp.Class = av.CurrentClass
+
+	impPackageName, impClassName := ast.SplitPackageName(imp.ImportString)
+
+	impPkg := av.Hierarchy.GetPackage(impPackageName)
+	imp.ImportPackage = impPkg
+
+	if impClassName == "*" {
+		imp.Star = true
+		impPkg.AddImportReference(imp)
+	} else {
+		impClass := impPkg.GetClass(impClassName)
+		imp.ImportClass = impClass
+		impPkg.AddImportReference(imp)
+	}
+
+	return av.zero // no children
+}
+
 func (av *ASTVisitor[T]) VisitTypeElement(node *ast.TypeElementNode) T {
 
 	// connect the type to its class,

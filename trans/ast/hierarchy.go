@@ -48,31 +48,3 @@ func (h *Hierarchy) AddClass(class *Class) {
 	class.Package = pkg
 	pkg.AddClass(class)
 }
-
-type Package struct {
-	Name    string
-	Classes map[string]*Class
-}
-
-func NewPackage(name string) *Package {
-	return &Package{
-		Name:    name,
-		Classes: make(map[string]*Class),
-	}
-}
-
-func (pkg *Package) AddClass(class *Class) {
-	pkg.Classes[class.Name] = class
-}
-
-func (pkg *Package) String() string {
-	return "package " + pkg.Name
-}
-
-func (pkg *Package) Children() []node.Node {
-	list := make([]node.Node, 0)
-	for _, class := range pkg.Classes {
-		list = append(list, class)
-	}
-	return list
-}
