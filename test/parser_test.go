@@ -5,7 +5,7 @@ import (
 
 	"github.com/antlr/antlr4/runtime/Go/antlr"
 	"github.com/dragonfax/java_converter/input/parser"
-	"github.com/dragonfax/java_converter/trans/ast/exp"
+	"github.com/dragonfax/java_converter/trans/ast"
 )
 
 /*
@@ -48,7 +48,7 @@ func TestTypeNode(t *testing.T) {
 	p.BuildParseTrees = true
 	ptree := p.TypeType()
 
-	source := exp.NewTypeNode(ptree)
+	source := ast.NewTypeNode(ptree)
 
 	if "Level.Source" != source.String() {
 		t.Fatal("differnces")

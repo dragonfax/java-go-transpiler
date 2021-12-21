@@ -11,7 +11,6 @@ import (
 
 	"github.com/dragonfax/java_converter/tool"
 	"github.com/dragonfax/java_converter/trans/ast"
-	"github.com/dragonfax/java_converter/trans/ast/exp"
 	"github.com/dragonfax/java_converter/trans/node"
 
 	"github.com/schollz/progressbar/v3"
@@ -43,9 +42,14 @@ func (av *ASTVisitor[T]) VisitNode(tree node.Node) T {
 		fmt.Printf("someone gave us a nil node to visit\n")
 		return av.zero
 	}
+
+	if scope, ok := tree.(ast.HasScope); av.CurrentMethod != nil && ok {
+		scope.SetScope(av.CurrentMethod)
+	}
+
 	if class, ok := tree.(*ast.Class); ok {
 		return av.VisitClass(class)
-	} else if te, ok := tree.(*exp.TypeElementNode); ok {
+	} else if te, ok := tree.(*ast.TypeElementNode); ok {
 		return av.VisitTypeElement(te)
 	} else if pkg, ok := tree.(*ast.Package); ok {
 		return av.VisitPackage(pkg)

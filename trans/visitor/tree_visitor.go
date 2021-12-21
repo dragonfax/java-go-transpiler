@@ -5,7 +5,6 @@ import (
 
 	"github.com/dragonfax/java_converter/input/parser"
 	"github.com/dragonfax/java_converter/trans/ast"
-	"github.com/dragonfax/java_converter/trans/ast/exp"
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
@@ -65,7 +64,7 @@ func (gv *TreeVisitor) VisitClassDeclaration(ctx *parser.ClassDeclarationContext
 
 	if ctx.TypeList() != nil {
 		for _, typeType := range ctx.TypeList().AllTypeType() {
-			class.Interfaces = append(class.Interfaces, exp.NewTypeNode(typeType))
+			class.Interfaces = append(class.Interfaces, ast.NewTypeNode(typeType))
 		}
 	}
 
@@ -143,7 +142,7 @@ func (gv *TreeVisitor) VisitClassBodyDeclaration(ctx *parser.ClassBodyDeclaratio
 func (gv *TreeVisitor) VisitGenericMethodDeclaration(ctx *parser.GenericMethodDeclarationContext) node.Node {
 
 	method := gv.VisitMethodDeclaration(ctx.MethodDeclaration())
-	method.(*ast.Method).TypeParameters = exp.NewTypeParameterList(ctx.TypeParameters())
+	method.(*ast.Method).TypeParameters = ast.NewTypeParameterList(ctx.TypeParameters())
 
 	return method
 }
@@ -155,8 +154,8 @@ func (gv *TreeVisitor) VisitGenericConstructorDeclaration(ctx *parser.GenericCon
 func (gv *TreeVisitor) VisitMethodDeclaration(ctx *parser.MethodDeclarationContext) node.Node {
 	name := ctx.IDENTIFIER().GetText()
 
-	body := exp.NewBlockNode(ctx.MethodBody().Block())
-	m := ast.NewMethod(name, exp.FormalParameterListProcessor(ctx.FormalParameters().FormalParameterList()), exp.NewTypeOrVoidNode(ctx.TypeTypeOrVoid()), body)
+	body := ast.NewBlockNode(ctx.MethodBody().Block())
+	m := ast.NewMethod(name, ast.FormalParameterListProcessor(ctx.FormalParameters().FormalParameterList()), ast.NewTypeOrVoidNode(ctx.TypeTypeOrVoid()), body)
 
 	if ctx.THROWS() != nil {
 		m.Throws = ctx.QualifiedNameList().GetText()

@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/dragonfax/java_converter/input/parser"
-	"github.com/dragonfax/java_converter/trans/ast/exp"
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
@@ -31,11 +30,11 @@ func NewConstructor(ctx *parser.ConstructorDeclarationContext) *Constructor {
 	c := &Constructor{Name: ctx.IDENTIFIER().GetText()}
 
 	if ctx.GetConstructorBody() != nil {
-		c.Body = exp.NewBlockNode(ctx.GetConstructorBody())
+		c.Body = NewBlockNode(ctx.GetConstructorBody())
 	}
 
 	if ctx.FormalParameters().FormalParameterList() != nil {
-		c.Parameters = exp.FormalParameterListProcessor(ctx.FormalParameters().FormalParameterList())
+		c.Parameters = FormalParameterListProcessor(ctx.FormalParameters().FormalParameterList())
 	}
 
 	if ctx.QualifiedNameList() != nil {
@@ -56,5 +55,5 @@ func (c *Constructor) String() string {
 		throws = " /* TODO throws " + c.Throws + " */"
 	}
 
-	return fmt.Sprintf("func New%s(%s) %s *%s{\n%s\n}\n\n", c.Name, exp.ArgumentListToString(c.Parameters), throws, c.Name, body)
+	return fmt.Sprintf("func New%s(%s) %s *%s{\n%s\n}\n\n", c.Name, ArgumentListToString(c.Parameters), throws, c.Name, body)
 }

@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/dragonfax/java_converter/input/parser"
-	"github.com/dragonfax/java_converter/trans/ast/exp"
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
@@ -13,13 +12,13 @@ import (
  */
 type Initializer struct {
 	Static bool
-	Block  *exp.BlockNode
+	Block  *BlockNode
 }
 
 func NewInitializerBlock(ctx *parser.ClassBodyDeclarationContext) *Initializer {
 	this := &Initializer{
 		Static: ctx.Block() != nil,
-		Block:  exp.NewBlockNode(ctx.Block()),
+		Block:  NewBlockNode(ctx.Block()),
 	}
 	return this
 }

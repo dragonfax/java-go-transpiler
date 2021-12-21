@@ -2,7 +2,6 @@ package visitor
 
 import (
 	"github.com/dragonfax/java_converter/trans/ast"
-	"github.com/dragonfax/java_converter/trans/ast/exp"
 )
 
 func (av *ASTVisitor[T]) VisitPackage(pkg *ast.Package) T {
@@ -22,7 +21,7 @@ func (av *ASTVisitor[T]) VisitClass(class *ast.Class) T {
 	return av.VisitChildren(class)
 }
 
-func (av *ASTVisitor[T]) VisitTypeElement(node *exp.TypeElementNode) T {
+func (av *ASTVisitor[T]) VisitTypeElement(node *ast.TypeElementNode) T {
 
 	// connect the type to its class,
 	// its type arguments will get connected as children later.

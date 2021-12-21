@@ -4,4 +4,4 @@
  * The design of the AST pretty much consideres statements and expressions the same thing.
  * and doesn't try to enforce any java designs.
  */
-package exp
+package ast

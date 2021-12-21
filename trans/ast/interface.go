@@ -2,7 +2,6 @@ package ast
 
 import (
 	"github.com/dragonfax/java_converter/input/parser"
-	"github.com/dragonfax/java_converter/trans/ast/exp"
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
@@ -37,8 +36,8 @@ func NewInterface(ctx *parser.InterfaceDeclarationContext) *Class {
 
 		member := &InterfaceMember{
 			Name:       declCtx.IDENTIFIER().GetText(),
-			Arguments:  exp.FormalParameterListProcessor(declCtx.FormalParameters().FormalParameterList()),
-			ReturnType: exp.NewTypeOrVoidNode(declCtx.TypeTypeOrVoid()),
+			Arguments:  FormalParameterListProcessor(declCtx.FormalParameters().FormalParameterList()),
+			ReturnType: NewTypeOrVoidNode(declCtx.TypeTypeOrVoid()),
 		}
 
 		this.Members = append(this.Members, member)
@@ -53,5 +52,5 @@ func (im *InterfaceMember) String() string {
 }
 
 func (im *InterfaceMember) ArgumentsString() string {
-	return exp.ArgumentListToString(im.Arguments)
+	return ArgumentListToString(im.Arguments)
 }

@@ -6,7 +6,6 @@ import (
 
 	"github.com/dragonfax/java_converter/input/parser"
 	"github.com/dragonfax/java_converter/tool"
-	"github.com/dragonfax/java_converter/trans/ast/exp"
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
@@ -21,7 +20,7 @@ func (fl FieldList) Children() []node.Node {
 }
 
 type Field struct {
-	exp.VariableDeclNode
+	VariableDeclNode
 
 	Public    bool
 	Transient bool
@@ -35,7 +34,7 @@ func (f *Field) Children() []node.Node {
 func NewFields(ctx *parser.FieldDeclarationContext) FieldList {
 	members := make([]*Field, 0)
 
-	typ := exp.NewTypeNode(ctx.TypeType())
+	typ := NewTypeNode(ctx.TypeType())
 
 	for _, varDec := range ctx.VariableDeclarators().AllVariableDeclarator() {
 		varDecCtx := varDec
@@ -46,13 +45,13 @@ func NewFields(ctx *parser.FieldDeclarationContext) FieldList {
 		if varDecCtx.VariableInitializer() != nil {
 			initCtx := varDecCtx.VariableInitializer()
 			if initCtx.Expression() != nil {
-				init = exp.ExpressionProcessor(initCtx.Expression())
+				init = ExpressionProcessor(initCtx.Expression())
 			} else if initCtx.ArrayInitializer() != nil {
-				init = exp.NewArrayLiteral(initCtx.ArrayInitializer())
+				init = NewArrayLiteral(initCtx.ArrayInitializer())
 			}
 		}
 
-		node := exp.NewVariableDecl(typ, name, init)
+		node := NewVariableDecl(typ, name, init)
 		members = append(members, &Field{VariableDeclNode: *node})
 	}
 

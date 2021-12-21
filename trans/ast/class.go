@@ -5,7 +5,6 @@ import (
 	"strings"
 	"text/template"
 
-	"github.com/dragonfax/java_converter/trans/ast/exp"
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
@@ -13,7 +12,7 @@ type Class struct {
 	Name        string
 	Imports     []*Import
 	BaseClass   string
-	Interfaces  []exp.TypeNode
+	Interfaces  []TypeNode
 	Members     []node.Node
 	Fields      []*Field
 	Package     *Package
@@ -73,13 +72,13 @@ var interfaceTemplateCompiled = template.Must(template.New("interface").Parse(in
 
 func (c *Class) String() string {
 	if c.Interface {
-		return exp.ExecuteTemplateToString(interfaceTemplateCompiled, c)
+		return ExecuteTemplateToString(interfaceTemplateCompiled, c)
 	}
 	if c.Enum {
-		return exp.ExecuteTemplateToString(enumTemplateCompiled, c)
+		return ExecuteTemplateToString(enumTemplateCompiled, c)
 	}
 
-	return exp.ExecuteTemplateToString(classTpl, c)
+	return ExecuteTemplateToString(classTpl, c)
 }
 
 func (c *Class) PackageBasename() string {
@@ -94,7 +93,7 @@ func (c *Class) AsFile() string {
 func NewClass() *Class {
 	c := &Class{}
 	c.Members = make([]node.Node, 0)
-	c.Interfaces = make([]exp.TypeNode, 0)
+	c.Interfaces = make([]TypeNode, 0)
 	c.Fields = make([]*Field, 0)
 	c.Imports = make([]*Import, 0)
 	c.Constants = make([]*EnumConstant, 0)

@@ -1,4 +1,4 @@
-package exp
+package ast
 
 import (
 	"fmt"
@@ -8,6 +8,8 @@ import (
 )
 
 type VariableDeclNode struct {
+	*BaseHasScope
+
 	Type       TypeNode
 	Name       string
 	Expression node.Node // for now
@@ -31,7 +33,7 @@ func NewVariableDecl(typ TypeNode, name string, expression node.Node) *VariableD
 	if name == "" {
 		panic("no variable name")
 	}
-	return &VariableDeclNode{Type: typ, Name: name, Expression: expression}
+	return &VariableDeclNode{BaseHasScope: NewBaseHasScope(), Type: typ, Name: name, Expression: expression}
 }
 
 func NewVariableDeclNodeList(decl *parser.LocalVariableDeclarationContext) []node.Node {
@@ -50,11 +52,7 @@ func NewVariableDeclNodeList(decl *parser.LocalVariableDeclarationContext) []nod
 			exp = variableInitializerProcessor(varInitCtx)
 		}
 
-		node := &VariableDeclNode{
-			Type:       typ,
-			Name:       varDeclCtx.VariableDeclaratorId().GetText(),
-			Expression: exp,
-		}
+		node := NewVariableDecl(typ, varDeclCtx.VariableDeclaratorId().GetText(), exp)
 
 		l = append(l, node)
 	}

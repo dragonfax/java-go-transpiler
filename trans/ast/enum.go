@@ -4,7 +4,6 @@ import (
 	"text/template"
 
 	"github.com/dragonfax/java_converter/input/parser"
-	"github.com/dragonfax/java_converter/trans/ast/exp"
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
@@ -38,7 +37,7 @@ var enumTemplateCompiled = template.Must(template.New("enum").Parse(enumTemplate
 func NewEnum(ctx *parser.EnumDeclarationContext, fields FieldList, members []node.Node) *Class {
 	this := &Class{
 		Name:       ctx.IDENTIFIER().GetText(),
-		Interfaces: make([]exp.TypeNode, 0),
+		Interfaces: make([]TypeNode, 0),
 		Members:    members,
 		Fields:     fields,
 		Enum:       true,
@@ -46,7 +45,7 @@ func NewEnum(ctx *parser.EnumDeclarationContext, fields FieldList, members []nod
 
 	if ctx.TypeList() != nil {
 		for _, typeType := range ctx.TypeList().AllTypeType() {
-			this.Interfaces = append(this.Interfaces, exp.NewTypeNode(typeType))
+			this.Interfaces = append(this.Interfaces, NewTypeNode(typeType))
 		}
 	}
 

@@ -3,14 +3,13 @@ package ast
 import (
 	"fmt"
 
-	"github.com/dragonfax/java_converter/trans/ast/exp"
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
 type Method struct {
 	Name string
 
-	TypeParameters exp.TypeParameterList // implies generic method
+	TypeParameters TypeParameterList // implies generic method
 	Body           node.Node
 	Arguments      []node.Node
 	ReturnType     node.Node
@@ -64,7 +63,7 @@ func (m *Method) String() string {
 
 	arguments := ""
 	if len(m.Arguments) > 0 {
-		arguments = exp.ArgumentListToString(m.Arguments)
+		arguments = ArgumentListToString(m.Arguments)
 	}
 
 	throws := ""
