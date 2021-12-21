@@ -107,7 +107,6 @@ func (gv *TreeVisitor) VisitClassBodyDeclaration(ctx *parser.ClassBodyDeclaratio
 
 	// static and non-static initializers
 	// wont' be processed by any of my other visit rules
-
 	if ctx.Block() != nil {
 		// acts as a member
 		return ast.NewInitializerBlock(ctx)
@@ -147,6 +146,14 @@ func (gv *TreeVisitor) VisitClassBodyDeclaration(ctx *parser.ClassBodyDeclaratio
 	}
 
 	return member
+}
+
+func (gv *TreeVisitor) VisitGenericMethodDeclaration(ctx *parser.GenericMethodDeclarationContext) ast.Node {
+	panic("generic method declaration")
+}
+
+func (gv *TreeVisitor) VisitGenericConstructorDeclaration(ctx *parser.GenericConstructorDeclarationContext) ast.Node {
+	panic("generic constructor declaration")
 }
 
 func (gv *TreeVisitor) VisitMethodDeclaration(ctx *parser.MethodDeclarationContext) ast.Node {
