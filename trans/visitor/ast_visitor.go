@@ -17,6 +17,11 @@ import (
 type ASTVisitor[T comparable] struct {
 	Hierarchy *hier.Hierarchy
 	zero      T
+
+	// Context
+	CurrentPackage *hier.Package
+	CurrentClass   *ast.Class
+	CurrentMethod  *node.Node
 }
 
 func NewASTVisitor[T comparable]() *ASTVisitor[T] {
@@ -53,9 +58,11 @@ func (av *ASTVisitor[T]) VisitChildren(tree node.Node) T {
 
 func (av *ASTVisitor[T]) VisitClass(class *ast.Class) T {
 
-	pack := av.Hierarchy.GetPackage(class.PackageName)
-	class.Package = pack
-	av.Hierarchy.AddClass(class)
+	/*
+		pack := av.Hierarchy.GetPackage(class.PackageName)
+		class.Package = pack
+		av.Hierarchy.AddClass(class)
+	*/
 	// above also adds imports and instantiates their references, all class references. created new classes as needed.
 
 	return av.VisitChildren(class)

@@ -2,14 +2,13 @@ package trans
 
 import (
 	"github.com/antlr/antlr4/runtime/Go/antlr"
-	"github.com/dragonfax/java_converter/trans/hier"
 	"github.com/dragonfax/java_converter/trans/node"
 	"github.com/dragonfax/java_converter/trans/visitor"
 )
 
-func BuildAST(h *hier.Hierarchy, tree antlr.RuleContext) node.Node {
+func BuildAST(tree antlr.RuleContext) node.Node {
 
-	TreeVisitor := visitor.NewTreeVisitor(h)
+	TreeVisitor := visitor.NewTreeVisitor()
 
 	file := TreeVisitor.Visit(tree)
 

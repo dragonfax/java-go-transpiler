@@ -6,18 +6,15 @@ import (
 	"github.com/dragonfax/java_converter/input/parser"
 	"github.com/dragonfax/java_converter/trans/ast"
 	"github.com/dragonfax/java_converter/trans/ast/exp"
-	"github.com/dragonfax/java_converter/trans/hier"
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
 type TreeVisitor struct {
 	*parser.BaseJavaParserVisitor[node.Node]
-
-	Hierarchy *hier.Hierarchy
 }
 
-func NewTreeVisitor(h *hier.Hierarchy) *TreeVisitor {
-	this := &TreeVisitor{Hierarchy: h}
+func NewTreeVisitor() *TreeVisitor {
+	this := &TreeVisitor{}
 	this.BaseJavaParserVisitor = parser.NewBaseJavaParserVisitor[node.Node](this)
 	return this
 }
@@ -50,7 +47,6 @@ func (gv *TreeVisitor) VisitCompilationUnit(ctx *parser.CompilationUnitContext) 
 		for _, importCtx := range ctx.AllImportDeclaration() {
 			importedPackageName := importCtx.QualifiedName().GetText()
 			class.Imports = append(class.Imports, ast.NewImport(importedPackageName))
-			gv.Hierarchy.AddClass(importedPackageName, class)
 		}
 		return class
 	}

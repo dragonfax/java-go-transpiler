@@ -11,11 +11,11 @@ import (
 	"github.com/dragonfax/java_converter/input"
 	"github.com/dragonfax/java_converter/trans"
 	"github.com/dragonfax/java_converter/trans/ast"
-	"github.com/dragonfax/java_converter/trans/hier"
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
-func walkFunc(h *hier.Hierarchy) fs.WalkDirFunc {
+func walkFunc(classes *[]node.Node) fs.WalkDirFunc {
+	*classes = make([]node.Node, 0)
 	return func(filename string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -25,14 +25,13 @@ func walkFunc(h *hier.Hierarchy) fs.WalkDirFunc {
 			return nil
 		}
 
-		parseFile(h, filename)
+		class := parseFile(filename)
+		*classes = append(*classes, class)
 		return nil
 	}
 }
 
 func Translate(path string) error {
-
-	h := hier.New()
 
 	info, err := os.Stat(path)
 	if err != nil {
@@ -40,11 +39,13 @@ func Translate(path string) error {
 	}
 
 	dir := path
+	var classes []node.Node
 	if info.IsDir() {
-		err = filepath.WalkDir(path, walkFunc(h))
+		err = filepath.WalkDir(path, walkFunc(&classes))
 	} else {
 		dir = filepath.Dir(path)
-		parseFile(h, path)
+		class := parseFile(path)
+		classes = []node.Node{class}
 	}
 	if err != nil {
 		return err
@@ -54,23 +55,23 @@ func Translate(path string) error {
 
 	outputRoot := generateOutputRoot(dir)
 
-	outputStructures(h, outputRoot)
+	outputStructures(classes, outputRoot)
 
 	return nil
 }
 
 // input filename to go-code string
-func parseFile(h *hier.Hierarchy, filename string) {
+func parseFile(filename string) node.Node {
 	fmt.Println(filename)
 	tree := input.ParseToTree(filename)
 
-	trans.BuildAST(h, tree)
+	return trans.BuildAST(tree)
 }
 
-func outputStructures(h *hier.Hierarchy, outputRoot string) {
+func outputStructures(classes []node.Node, outputRoot string) {
 
-	for _, class := range h.Classes {
-		outputStructure(class, outputRoot)
+	for _, class := range classes {
+		outputStructure(class.(*ast.Class), outputRoot)
 	}
 }
 
