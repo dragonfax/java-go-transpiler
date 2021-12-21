@@ -9,11 +9,12 @@ import (
 type Method struct {
 	*BaseMember
 
-	Body       exp.ExpressionNode
-	Arguments  []exp.ExpressionNode
-	ReturnType exp.ExpressionNode
-	Class      string
-	Throws     string
+	TypeParameters exp.TypeParameterList // implies generic method
+	Body           exp.ExpressionNode
+	Arguments      []exp.ExpressionNode
+	ReturnType     exp.ExpressionNode
+	Class          string
+	Throws         string
 
 	Public       bool
 	Abstract     bool
