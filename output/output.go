@@ -12,6 +12,7 @@ import (
 	"github.com/dragonfax/java_converter/trans"
 	"github.com/dragonfax/java_converter/trans/ast"
 	"github.com/dragonfax/java_converter/trans/hier"
+	"github.com/dragonfax/java_converter/trans/node"
 )
 
 func walkFunc(h *hier.Hierarchy) fs.WalkDirFunc {
@@ -126,7 +127,7 @@ func generateOutputRoot(dir string) string {
 	return targetDir
 }
 
-func dumpAST(node ast.Node) (string, error) {
+func dumpAST(node node.Node) (string, error) {
 	js, err := json.MarshalIndent(node, "", "  ")
 	return string(js), err
 }

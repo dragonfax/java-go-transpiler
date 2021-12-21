@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/dragonfax/java_converter/input/parser"
+	"github.com/dragonfax/java_converter/trans/node"
 )
 
 var primitiveTranslation = map[string]string{
@@ -24,10 +25,18 @@ func (tn TypeNode) String() string {
 	return strings.Join(list, ".")
 }
 
+func (tn TypeNode) Children() []node.Node {
+	return node.ListOfNodesToNodeList(tn)
+}
+
 // used when defining the type of variable/return value/parameter/etc
 type TypeElementNode struct {
 	Class         string
 	TypeArguments []TypeNode
+}
+
+func (te *TypeElementNode) Children() []node.Node {
+	return node.ListOfNodesToNodeList(te.TypeArguments)
 }
 
 func (tn *TypeElementNode) String() string {

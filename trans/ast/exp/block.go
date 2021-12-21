@@ -5,10 +5,15 @@ import (
 
 	"github.com/dragonfax/java_converter/input/parser"
 	"github.com/dragonfax/java_converter/tool"
+	"github.com/dragonfax/java_converter/trans/node"
 )
 
 type BlockNode struct {
-	Body []ExpressionNode
+	Body []node.Node
+}
+
+func (bn *BlockNode) Children() []node.Node {
+	return node.ListOfNodesToNodeList(bn.Body)
 }
 
 func (bn *BlockNode) String() string {
@@ -24,7 +29,7 @@ func NewBlockNode(block *parser.BlockContext) *BlockNode {
 	}
 	ctx := block
 
-	l := make([]ExpressionNode, 0)
+	l := make([]node.Node, 0)
 
 	for _, blockStatement := range ctx.AllBlockStatement() {
 		s := BlockStatementProcessor(blockStatement)
@@ -34,7 +39,7 @@ func NewBlockNode(block *parser.BlockContext) *BlockNode {
 	return &BlockNode{Body: l}
 }
 
-func BlockStatementProcessor(ctx *parser.BlockStatementContext) []ExpressionNode {
+func BlockStatementProcessor(ctx *parser.BlockStatementContext) []node.Node {
 	if ctx.LocalVariableDeclaration() != nil {
 		localVarCtx := ctx.LocalVariableDeclaration()
 		nodes := NewVariableDeclNodeList(localVarCtx)
@@ -46,11 +51,11 @@ func BlockStatementProcessor(ctx *parser.BlockStatementContext) []ExpressionNode
 		return nodes
 	} else if ctx.Statement() != nil {
 		statementCtx := ctx.Statement()
-		node := StatementProcessor(statementCtx)
-		if node == nil {
+		stmt := StatementProcessor(statementCtx)
+		if stmt == nil {
 			tool.PanicDebug("adding nil to expression list: ", ctx)
 		}
-		return []ExpressionNode{node}
+		return []node.Node{stmt}
 	} else if ctx.LocalTypeDeclaration() != nil {
 		panic("didn't anticipate this")
 	}

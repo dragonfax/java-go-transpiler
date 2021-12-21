@@ -5,9 +5,10 @@ import (
 
 	"github.com/dragonfax/java_converter/input/parser"
 	"github.com/dragonfax/java_converter/tool"
+	"github.com/dragonfax/java_converter/trans/node"
 )
 
-func StatementProcessor(statementCtxI *parser.StatementContext) ExpressionNode {
+func StatementProcessor(statementCtxI *parser.StatementContext) node.Node {
 	// TODO only one expression per block? no this isn't complicated enough.
 	// but okay for a first of expression parsing
 

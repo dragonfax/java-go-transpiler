@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/dragonfax/java_converter/input/parser"
+	"github.com/dragonfax/java_converter/trans/node"
 )
 
 type LiteralType int
@@ -20,6 +21,10 @@ const (
 type LiteralNode struct {
 	Type  LiteralType
 	Value string
+}
+
+func (ln *LiteralNode) Children() []node.Node {
+	return nil
 }
 
 func NewLiteralNode(literal *parser.LiteralContext) *LiteralNode {

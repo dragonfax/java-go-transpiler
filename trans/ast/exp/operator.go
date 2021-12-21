@@ -4,22 +4,27 @@ import (
 	"fmt"
 
 	"github.com/dragonfax/java_converter/tool"
+	"github.com/dragonfax/java_converter/trans/node"
 )
 
 type BaseOperatorNode struct {
 	Operator string
 }
 
-var _ ExpressionNode = &BinaryOperatorNode{}
+var _ node.Node = &BinaryOperatorNode{}
 
 type BinaryOperatorNode struct {
 	BaseOperatorNode
 
-	Left  ExpressionNode
-	Right ExpressionNode
+	Left  node.Node
+	Right node.Node
 }
 
-func NewBinaryOperatorNode(operator string, left ExpressionNode, right ExpressionNode) *BinaryOperatorNode {
+func (bo *BinaryOperatorNode) Children() []node.Node {
+	return []node.Node{bo.Left, bo.Right}
+}
+
+func NewBinaryOperatorNode(operator string, left node.Node, right node.Node) *BinaryOperatorNode {
 	if operator == "" {
 		panic("no operator")
 	}
@@ -45,16 +50,20 @@ func (bo *BinaryOperatorNode) String() string {
 	return fmt.Sprintf("%s%s%s", bo.Left, bo.Operator, bo.Right)
 }
 
-var _ ExpressionNode = &UnaryOperatorNode{}
+var _ node.Node = &UnaryOperatorNode{}
 
 type UnaryOperatorNode struct {
 	BaseOperatorNode
 	Prefix bool
 
-	Left ExpressionNode
+	Left node.Node
 }
 
-func NewUnaryOperatorNode(prefix bool, operator string, left ExpressionNode) *UnaryOperatorNode {
+func (uo *UnaryOperatorNode) Children() []node.Node {
+	return []node.Node{uo.Left}
+}
+
+func NewUnaryOperatorNode(prefix bool, operator string, left node.Node) *UnaryOperatorNode {
 	if operator == "" {
 		panic("no operator")
 	}
@@ -76,12 +85,16 @@ func (uo *UnaryOperatorNode) String() string {
 type TernaryOperatorNode struct {
 	BaseOperatorNode
 
-	Left   ExpressionNode
-	Middle ExpressionNode
-	Right  ExpressionNode
+	Left   node.Node
+	Middle node.Node
+	Right  node.Node
 }
 
-func NewTernaryOperatorNode(operator string, left ExpressionNode, middle ExpressionNode, right ExpressionNode) *TernaryOperatorNode {
+func (to *TernaryOperatorNode) Children() []node.Node {
+	return []node.Node{to.Left, to.Middle, to.Right}
+}
+
+func NewTernaryOperatorNode(operator string, left node.Node, middle node.Node, right node.Node) *TernaryOperatorNode {
 	if operator == "" {
 		panic("no operator")
 	}

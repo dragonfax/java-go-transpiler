@@ -3,10 +3,11 @@ package exp
 import (
 	"github.com/dragonfax/java_converter/input/parser"
 	"github.com/dragonfax/java_converter/tool"
+	"github.com/dragonfax/java_converter/trans/node"
 )
 
 // deal with the recursive expression tree.
-func ExpressionProcessor(expressionI *parser.ExpressionContext) ExpressionNode {
+func ExpressionProcessor(expressionI *parser.ExpressionContext) node.Node {
 	if tool.IsNilInterface(expressionI) {
 		return nil
 	}
@@ -120,7 +121,7 @@ func ExpressionProcessor(expressionI *parser.ExpressionContext) ExpressionNode {
 	// return nil
 }
 
-func expressionFromPrimary(primary *parser.PrimaryContext) ExpressionNode {
+func expressionFromPrimary(primary *parser.PrimaryContext) node.Node {
 	primaryCtx := primary
 
 	if primaryCtx.IDENTIFIER() != nil {
@@ -151,13 +152,13 @@ func expressionFromPrimary(primary *parser.PrimaryContext) ExpressionNode {
 	panic("unknown primary type: " + primary.GetText() + "\n\n" + primary.ToStringTree(parser.RuleNames, nil))
 }
 
-func FormalParameterListProcessor(formal *parser.FormalParameterListContext) []ExpressionNode {
+func FormalParameterListProcessor(formal *parser.FormalParameterListContext) []node.Node {
 	if tool.IsNilInterface(formal) {
 		return nil
 	}
 	ctx := formal
 
-	parameters := make([]ExpressionNode, 0)
+	parameters := make([]node.Node, 0)
 	for _, formalParam := range ctx.AllFormalParameter() {
 		formalParamCtx := formalParam
 		t := NewTypeNode(formalParamCtx.TypeType())

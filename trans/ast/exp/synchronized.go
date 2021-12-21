@@ -4,11 +4,16 @@ import (
 	"fmt"
 
 	"github.com/dragonfax/java_converter/input/parser"
+	"github.com/dragonfax/java_converter/trans/node"
 )
 
 type SynchronizedBlock struct {
-	Condition ExpressionNode
+	Condition node.Node
 	Block     *BlockNode
+}
+
+func (sb *SynchronizedBlock) Children() []node.Node {
+	return []node.Node{sb.Condition, sb.Block}
 }
 
 func NewSynchronizedBlock(ctx *parser.StatementContext) *SynchronizedBlock {

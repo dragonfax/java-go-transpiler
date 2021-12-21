@@ -2,6 +2,8 @@ package exp
 
 import (
 	"fmt"
+
+	"github.com/dragonfax/java_converter/trans/node"
 )
 
 /* argument in a method delcaration.
@@ -11,6 +13,10 @@ type ArgumentNode struct {
 	Type     TypeNode
 	Name     string
 	Ellipses bool
+}
+
+func (an *ArgumentNode) Children() []node.Node {
+	return []node.Node{an.Type}
 }
 
 func (an *ArgumentNode) String() string {

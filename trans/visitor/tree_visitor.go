@@ -7,21 +7,22 @@ import (
 	"github.com/dragonfax/java_converter/trans/ast"
 	"github.com/dragonfax/java_converter/trans/ast/exp"
 	"github.com/dragonfax/java_converter/trans/hier"
+	"github.com/dragonfax/java_converter/trans/node"
 )
 
 type TreeVisitor struct {
-	*parser.BaseJavaParserVisitor[ast.Node]
+	*parser.BaseJavaParserVisitor[node.Node]
 
 	Hierarchy *hier.Hierarchy
 }
 
 func NewTreeVisitor(h *hier.Hierarchy) *TreeVisitor {
 	this := &TreeVisitor{Hierarchy: h}
-	this.BaseJavaParserVisitor = parser.NewBaseJavaParserVisitor[ast.Node](this)
+	this.BaseJavaParserVisitor = parser.NewBaseJavaParserVisitor[node.Node](this)
 	return this
 }
 
-func (gv *TreeVisitor) AggregateResult(aggregate, nextResult ast.Node) ast.Node {
+func (gv *TreeVisitor) AggregateResult(aggregate, nextResult node.Node) node.Node {
 	if aggregate == nil {
 		return nextResult
 	}
@@ -33,7 +34,7 @@ func (gv *TreeVisitor) AggregateResult(aggregate, nextResult ast.Node) ast.Node 
 	return gv.BaseJavaParserVisitor.AggregateResult(aggregate, nextResult)
 }
 
-func (gv *TreeVisitor) VisitCompilationUnit(ctx *parser.CompilationUnitContext) ast.Node {
+func (gv *TreeVisitor) VisitCompilationUnit(ctx *parser.CompilationUnitContext) node.Node {
 
 	node := gv.VisitChildren(ctx)
 	if node == nil {
@@ -57,7 +58,7 @@ func (gv *TreeVisitor) VisitCompilationUnit(ctx *parser.CompilationUnitContext) 
 	panic("got something unknown from children")
 }
 
-func (gv *TreeVisitor) VisitClassDeclaration(ctx *parser.ClassDeclarationContext) ast.Node {
+func (gv *TreeVisitor) VisitClassDeclaration(ctx *parser.ClassDeclarationContext) node.Node {
 	class := gv.VisitChildren(ctx).(*ast.Class)
 
 	class.Name = ctx.IDENTIFIER().GetText()
@@ -81,7 +82,7 @@ func (gv *TreeVisitor) VisitClassDeclaration(ctx *parser.ClassDeclarationContext
 	return class
 }
 
-func (gv *TreeVisitor) VisitClassBody(ctx *parser.ClassBodyContext) ast.Node {
+func (gv *TreeVisitor) VisitClassBody(ctx *parser.ClassBodyContext) node.Node {
 
 	class := ast.NewClass()
 
@@ -104,7 +105,7 @@ func (gv *TreeVisitor) VisitClassBody(ctx *parser.ClassBodyContext) ast.Node {
 	return class
 }
 
-func (gv *TreeVisitor) VisitClassBodyDeclaration(ctx *parser.ClassBodyDeclarationContext) ast.Node {
+func (gv *TreeVisitor) VisitClassBodyDeclaration(ctx *parser.ClassBodyDeclarationContext) node.Node {
 
 	// static and non-static initializers
 	// wont' be processed by any of my other visit rules
@@ -149,15 +150,15 @@ func (gv *TreeVisitor) VisitClassBodyDeclaration(ctx *parser.ClassBodyDeclaratio
 	return member
 }
 
-func (gv *TreeVisitor) VisitGenericMethodDeclaration(ctx *parser.GenericMethodDeclarationContext) ast.Node {
+func (gv *TreeVisitor) VisitGenericMethodDeclaration(ctx *parser.GenericMethodDeclarationContext) node.Node {
 	panic("generic method declaration")
 }
 
-func (gv *TreeVisitor) VisitGenericConstructorDeclaration(ctx *parser.GenericConstructorDeclarationContext) ast.Node {
+func (gv *TreeVisitor) VisitGenericConstructorDeclaration(ctx *parser.GenericConstructorDeclarationContext) node.Node {
 	panic("generic constructor declaration")
 }
 
-func (gv *TreeVisitor) VisitMethodDeclaration(ctx *parser.MethodDeclarationContext) ast.Node {
+func (gv *TreeVisitor) VisitMethodDeclaration(ctx *parser.MethodDeclarationContext) node.Node {
 	name := ctx.IDENTIFIER().GetText()
 
 	body := exp.NewBlockNode(ctx.MethodBody().Block())
@@ -170,17 +171,17 @@ func (gv *TreeVisitor) VisitMethodDeclaration(ctx *parser.MethodDeclarationConte
 	return m
 }
 
-func (v *TreeVisitor) VisitFieldDeclaration(ctx *parser.FieldDeclarationContext) ast.Node {
+func (v *TreeVisitor) VisitFieldDeclaration(ctx *parser.FieldDeclarationContext) node.Node {
 	return ast.NewFields(ctx)
 }
 
-func (v *TreeVisitor) VisitConstructorDeclaration(ctx *parser.ConstructorDeclarationContext) ast.Node {
+func (v *TreeVisitor) VisitConstructorDeclaration(ctx *parser.ConstructorDeclarationContext) node.Node {
 	c := ast.NewConstructor(ctx)
 	return c
 }
 
-func (gv *TreeVisitor) VisitEnumDeclaration(ctx *parser.EnumDeclarationContext) ast.Node {
-	members := make([]ast.Member, 0)
+func (gv *TreeVisitor) VisitEnumDeclaration(ctx *parser.EnumDeclarationContext) node.Node {
+	members := make([]node.Node, 0)
 	fields := make(ast.FieldList, 0)
 	if ctx.EnumBodyDeclarations() != nil {
 		for _, decl := range ctx.EnumBodyDeclarations().AllClassBodyDeclaration() {
@@ -203,6 +204,6 @@ func (gv *TreeVisitor) VisitEnumDeclaration(ctx *parser.EnumDeclarationContext) 
 	return ast.NewEnum(ctx, fields, members)
 }
 
-func (gv *TreeVisitor) VisitInterfaceDeclaration(ctx *parser.InterfaceDeclarationContext) ast.Node {
+func (gv *TreeVisitor) VisitInterfaceDeclaration(ctx *parser.InterfaceDeclarationContext) node.Node {
 	return ast.NewInterface(ctx)
 }

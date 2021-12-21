@@ -5,17 +5,20 @@ import (
 
 	"github.com/dragonfax/java_converter/input/parser"
 	"github.com/dragonfax/java_converter/trans/ast/exp"
+	"github.com/dragonfax/java_converter/trans/node"
 )
 
-var _ Member = &Constructor{}
-
 type Constructor struct {
-	*BaseMember
-	Body       exp.ExpressionNode
-	Parameters []exp.ExpressionNode
+	Name       string
+	Body       node.Node
+	Parameters []node.Node
 	Throws     string
 
 	Public bool
+}
+
+func (c *Constructor) Children() []node.Node {
+	return node.AppendNodeLists(c.Parameters, c.Body)
 }
 
 func (c *Constructor) SetPublic(public bool) {
@@ -24,7 +27,7 @@ func (c *Constructor) SetPublic(public bool) {
 
 func NewConstructor(ctx *parser.ConstructorDeclarationContext) *Constructor {
 
-	c := &Constructor{BaseMember: NewBaseMember(ctx.IDENTIFIER().GetText())}
+	c := &Constructor{Name: ctx.IDENTIFIER().GetText()}
 
 	if ctx.GetConstructorBody() != nil {
 		c.Body = exp.NewBlockNode(ctx.GetConstructorBody())

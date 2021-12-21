@@ -7,20 +7,17 @@ import (
 	"github.com/dragonfax/java_converter/input/parser"
 	"github.com/dragonfax/java_converter/tool"
 	"github.com/dragonfax/java_converter/trans/ast/exp"
+	"github.com/dragonfax/java_converter/trans/node"
 )
-
-func NodeListToStringList[T Node](list []T) []string {
-	s := make([]string, 0, len(list))
-	for _, n := range list {
-		s = append(s, n.String())
-	}
-	return s
-}
 
 type FieldList []*Field
 
 func (fl FieldList) String() string {
-	return strings.Join(NodeListToStringList(fl), ",")
+	return strings.Join(node.NodeListToStringList(fl), ",")
+}
+
+func (fl FieldList) Children() []node.Node {
+	return node.ListOfNodesToNodeList(fl)
 }
 
 type Field struct {
@@ -29,6 +26,10 @@ type Field struct {
 	Public    bool
 	Transient bool
 	Static    bool
+}
+
+func (f *Field) Children() []node.Node {
+	return nil
 }
 
 func NewFields(ctx *parser.FieldDeclarationContext) FieldList {
@@ -41,7 +42,7 @@ func NewFields(ctx *parser.FieldDeclarationContext) FieldList {
 
 		name := varDecCtx.VariableDeclaratorId().GetText()
 
-		var init exp.ExpressionNode
+		var init node.Node
 		if varDecCtx.VariableInitializer() != nil {
 			initCtx := varDecCtx.VariableInitializer()
 			if initCtx.Expression() != nil {

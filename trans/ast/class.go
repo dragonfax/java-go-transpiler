@@ -6,6 +6,7 @@ import (
 	"text/template"
 
 	"github.com/dragonfax/java_converter/trans/ast/exp"
+	"github.com/dragonfax/java_converter/trans/node"
 )
 
 type Class struct {
@@ -13,11 +14,15 @@ type Class struct {
 	Imports    []*Import
 	BaseClass  string
 	Interfaces []exp.TypeNode
-	Members    []Member
+	Members    []node.Node
 	Fields     []*Field
 	Package    string
 	Interface  bool
 	Enum       bool
+}
+
+func (c *Class) Children() []node.Node {
+	return node.AppendNodeLists(node.ListOfNodesToNodeList(c.Members), node.ListOfNodesToNodeList(c.Fields)...)
 }
 
 func (c *Class) OutputFilename() string {
@@ -86,7 +91,7 @@ func (c *Class) AsFile() string {
 
 func NewClass() *Class {
 	c := &Class{}
-	c.Members = make([]Member, 0)
+	c.Members = make([]node.Node, 0)
 	c.Interfaces = make([]exp.TypeNode, 0)
 	c.Fields = make([]*Field, 0)
 	c.Imports = make([]*Import, 0)
@@ -95,6 +100,10 @@ func NewClass() *Class {
 
 type SubClassTODO struct {
 	Name string
+}
+
+func (sc *SubClassTODO) Children() []node.Node {
+	return nil
 }
 
 func NewSubClassTODO(name string) *SubClassTODO {

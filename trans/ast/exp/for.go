@@ -5,9 +5,10 @@ import (
 	"strings"
 
 	"github.com/dragonfax/java_converter/input/parser"
+	"github.com/dragonfax/java_converter/trans/node"
 )
 
-func NewForNode(statementCtx *parser.StatementContext) ExpressionNode {
+func NewForNode(statementCtx *parser.StatementContext) node.Node {
 
 	if statementCtx.ForControl().EnhancedForControl() != nil {
 		return NewEnhancedForNode(statementCtx)
@@ -17,8 +18,12 @@ func NewForNode(statementCtx *parser.StatementContext) ExpressionNode {
 
 type EnhancedForNode struct {
 	Variable *VariableDeclNode
-	Instance ExpressionNode
-	Body     ExpressionNode
+	Instance node.Node
+	Body     node.Node
+}
+
+func (ef *EnhancedForNode) Children() []node.Node {
+	return []node.Node{ef.Variable, ef.Instance, ef.Body}
 }
 
 func NewEnhancedForNode(statementCtx *parser.StatementContext) *EnhancedForNode {
@@ -42,11 +47,21 @@ func (ef *EnhancedForNode) String() string {
 }
 
 type ClassicForNode struct {
-	Condition     ExpressionNode
-	Init          []ExpressionNode
-	Increment     []ExpressionNode
-	Body          ExpressionNode
+	Condition     node.Node
+	Init          []node.Node
+	Increment     []node.Node
+	Body          node.Node
 	ConditionLast bool // Do...While
+}
+
+func (cf *ClassicForNode) Children() []node.Node {
+	list := []node.Node{cf.Body}
+	list = append(list, cf.Init...)
+	list = append(list, cf.Increment...)
+	if cf.Condition != nil {
+		list = append(list, cf.Condition)
+	}
+	return list
 }
 
 func (fn *ClassicForNode) String() string {
@@ -76,9 +91,9 @@ func NewClassicForNode(statementCtx *parser.StatementContext) *ClassicForNode {
 	}
 }
 
-func classicForControlProcessor(forControlCtx *parser.ForControlContext) (init []ExpressionNode, condition ExpressionNode, increment []ExpressionNode) {
+func classicForControlProcessor(forControlCtx *parser.ForControlContext) (init []node.Node, condition node.Node, increment []node.Node) {
 	if forControlCtx.GetForUpdate() != nil {
-		increment = make([]ExpressionNode, 0)
+		increment = make([]node.Node, 0)
 		for _, exp := range forControlCtx.GetForUpdate().AllExpression() {
 			node := ExpressionProcessor(exp)
 			if node == nil {
@@ -94,7 +109,7 @@ func classicForControlProcessor(forControlCtx *parser.ForControlContext) (init [
 
 	if forControlCtx.ForInit() != nil {
 		initCtx := forControlCtx.ForInit()
-		init = make([]ExpressionNode, 0)
+		init = make([]node.Node, 0)
 		if initCtx.LocalVariableDeclaration() != nil {
 			// variable declaractions
 			declCtx := initCtx.LocalVariableDeclaration()

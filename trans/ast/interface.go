@@ -3,18 +3,23 @@ package ast
 import (
 	"github.com/dragonfax/java_converter/input/parser"
 	"github.com/dragonfax/java_converter/trans/ast/exp"
+	"github.com/dragonfax/java_converter/trans/node"
 )
 
 type InterfaceMember struct {
 	Name       string
-	Arguments  []exp.ExpressionNode
-	ReturnType exp.ExpressionNode
+	Arguments  []node.Node
+	ReturnType node.Node
+}
+
+func (im *InterfaceMember) Children() []node.Node {
+	return node.AppendNodeLists(im.Arguments, im.ReturnType)
 }
 
 func NewInterface(ctx *parser.InterfaceDeclarationContext) *Class {
 	this := &Class{
 		Name:      ctx.IDENTIFIER().GetText(),
-		Members:   make([]Member, 0),
+		Members:   make([]node.Node, 0),
 		Interface: true,
 	}
 

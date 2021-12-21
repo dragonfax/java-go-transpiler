@@ -5,12 +5,22 @@ import (
 	"strings"
 
 	"github.com/dragonfax/java_converter/input/parser"
+	"github.com/dragonfax/java_converter/trans/node"
 )
 
 type TryCatchNode struct {
-	Body         ExpressionNode
-	Finally      ExpressionNode
+	Body         node.Node
+	Finally      node.Node
 	CatchClauses []*CatchClause
+}
+
+func (tc *TryCatchNode) Children() []node.Node {
+	list := []node.Node{tc.Body}
+	if tc.Finally != nil {
+		list = append(list, tc.Finally)
+	}
+	list = node.AppendNodeLists(list, tc.CatchClauses...)
+	return list
 }
 
 func (tn *TryCatchNode) String() string {
@@ -49,9 +59,17 @@ if err != nil {
 }
 
 type CatchClause struct {
-	Body      ExpressionNode
+	Body      node.Node
 	CatchType []string
 	Variable  string
+}
+
+func (cc *CatchClause) String() string {
+	return "catch"
+}
+
+func (cc *CatchClause) Children() []node.Node {
+	return []node.Node{cc.Body}
 }
 
 func NewTryCatchNode(statement *parser.StatementContext) *TryCatchNode {
@@ -64,7 +82,7 @@ func NewTryCatchNode(statement *parser.StatementContext) *TryCatchNode {
 
 	block := NewBlockNode(ctx.Block())
 
-	var finallyBlock ExpressionNode
+	var finallyBlock node.Node
 	finally := ctx.FinallyBlock()
 	if finally != nil {
 		finallyBlock = NewBlockNode(finally.Block())

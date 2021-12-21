@@ -4,12 +4,17 @@ import (
 	"fmt"
 
 	"github.com/dragonfax/java_converter/input/parser"
+	"github.com/dragonfax/java_converter/trans/node"
 )
 
 type VariableDeclNode struct {
 	Type       TypeNode
 	Name       string
-	Expression ExpressionNode // for now
+	Expression node.Node // for now
+}
+
+func (vn *VariableDeclNode) Children() []node.Node {
+	return []node.Node{vn.Type, vn.Expression}
 }
 
 func (vn *VariableDeclNode) String() string {
@@ -19,7 +24,7 @@ func (vn *VariableDeclNode) String() string {
 	return fmt.Sprintf("%s := %s", vn.Name, vn.Expression) // we'll assume the type matches the expression.
 }
 
-func NewVariableDecl(typ TypeNode, name string, expression ExpressionNode) *VariableDeclNode {
+func NewVariableDecl(typ TypeNode, name string, expression node.Node) *VariableDeclNode {
 	if typ == nil {
 		panic(" no variable type")
 	}
@@ -29,9 +34,9 @@ func NewVariableDecl(typ TypeNode, name string, expression ExpressionNode) *Vari
 	return &VariableDeclNode{Type: typ, Name: name, Expression: expression}
 }
 
-func NewVariableDeclNodeList(decl *parser.LocalVariableDeclarationContext) []ExpressionNode {
+func NewVariableDeclNodeList(decl *parser.LocalVariableDeclarationContext) []node.Node {
 
-	l := make([]ExpressionNode, 0)
+	l := make([]node.Node, 0)
 
 	typ := NewTypeNode(decl.TypeType())
 
@@ -39,7 +44,7 @@ func NewVariableDeclNodeList(decl *parser.LocalVariableDeclarationContext) []Exp
 
 		varDeclCtx := varDecl
 
-		var exp ExpressionNode
+		var exp node.Node
 		if varDeclCtx.VariableInitializer() != nil {
 			varInitCtx := varDeclCtx.VariableInitializer()
 			exp = variableInitializerProcessor(varInitCtx)
@@ -57,8 +62,8 @@ func NewVariableDeclNodeList(decl *parser.LocalVariableDeclarationContext) []Exp
 	return l
 }
 
-func variableInitializerProcessor(ctx *parser.VariableInitializerContext) ExpressionNode {
-	var exp ExpressionNode
+func variableInitializerProcessor(ctx *parser.VariableInitializerContext) node.Node {
+	var exp node.Node
 	if ctx.Expression() != nil {
 		exp = ExpressionProcessor(ctx.Expression())
 	}

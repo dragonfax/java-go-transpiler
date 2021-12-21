@@ -5,6 +5,7 @@ import (
 
 	"github.com/dragonfax/java_converter/input/parser"
 	"github.com/dragonfax/java_converter/trans/ast/exp"
+	"github.com/dragonfax/java_converter/trans/node"
 )
 
 /*
@@ -38,7 +39,7 @@ const (
 
 var enumTemplateCompiled = template.Must(template.New("enum").Parse(enumTemplate))
 
-func NewEnum(ctx *parser.EnumDeclarationContext, fields FieldList, members []Member) *Class {
+func NewEnum(ctx *parser.EnumDeclarationContext, fields FieldList, members []node.Node) *Class {
 	this := &Class{
 		Name:       ctx.IDENTIFIER().GetText(),
 		Interfaces: make([]exp.TypeNode, 0),

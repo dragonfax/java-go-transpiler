@@ -6,11 +6,16 @@ import (
 	"text/template"
 
 	"github.com/dragonfax/java_converter/input/parser"
+	"github.com/dragonfax/java_converter/trans/node"
 )
 
 type Switch struct {
-	Condition ExpressionNode
+	Condition node.Node
 	Cases     []*SwitchCase
+}
+
+func (s *Switch) Children() []node.Node {
+	return node.AppendNodeLists(s.Cases, s.Condition)
 }
 
 var switchTemplate = `
@@ -41,8 +46,16 @@ func (s *Switch) String() string {
 }
 
 type SwitchCase struct {
-	Labels     []ExpressionNode
-	Statements []ExpressionNode
+	Labels     []node.Node
+	Statements []node.Node
+}
+
+func (sc *SwitchCase) String() string {
+	return "case: "
+}
+
+func (sc *SwitchCase) Children() []node.Node {
+	return node.AppendNodeLists(sc.Labels, sc.Statements...)
 }
 
 func NewSwitch(ctx *parser.StatementContext) *Switch {
@@ -76,17 +89,17 @@ func NewSwitch(ctx *parser.StatementContext) *Switch {
 	return s
 }
 
-func switchLabelsFromContext(ctx *parser.SwitchLabelContext) []ExpressionNode {
+func switchLabelsFromContext(ctx *parser.SwitchLabelContext) []node.Node {
 	if ctx.DEFAULT() != nil {
-		return []ExpressionNode{NewIdentifierNode("default")}
+		return []node.Node{NewIdentifierNode("default")}
 	}
 
 	if ctx.GetEnumConstantName() != nil {
-		return []ExpressionNode{NewEnumRef(ctx.GetEnumConstantName().GetText())}
+		return []node.Node{NewEnumRef(ctx.GetEnumConstantName().GetText())}
 	}
 
 	if ctx.GetConstantExpression() != nil {
-		return []ExpressionNode{ExpressionProcessor(ctx.GetConstantExpression())}
+		return []node.Node{ExpressionProcessor(ctx.GetConstantExpression())}
 	}
 	return nil
 }

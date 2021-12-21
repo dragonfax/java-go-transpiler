@@ -10,6 +10,7 @@ import (
 	"github.com/dragonfax/java_converter/trans/ast"
 	"github.com/dragonfax/java_converter/trans/ast/exp"
 	"github.com/dragonfax/java_converter/trans/hier"
+	"github.com/dragonfax/java_converter/trans/node"
 )
 
 /* this first attempt of an AST pass just defineds the interconnectedness between classes and packages */
@@ -22,9 +23,9 @@ func NewASTVisitor[T comparable]() *ASTVisitor[T] {
 	return &ASTVisitor[T]{}
 }
 
-func (av *ASTVisitor[T]) VisitNode(tree ast.Node) T {
+func (av *ASTVisitor[T]) VisitNode(tree node.Node) T {
 	if class, ok := tree.(*ast.Class); ok {
-		return av.VisitClass(clas)
+		return av.VisitClass(class)
 	} else if te, ok := tree.(*exp.TypeElementNode); ok {
 		return av.VisitTypeElement(te)
 	} else {
@@ -32,7 +33,7 @@ func (av *ASTVisitor[T]) VisitNode(tree ast.Node) T {
 	}
 }
 
-func (av *ASTVisitor[T]) VisitChildren(tree ast.Node) T {
+func (av *ASTVisitor[T]) VisitChildren(tree node.Node) T {
 	var result T
 	for _, child := range tree.Children() {
 		nextResult := av.VisitNode(child)

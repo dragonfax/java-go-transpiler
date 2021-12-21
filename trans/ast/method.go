@@ -4,14 +4,15 @@ import (
 	"fmt"
 
 	"github.com/dragonfax/java_converter/trans/ast/exp"
+	"github.com/dragonfax/java_converter/trans/node"
 )
 
 type Method struct {
-	*BaseMember
+	Name string
 
-	Body       exp.ExpressionNode
-	Arguments  []exp.ExpressionNode
-	ReturnType exp.ExpressionNode
+	Body       node.Node
+	Arguments  []node.Node
+	ReturnType node.Node
 	Class      string
 	Throws     string
 
@@ -21,9 +22,13 @@ type Method struct {
 	Synchronized bool
 }
 
-func NewMethod(name string, class string, arguments []exp.ExpressionNode, returnType exp.ExpressionNode, body exp.ExpressionNode) *Method {
+func (m *Method) Children() []node.Node {
+	return node.AppendNodeLists([]node.Node{m.Body, m.ReturnType}, m.Arguments...)
+}
+
+func NewMethod(name string, class string, arguments []node.Node, returnType node.Node, body node.Node) *Method {
 	return &Method{
-		BaseMember: NewBaseMember(name),
+		Name:       name,
 		Class:      class,
 		Arguments:  arguments,
 		ReturnType: returnType,

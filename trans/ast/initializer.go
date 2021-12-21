@@ -5,6 +5,7 @@ import (
 
 	"github.com/dragonfax/java_converter/input/parser"
 	"github.com/dragonfax/java_converter/trans/ast/exp"
+	"github.com/dragonfax/java_converter/trans/node"
 )
 
 /* static and non-static initializers.
@@ -21,6 +22,10 @@ func NewInitializerBlock(ctx *parser.ClassBodyDeclarationContext) *Initializer {
 		Block:  exp.NewBlockNode(ctx.Block()),
 	}
 	return this
+}
+
+func (ib *Initializer) Children() []node.Node {
+	return []node.Node{ib.Block}
 }
 
 func (i *Initializer) String() string {

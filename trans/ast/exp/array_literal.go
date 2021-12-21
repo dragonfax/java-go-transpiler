@@ -5,11 +5,16 @@ import (
 	"strings"
 
 	"github.com/dragonfax/java_converter/input/parser"
+	"github.com/dragonfax/java_converter/trans/node"
 )
 
 type ArrayLiteral struct {
 	Type     string
-	Elements []ExpressionNode
+	Elements []node.Node
+}
+
+func (al *ArrayLiteral) Children() []node.Node {
+	return node.ListOfNodesToNodeList(al.Elements)
 }
 
 func (al *ArrayLiteral) String() string {
@@ -27,7 +32,7 @@ func NewArrayLiteral(lit *parser.ArrayInitializerContext) *ArrayLiteral {
 		return &ArrayLiteral{}
 	}
 
-	l := make([]ExpressionNode, 0)
+	l := make([]node.Node, 0)
 	for _, varInit := range ctx.AllVariableInitializer() {
 		varInitCtx := varInit
 

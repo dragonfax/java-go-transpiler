@@ -1,7 +1,13 @@
 package exp
 
+import "github.com/dragonfax/java_converter/trans/node"
+
 type UnimplementedNode struct {
 	Msg string
+}
+
+func (un *UnimplementedNode) Children() []node.Node {
+	return nil
 }
 
 func (un *UnimplementedNode) String() string {

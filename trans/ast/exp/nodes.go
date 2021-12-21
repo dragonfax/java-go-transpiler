@@ -2,44 +2,13 @@ package exp
 
 import (
 	"fmt"
-	"runtime/debug"
 	"strconv"
 	"strings"
 
 	"github.com/dragonfax/java_converter/input/parser"
 	"github.com/dragonfax/java_converter/tool"
+	"github.com/dragonfax/java_converter/trans/node"
 )
-
-type ExpressionNode interface {
-	String() string
-}
-
-func ArgumentListToString(list []ExpressionNode) string {
-	s := make([]string, 0)
-	for _, node := range list {
-		if tool.IsNilInterface(node) {
-			s = append(s, "nil node in argument list\n"+string(debug.Stack()))
-		} else {
-			s = append(s, node.String())
-		}
-	}
-	return strings.Join(s, ",")
-}
-
-func expressionListToString(list []ExpressionNode) string {
-	if list == nil {
-		panic("list expression list")
-	}
-	s := ""
-	for _, node := range list {
-		if tool.IsNilInterface(node) {
-			s += "nil node in expression list\n" + string(debug.Stack())
-		} else {
-			s += node.String() + "\n"
-		}
-	}
-	return s
-}
 
 type VariableNode struct {
 	Name string
@@ -54,17 +23,32 @@ func NewVariableNode(name string) *VariableNode {
 	}
 }
 
+func (vn *VariableNode) Children() []node.Node {
+	return nil
+}
+
 func (vn *VariableNode) String() string {
 	return vn.Name
 }
 
 type IfNode struct {
-	Condition ExpressionNode
-	Body      ExpressionNode
-	Else      ExpressionNode
+	Condition node.Node
+	Body      node.Node
+	Else      node.Node
 }
 
-func NewIfNode(condition, body, els ExpressionNode) *IfNode {
+func (in *IfNode) Children() []node.Node {
+	list := []node.Node{in.Body}
+	if in.Condition != nil {
+		list = append(list, in.Condition)
+	}
+	if in.Else != nil {
+		list = append(list, in.Else)
+	}
+	return list
+}
+
+func NewIfNode(condition, body, els node.Node) *IfNode {
 	if tool.IsNilInterface(body) {
 		panic("missing body")
 	}
@@ -86,10 +70,17 @@ func (in *IfNode) String() string {
 }
 
 type ReturnNode struct {
-	Expression ExpressionNode
+	Expression node.Node
 }
 
-func NewReturnNode(exp ExpressionNode) *ReturnNode {
+func (rn *ReturnNode) Children() []node.Node {
+	if rn.Expression != nil {
+		return []node.Node{rn.Expression}
+	}
+	return nil
+}
+
+func NewReturnNode(exp node.Node) *ReturnNode {
 	return &ReturnNode{Expression: exp}
 }
 
@@ -105,6 +96,10 @@ type ThrowNode struct {
 	Expression string
 }
 
+func (tn *ThrowNode) Children() []node.Node {
+	return nil
+}
+
 func NewThrowNode(exp string) *ThrowNode {
 	return &ThrowNode{Expression: exp}
 }
@@ -115,6 +110,10 @@ func (tn *ThrowNode) String() string {
 
 type BreakNode struct {
 	Label string
+}
+
+func (b *BreakNode) Children() []node.Node {
+	return nil
 }
 
 func NewBreakNode(label string) *BreakNode {
@@ -129,6 +128,10 @@ type ContinueNode struct {
 	Label string
 }
 
+func (c *ContinueNode) Children() []node.Node {
+	return nil
+}
+
 func NewContinueNode(label string) *ContinueNode {
 	return &ContinueNode{Label: label}
 }
@@ -139,10 +142,14 @@ func (cn *ContinueNode) String() string {
 
 type LabelNode struct {
 	Label      string
-	Expression ExpressionNode
+	Expression node.Node
 }
 
-func NewLabelNode(label string, exp ExpressionNode) *LabelNode {
+func (l *LabelNode) Children() []node.Node {
+	return []node.Node{l.Expression}
+}
+
+func NewLabelNode(label string, exp node.Node) *LabelNode {
 	if label == "" {
 		panic("label missing")
 	}
@@ -158,10 +165,14 @@ func (ln *LabelNode) String() string {
 
 type InstanceAttributeReference struct {
 	Attribute         string
-	InstanceReference ExpressionNode
+	InstanceReference node.Node
 }
 
-func NewInstanceAttributeReference(attribute string, instanceExpression ExpressionNode) *InstanceAttributeReference {
+func (ia *InstanceAttributeReference) Children() []node.Node {
+	return []node.Node{ia.InstanceReference}
+}
+
+func NewInstanceAttributeReference(attribute string, instanceExpression node.Node) *InstanceAttributeReference {
 	if attribute == "" {
 		panic("no attribute")
 	}
@@ -177,12 +188,18 @@ func (ia *InstanceAttributeReference) String() string {
 }
 
 type MethodCall struct {
-	Instance   ExpressionNode
+	Instance   node.Node
 	MethodName string
-	Arguments  []ExpressionNode
+	Arguments  []node.Node
 }
 
-func NewMethodCall(instance ExpressionNode, methodCall *parser.MethodCallContext) *MethodCall {
+func (mc *MethodCall) Children() []node.Node {
+	list := []node.Node{mc.Instance}
+	list = append(list, mc.Arguments...)
+	return list
+}
+
+func NewMethodCall(instance node.Node, methodCall *parser.MethodCallContext) *MethodCall {
 	if tool.IsNilInterface(methodCall) {
 		panic("no method call")
 	}
@@ -200,7 +217,7 @@ func NewMethodCall(instance ExpressionNode, methodCall *parser.MethodCallContext
 		panic("no method name in method call")
 	}
 
-	arguments := make([]ExpressionNode, 0)
+	arguments := make([]node.Node, 0)
 
 	if methodCallCtx.ExpressionList() != nil {
 		for _, expression := range methodCallCtx.ExpressionList().AllExpression() {
@@ -227,6 +244,10 @@ type IdentifierNode struct {
 	Identifier string
 }
 
+func (i *IdentifierNode) Children() []node.Node {
+	return nil
+}
+
 func NewIdentifierNode(id string) *IdentifierNode {
 	return &IdentifierNode{Identifier: id}
 }
@@ -238,7 +259,11 @@ func (in *IdentifierNode) String() string {
 type ConstructorCall struct {
 	Class         string
 	TypeArguments []TypeNode
-	Arguments     []ExpressionNode
+	Arguments     []node.Node
+}
+
+func (cc *ConstructorCall) Children() []node.Node {
+	return node.AppendNodeLists(cc.TypeArguments, cc.Arguments...)
 }
 
 func NewConstructorCall(creator *parser.CreatorContext) *ConstructorCall {
@@ -268,7 +293,7 @@ func NewConstructorCall(creator *parser.CreatorContext) *ConstructorCall {
 		}
 	}
 
-	arguments := make([]ExpressionNode, 0)
+	arguments := make([]node.Node, 0)
 	if creatorCtx.ClassCreatorRest() != nil {
 		if creatorCtx.ClassCreatorRest().Arguments().ExpressionList() != nil {
 			for _, expression := range creatorCtx.ClassCreatorRest().Arguments().ExpressionList().AllExpression() {
@@ -304,6 +329,10 @@ type ClassReference struct {
 	Class string
 }
 
+func (cr *ClassReference) Children() []node.Node {
+	return nil
+}
+
 func NewClassReference(class string) *ClassReference {
 	if class == "" {
 		panic("no class name")
@@ -316,15 +345,19 @@ func (cr *ClassReference) String() string {
 }
 
 type LambdaNode struct {
-	Arguments []ExpressionNode
-	Body      ExpressionNode
+	Arguments []node.Node
+	Body      node.Node
+}
+
+func (ln *LambdaNode) Children() []node.Node {
+	return node.AppendNodeLists(ln.Arguments, ln.Body)
 }
 
 func NewLambdaNode(lambda *parser.LambdaExpressionContext) *LambdaNode {
 	lambdaCtx := lambda
 
 	bodyCtx := lambdaCtx.LambdaBody()
-	var body ExpressionNode
+	var body node.Node
 	if bodyCtx.Expression() != nil {
 		body = ExpressionProcessor(bodyCtx.Expression())
 	} else if bodyCtx.Block() != nil {
@@ -337,7 +370,7 @@ func NewLambdaNode(lambda *parser.LambdaExpressionContext) *LambdaNode {
 		panic("no body for lambda")
 	}
 
-	arguments := make([]ExpressionNode, 0)
+	arguments := make([]node.Node, 0)
 	parametersCtx := lambdaCtx.LambdaParameters()
 	if len(parametersCtx.AllIDENTIFIER()) > 0 {
 		// java lambda can have just parameter names, without types. thats valid
@@ -361,11 +394,15 @@ func (ln *LambdaNode) String() string {
 }
 
 type MethodReference struct {
-	Instance ExpressionNode
+	Instance node.Node
 	Method   string
 }
 
-func NewMethodReference(expression *parser.ExpressionContext) ExpressionNode {
+func (mr *MethodReference) Children() []node.Node {
+	return []node.Node{mr.Instance}
+}
+
+func NewMethodReference(expression *parser.ExpressionContext) node.Node {
 	ctx := expression
 
 	method := ""
@@ -379,7 +416,7 @@ func NewMethodReference(expression *parser.ExpressionContext) ExpressionNode {
 		panic("no method name in method reference")
 	}
 
-	var instance ExpressionNode
+	var instance node.Node
 	if ctx.Expression(0) != nil {
 		instance = ExpressionProcessor(ctx.Expression(0))
 	} else if ctx.TypeType(0) != nil {
