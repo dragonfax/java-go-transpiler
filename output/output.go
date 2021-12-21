@@ -68,6 +68,9 @@ func Translate(path string) error {
 		panic(err)
 	}
 
+	// parsing files
+
+	fmt.Println("parsing")
 	dir := path
 	var classes []*ast.Class
 	if info.IsDir() {
@@ -81,22 +84,26 @@ func Translate(path string) error {
 	if err != nil {
 		return err
 	}
-
 	fmt.Println("parsing complete")
 
 	// process the global AST
+
+	// build the root hierary
+	fmt.Println("ast walking")
 	h := ast.NewHierarchy()
 	for _, class := range classes {
 		h.AddClass(class)
 	}
+	// process the hierarchy (all classes and packages) at once
 	astVisitor := visitor.NewASTVisitor[node.Node](h)
 	astVisitor.VisitNode(h)
-
 	fmt.Println("ast walking complete")
 
+	// output
+	fmt.Println("writing files")
 	outputRoot := generateOutputRoot(dir)
-
 	outputStructures(classes, outputRoot)
+	fmt.Println("writing files complete")
 
 	return nil
 }

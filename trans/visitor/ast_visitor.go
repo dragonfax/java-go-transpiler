@@ -25,7 +25,7 @@ type ASTVisitor[T comparable] struct {
 	// Context
 	CurrentPackage *ast.Package
 	CurrentClass   *ast.Class
-	CurrentMethod  *node.Node
+	CurrentMethod  node.Node
 
 	ProgressBar *progressbar.ProgressBar
 }
@@ -47,6 +47,12 @@ func (av *ASTVisitor[T]) VisitNode(tree node.Node) T {
 		return av.VisitClass(class)
 	} else if te, ok := tree.(*exp.TypeElementNode); ok {
 		return av.VisitTypeElement(te)
+	} else if pkg, ok := tree.(*ast.Package); ok {
+		return av.VisitPackage(pkg)
+	} else if method, ok := tree.(*ast.Method); ok {
+		return av.VisitMethod(method)
+	} else if con, ok := tree.(*ast.Constructor); ok {
+		return av.VisitConstructor(con)
 	} else {
 		return av.VisitChildren(tree)
 	}
@@ -76,29 +82,4 @@ func (av *ASTVisitor[T]) VisitChildren(tree node.Node) T {
 		}
 	}
 	return av.zero
-}
-
-func (av *ASTVisitor[T]) VisitClass(class *ast.Class) T {
-
-	pkg := av.Hierarchy.GetPackage(class.PackageName)
-	class.Package = pkg
-	av.Hierarchy.AddClass(class)
-
-	// above also adds imports and instantiates their references, all class references. created new classes as needed.
-
-	defer av.ProgressBar.Add(1)
-
-	return av.VisitChildren(class)
-}
-
-func (av *ASTVisitor[T]) VisitTypeElement(ctx *exp.TypeElementNode) T {
-
-	// connect the type to its class,
-	// its type arguments will get connected as children later.
-	// will have to figure out hierarchy of known types in this class.
-	// startign with imports, then the local package, then types in the same file.
-	// ? how does the TypeElement know what class its currently in and the rest of its context?
-	// I'm confused how this will work now.
-
-	return av.VisitChildren(ctx)
 }
