@@ -7,28 +7,34 @@
 package visitor
 
 import (
+	"fmt"
+
+	"github.com/dragonfax/java_converter/tool"
 	"github.com/dragonfax/java_converter/trans/ast"
 	"github.com/dragonfax/java_converter/trans/ast/exp"
-	"github.com/dragonfax/java_converter/trans/hier"
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
 /* this first attempt of an AST pass just defineds the interconnectedness between classes and packages */
 type ASTVisitor[T comparable] struct {
-	Hierarchy *hier.Hierarchy
+	Hierarchy *ast.Hierarchy
 	zero      T
 
 	// Context
-	CurrentPackage *hier.Package
+	CurrentPackage *ast.Package
 	CurrentClass   *ast.Class
 	CurrentMethod  *node.Node
 }
 
-func NewASTVisitor[T comparable]() *ASTVisitor[T] {
-	return &ASTVisitor[T]{}
+func NewASTVisitor[T comparable](h *ast.Hierarchy) *ASTVisitor[T] {
+	return &ASTVisitor[T]{Hierarchy: h}
 }
 
 func (av *ASTVisitor[T]) VisitNode(tree node.Node) T {
+	if tree == nil {
+		fmt.Printf("someone gave us a nil node to visit\n")
+		return av.zero
+	}
 	if class, ok := tree.(*ast.Class); ok {
 		return av.VisitClass(class)
 	} else if te, ok := tree.(*exp.TypeElementNode); ok {
@@ -41,6 +47,14 @@ func (av *ASTVisitor[T]) VisitNode(tree node.Node) T {
 func (av *ASTVisitor[T]) VisitChildren(tree node.Node) T {
 	var result T
 	for _, child := range tree.Children() {
+		if child == nil {
+			fmt.Printf("someone delivered a nil child\n")
+			continue
+		}
+		if tool.IsNilInterface(child) {
+			fmt.Printf("someone delivered a typed nil child\n")
+			continue
+		}
 		nextResult := av.VisitNode(child)
 		if nextResult == av.zero && result == av.zero {
 			// nothing
@@ -58,11 +72,10 @@ func (av *ASTVisitor[T]) VisitChildren(tree node.Node) T {
 
 func (av *ASTVisitor[T]) VisitClass(class *ast.Class) T {
 
-	/*
-		pack := av.Hierarchy.GetPackage(class.PackageName)
-		class.Package = pack
-		av.Hierarchy.AddClass(class)
-	*/
+	pkg := av.Hierarchy.GetPackage(class.PackageName)
+	class.Package = pkg
+	av.Hierarchy.AddClass(class)
+
 	// above also adds imports and instantiates their references, all class references. created new classes as needed.
 
 	return av.VisitChildren(class)

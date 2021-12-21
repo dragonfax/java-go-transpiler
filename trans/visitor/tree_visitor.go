@@ -42,7 +42,7 @@ func (gv *TreeVisitor) VisitCompilationUnit(ctx *parser.CompilationUnitContext) 
 
 	class, ok := node.(*ast.Class)
 	if ok {
-		class.Package = packageName
+		class.PackageName = packageName
 
 		for _, importCtx := range ctx.AllImportDeclaration() {
 			importedPackageName := importCtx.QualifiedName().GetText()

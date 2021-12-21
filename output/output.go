@@ -12,10 +12,11 @@ import (
 	"github.com/dragonfax/java_converter/trans"
 	"github.com/dragonfax/java_converter/trans/ast"
 	"github.com/dragonfax/java_converter/trans/node"
+	"github.com/dragonfax/java_converter/trans/visitor"
 )
 
-func walkFunc(classes *[]node.Node) fs.WalkDirFunc {
-	*classes = make([]node.Node, 0)
+func walkFunc(classes *[]*ast.Class) fs.WalkDirFunc {
+	*classes = make([]*ast.Class, 0)
 	return func(filename string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -41,19 +42,29 @@ func Translate(path string) error {
 	}
 
 	dir := path
-	var classes []node.Node
+	var classes []*ast.Class
 	if info.IsDir() {
 		err = filepath.WalkDir(path, walkFunc(&classes))
 	} else {
 		dir = filepath.Dir(path)
 		class := parseFile(path)
-		classes = []node.Node{class}
+		classes = []*ast.Class{class}
 	}
 	if err != nil {
 		return err
 	}
 
+	fmt.Println("parsing complete")
+
 	// process the global AST
+	h := ast.NewHierarchy()
+	for _, class := range classes {
+		h.AddClass(class)
+	}
+	astVisitor := visitor.NewASTVisitor[node.Node](h)
+	astVisitor.VisitNode(h)
+
+	fmt.Println("ast walking complete")
 
 	outputRoot := generateOutputRoot(dir)
 
@@ -63,17 +74,17 @@ func Translate(path string) error {
 }
 
 // input filename to go-code string
-func parseFile(filename string) node.Node {
-	fmt.Println(filename)
+func parseFile(filename string) *ast.Class {
+	// fmt.Println(filename)
 	tree := input.ParseToTree(filename)
 
 	return trans.BuildAST(tree)
 }
 
-func outputStructures(classes []node.Node, outputRoot string) {
+func outputStructures(classes []*ast.Class, outputRoot string) {
 
 	for _, class := range classes {
-		outputStructure(class.(*ast.Class), outputRoot)
+		outputStructure(class, outputRoot)
 	}
 }
 

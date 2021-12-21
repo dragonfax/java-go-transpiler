@@ -10,16 +10,17 @@ import (
 )
 
 type Class struct {
-	Name       string
-	Imports    []*Import
-	BaseClass  string
-	Interfaces []exp.TypeNode
-	Members    []node.Node
-	Fields     []*Field
-	Package    string
-	Interface  bool
-	Enum       bool
-	Constants  []*EnumConstant // for enums
+	Name        string
+	Imports     []*Import
+	BaseClass   string
+	Interfaces  []exp.TypeNode
+	Members     []node.Node
+	Fields      []*Field
+	Package     *Package
+	PackageName string
+	Interface   bool
+	Enum        bool
+	Constants   []*EnumConstant // for enums
 }
 
 func (c *Class) Children() []node.Node {
@@ -27,10 +28,10 @@ func (c *Class) Children() []node.Node {
 }
 
 func (c *Class) OutputFilename() string {
-	if c.Package == "" {
+	if c.PackageName == "" {
 		panic("no package for class")
 	}
-	return fmt.Sprintf("%s/%s/%s.go", strings.ReplaceAll(c.Package, ".", "/"), c.Name, c.Name)
+	return fmt.Sprintf("%s/%s/%s.go", strings.ReplaceAll(c.PackageName, ".", "/"), c.Name, c.Name)
 }
 
 var classTemplate = `
@@ -82,8 +83,8 @@ func (c *Class) String() string {
 }
 
 func (c *Class) PackageBasename() string {
-	last := strings.LastIndex(c.Package, ".")
-	return c.Package[last+1 : len(c.Package)]
+	last := strings.LastIndex(c.PackageName, ".")
+	return c.PackageName[last+1 : len(c.PackageName)]
 }
 
 func (c *Class) AsFile() string {
