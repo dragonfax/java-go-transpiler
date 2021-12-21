@@ -27,11 +27,8 @@ func (h *Hierarchy) ClassCount() int64 {
 func (h *Hierarchy) Children() []node.Node {
 	list := make([]node.Node, 0)
 	for _, pkg := range h.Packages {
-		for _, class := range pkg.Classes {
-			list = append(list, class)
-		}
+		list = append(list, pkg)
 	}
-
 	return list
 }
 
@@ -66,4 +63,16 @@ func NewPackage(name string) *Package {
 
 func (pkg *Package) AddClass(class *Class) {
 	pkg.Classes[class.Name] = class
+}
+
+func (pkg *Package) String() string {
+	return "package " + pkg.Name
+}
+
+func (pkg *Package) Children() []node.Node {
+	list := make([]node.Node, 0)
+	for _, class := range pkg.Classes {
+		list = append(list, class)
+	}
+	return list
 }
