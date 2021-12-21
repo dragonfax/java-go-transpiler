@@ -13,10 +13,10 @@ import (
 	"github.com/dragonfax/java_converter/trans/ast"
 	"github.com/dragonfax/java_converter/trans/node"
 	"github.com/dragonfax/java_converter/trans/visitor"
+	"github.com/schollz/progressbar/v3"
 )
 
-func walkFunc(classes *[]*ast.Class) fs.WalkDirFunc {
-	*classes = make([]*ast.Class, 0)
+func walkFunc(filenames *[]string) fs.WalkDirFunc {
 	return func(filename string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			return err
@@ -26,12 +26,39 @@ func walkFunc(classes *[]*ast.Class) fs.WalkDirFunc {
 			return nil
 		}
 
-		class := parseFile(filename)
-		if class != nil {
-			*classes = append(*classes, class)
-		}
+		*filenames = append(*filenames, filename)
+
 		return nil
 	}
+}
+
+func gatherFilenames(path string) []string {
+	filenames := make([]string, 0)
+	filepath.WalkDir(path, walkFunc(&filenames))
+	return filenames
+}
+
+func parseFiles(filenames []string) []*ast.Class {
+
+	bar := progressbar.Default(100)
+
+	classes := make([]*ast.Class, 0)
+	for _, filename := range filenames {
+		class := parseFile(filename)
+		if class != nil {
+			classes = append(classes, class)
+		}
+		bar.Add(1)
+	}
+	return classes
+}
+
+// input filename to go-code string
+func parseFile(filename string) *ast.Class {
+	// fmt.Println(filename)
+	tree := input.ParseToTree(filename)
+
+	return trans.BuildAST(tree)
 }
 
 func Translate(path string) error {
@@ -44,7 +71,8 @@ func Translate(path string) error {
 	dir := path
 	var classes []*ast.Class
 	if info.IsDir() {
-		err = filepath.WalkDir(path, walkFunc(&classes))
+		filenames := gatherFilenames(path)
+		classes = parseFiles(filenames)
 	} else {
 		dir = filepath.Dir(path)
 		class := parseFile(path)
@@ -73,18 +101,13 @@ func Translate(path string) error {
 	return nil
 }
 
-// input filename to go-code string
-func parseFile(filename string) *ast.Class {
-	// fmt.Println(filename)
-	tree := input.ParseToTree(filename)
-
-	return trans.BuildAST(tree)
-}
-
 func outputStructures(classes []*ast.Class, outputRoot string) {
+
+	bar := progressbar.Default(int64(len(classes)))
 
 	for _, class := range classes {
 		outputStructure(class, outputRoot)
+		bar.Add(1)
 	}
 }
 

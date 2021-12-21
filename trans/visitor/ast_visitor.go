@@ -13,6 +13,8 @@ import (
 	"github.com/dragonfax/java_converter/trans/ast"
 	"github.com/dragonfax/java_converter/trans/ast/exp"
 	"github.com/dragonfax/java_converter/trans/node"
+
+	"github.com/schollz/progressbar/v3"
 )
 
 /* this first attempt of an AST pass just defineds the interconnectedness between classes and packages */
@@ -24,10 +26,16 @@ type ASTVisitor[T comparable] struct {
 	CurrentPackage *ast.Package
 	CurrentClass   *ast.Class
 	CurrentMethod  *node.Node
+
+	ProgressBar *progressbar.ProgressBar
 }
 
 func NewASTVisitor[T comparable](h *ast.Hierarchy) *ASTVisitor[T] {
-	return &ASTVisitor[T]{Hierarchy: h}
+
+	return &ASTVisitor[T]{
+		Hierarchy:   h,
+		ProgressBar: progressbar.Default(h.ClassCount()),
+	}
 }
 
 func (av *ASTVisitor[T]) VisitNode(tree node.Node) T {
@@ -77,6 +85,8 @@ func (av *ASTVisitor[T]) VisitClass(class *ast.Class) T {
 	av.Hierarchy.AddClass(class)
 
 	// above also adds imports and instantiates their references, all class references. created new classes as needed.
+
+	defer av.ProgressBar.Add(1)
 
 	return av.VisitChildren(class)
 }

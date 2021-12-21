@@ -16,6 +16,14 @@ func (h *Hierarchy) String() string {
 	return "hierarchy"
 }
 
+func (h *Hierarchy) ClassCount() int64 {
+	n := 0
+	for _, pkg := range h.Packages {
+		n += len(pkg.Classes)
+	}
+	return int64(n)
+}
+
 func (h *Hierarchy) Children() []node.Node {
 	list := make([]node.Node, 0)
 	for _, pkg := range h.Packages {
