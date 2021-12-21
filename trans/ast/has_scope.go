@@ -1,8 +1,6 @@
 package ast
 
 import (
-	"fmt"
-
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
@@ -10,19 +8,18 @@ import (
  * a method or constructo
  */
 
-type HasScope interface {
+type Scope interface {
 	SetScope(node.Node)
 }
 
-type BaseHasScope struct {
+type BaseScope struct {
 	Scope node.Node // method or constructor for now.
 }
 
-func NewBaseHasScope() *BaseHasScope {
-	return &BaseHasScope{}
+func NewScope() *BaseScope {
+	return &BaseScope{}
 }
 
-func (s *BaseHasScope) SetScope(scope node.Node) {
-	fmt.Println("setting scope")
+func (s *BaseScope) SetScope(scope node.Node) {
 	s.Scope = scope
 }
