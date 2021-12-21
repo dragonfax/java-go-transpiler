@@ -10,7 +10,6 @@ import (
 	"github.com/dragonfax/java_converter/input"
 	"github.com/dragonfax/java_converter/trans"
 	"github.com/dragonfax/java_converter/trans/ast"
-	"github.com/dragonfax/java_converter/trans/node"
 	"github.com/dragonfax/java_converter/trans/visitor"
 	"github.com/schollz/progressbar/v3"
 )
@@ -94,8 +93,8 @@ func Translate(path string) error {
 		h.AddClass(class)
 	}
 	// process the hierarchy (all classes and packages) at once
-	astVisitor := visitor.NewASTVisitor[node.Node](h)
-	astVisitor.VisitNode(h)
+	scopeVisitor := visitor.NewScopeVisitor(h)
+	scopeVisitor.VisitNode(h)
 	fmt.Println("ast walking complete")
 
 	// output
