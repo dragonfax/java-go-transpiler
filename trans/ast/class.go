@@ -19,10 +19,11 @@ type Class struct {
 	Package    string
 	Interface  bool
 	Enum       bool
+	Constants  []*EnumConstant // for enums
 }
 
 func (c *Class) Children() []node.Node {
-	return node.AppendNodeLists(node.ListOfNodesToNodeList(c.Members), node.ListOfNodesToNodeList(c.Fields)...)
+	return node.AppendNodeLists(node.AppendNodeLists(node.ListOfNodesToNodeList(c.Members), node.ListOfNodesToNodeList(c.Fields)...), node.ListOfNodesToNodeList(c.Constants)...)
 }
 
 func (c *Class) OutputFilename() string {
@@ -95,6 +96,7 @@ func NewClass() *Class {
 	c.Interfaces = make([]exp.TypeNode, 0)
 	c.Fields = make([]*Field, 0)
 	c.Imports = make([]*Import, 0)
+	c.Constants = make([]*EnumConstant, 0)
 	return c
 }
 

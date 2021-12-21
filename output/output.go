@@ -26,7 +26,9 @@ func walkFunc(classes *[]node.Node) fs.WalkDirFunc {
 		}
 
 		class := parseFile(filename)
-		*classes = append(*classes, class)
+		if class != nil {
+			*classes = append(*classes, class)
+		}
 		return nil
 	}
 }

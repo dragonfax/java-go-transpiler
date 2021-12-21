@@ -8,17 +8,12 @@ import (
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
-/*
-type Enum struct {
-	Name        string
-	Interfaces  []exp.TypeNode
-	Constants   []*EnumConstant
-	BodyWarning bool
-}
-*/
-
 type EnumConstant struct {
 	Name string
+}
+
+func (ec *EnumConstant) Children() []node.Node {
+	return nil
 }
 
 func (ec *EnumConstant) String() string {
@@ -26,7 +21,6 @@ func (ec *EnumConstant) String() string {
 }
 
 var enumTemplate = `
-{{if .BodyWarning}}// TODO this enum has a body, fix pre-translation{{end}}
 type {{.Name}} int
 {{ $name := .Name }}
 
@@ -35,6 +29,8 @@ const (
 	{{ $element.Name }} {{ $name }} = iota{{end}}
 
 )
+{{if (or .Members .Fields)}}// TODO not including enum body
+{{end}}
 `
 
 var enumTemplateCompiled = template.Must(template.New("enum").Parse(enumTemplate))
@@ -51,6 +47,22 @@ func NewEnum(ctx *parser.EnumDeclarationContext, fields FieldList, members []nod
 	if ctx.TypeList() != nil {
 		for _, typeType := range ctx.TypeList().AllTypeType() {
 			this.Interfaces = append(this.Interfaces, exp.NewTypeNode(typeType))
+		}
+	}
+
+	if ctx.EnumConstants() != nil {
+		for _, constant := range ctx.EnumConstants().AllEnumConstant() {
+			if constant.ClassBody() != nil {
+				panic("enum constant has its own class body")
+			}
+
+			if constant.Arguments() != nil {
+				panic("enum constant has arguments")
+			}
+
+			this.Constants = append(this.Constants, &EnumConstant{
+				Name: constant.IDENTIFIER().GetText(),
+			})
 		}
 	}
 
