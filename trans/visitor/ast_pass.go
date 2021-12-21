@@ -15,6 +15,7 @@ func (av *ASTVisitor[T]) VisitClass(class *ast.Class) T {
 	defer av.ProgressBar.Add(1)
 
 	av.CurrentClass = class
+	// already has its package
 
 	// TODO resolve import references, as those are't children for some reason.
 
@@ -44,6 +45,7 @@ func (av *ASTVisitor[T]) VisitMethod(method *ast.Method) T {
 
 func (av *ASTVisitor[T]) VisitConstructor(constructor *ast.Constructor) T {
 	av.CurrentMethod = constructor
+	constructor.Class = av.CurrentClass
 
 	return av.VisitChildren(constructor)
 }

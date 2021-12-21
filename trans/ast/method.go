@@ -14,7 +14,7 @@ type Method struct {
 	Body           node.Node
 	Arguments      []node.Node
 	ReturnType     node.Node
-	Class          string
+	Class          *Class
 	Throws         string
 
 	Public       bool
@@ -27,18 +27,13 @@ func (m *Method) Children() []node.Node {
 	return node.AppendNodeLists([]node.Node{m.Body, m.ReturnType}, m.Arguments...)
 }
 
-func NewMethod(name string, class string, arguments []node.Node, returnType node.Node, body node.Node) *Method {
+func NewMethod(name string, arguments []node.Node, returnType node.Node, body node.Node) *Method {
 	return &Method{
 		Name:       name,
-		Class:      class,
 		Arguments:  arguments,
 		ReturnType: returnType,
 		Body:       body,
 	}
-}
-
-func (m *Method) SetClass(class string) {
-	m.Class = class
 }
 
 func (m *Method) SetPublic(public bool) {

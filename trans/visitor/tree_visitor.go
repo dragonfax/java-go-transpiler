@@ -69,12 +69,6 @@ func (gv *TreeVisitor) VisitClassDeclaration(ctx *parser.ClassDeclarationContext
 		}
 	}
 
-	for _, member := range class.Members {
-		if setClass, ok := member.(interface{ SetClass(string) }); ok {
-			setClass.SetClass(class.Name)
-		}
-	}
-
 	return class
 }
 
@@ -162,7 +156,7 @@ func (gv *TreeVisitor) VisitMethodDeclaration(ctx *parser.MethodDeclarationConte
 	name := ctx.IDENTIFIER().GetText()
 
 	body := exp.NewBlockNode(ctx.MethodBody().Block())
-	m := ast.NewMethod(name, "", exp.FormalParameterListProcessor(ctx.FormalParameters().FormalParameterList()), exp.NewTypeOrVoidNode(ctx.TypeTypeOrVoid()), body)
+	m := ast.NewMethod(name, exp.FormalParameterListProcessor(ctx.FormalParameters().FormalParameterList()), exp.NewTypeOrVoidNode(ctx.TypeTypeOrVoid()), body)
 
 	if ctx.THROWS() != nil {
 		m.Throws = ctx.QualifiedNameList().GetText()

@@ -13,6 +13,7 @@ type Constructor struct {
 	Body       node.Node
 	Parameters []node.Node
 	Throws     string
+	Class      *Class
 
 	Public bool
 }
