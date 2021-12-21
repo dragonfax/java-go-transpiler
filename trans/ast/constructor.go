@@ -8,11 +8,12 @@ import (
 )
 
 type Constructor struct {
+	*BaseClassScope
+
 	Name       string
 	Body       node.Node
 	Parameters []node.Node
 	Throws     string
-	Class      *Class
 
 	Public bool
 }
@@ -27,7 +28,7 @@ func (c *Constructor) SetPublic(public bool) {
 
 func NewConstructor(ctx *parser.ConstructorDeclarationContext) *Constructor {
 
-	c := &Constructor{Name: ctx.IDENTIFIER().GetText()}
+	c := &Constructor{BaseClassScope: NewClassScope(), Name: ctx.IDENTIFIER().GetText()}
 
 	if ctx.GetConstructorBody() != nil {
 		c.Body = NewBlockNode(ctx.GetConstructorBody())

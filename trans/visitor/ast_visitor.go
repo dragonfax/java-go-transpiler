@@ -43,8 +43,12 @@ func (av *ASTVisitor[T]) VisitNode(tree node.Node) T {
 		return av.zero
 	}
 
-	if scope, ok := tree.(ast.Scope); av.CurrentMethod != nil && ok {
-		scope.SetScope(av.CurrentMethod)
+	if scope, ok := tree.(ast.MethodScope); av.CurrentMethod != nil && ok {
+		scope.SetMethodScope(av.CurrentMethod)
+	}
+
+	if scope, ok := tree.(ast.ClassScope); av.CurrentClass != nil && ok {
+		scope.SetClassScope(av.CurrentClass)
 	}
 
 	if class, ok := tree.(*ast.Class); ok {

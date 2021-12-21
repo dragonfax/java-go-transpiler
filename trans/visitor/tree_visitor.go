@@ -59,7 +59,7 @@ func (gv *TreeVisitor) VisitClassDeclaration(ctx *parser.ClassDeclarationContext
 	class.Name = ctx.IDENTIFIER().GetText()
 
 	if ctx.TypeType() != nil {
-		class.BaseClass = ctx.TypeType().GetText()
+		class.BaseClassName = ctx.TypeType().GetText()
 	}
 
 	if ctx.TypeList() != nil {

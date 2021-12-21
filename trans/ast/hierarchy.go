@@ -45,6 +45,6 @@ func (h *Hierarchy) GetPackage(packageName string) *Package {
 func (h *Hierarchy) AddClass(class *Class) {
 	packageName := class.PackageName
 	pkg := h.GetPackage(packageName)
-	class.Package = pkg
+	class.PackageScope = pkg
 	pkg.AddClass(class)
 }

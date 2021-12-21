@@ -23,7 +23,7 @@ func (av *ASTVisitor[T]) VisitClass(class *ast.Class) T {
 
 func (av *ASTVisitor[T]) VisitImport(imp *ast.Import) T {
 
-	imp.Class = av.CurrentClass
+	imp.ClassScope = av.CurrentClass
 
 	impPackageName, impClassName := ast.SplitPackageName(imp.ImportString)
 
@@ -57,7 +57,7 @@ func (av *ASTVisitor[T]) VisitTypeElement(node *ast.TypeElementNode) T {
 func (av *ASTVisitor[T]) VisitMethod(method *ast.Method) T {
 
 	av.CurrentMethod = method
-	method.Class = av.CurrentClass
+	method.ClassScope = av.CurrentClass
 
 	return av.VisitChildren(method)
 
@@ -65,13 +65,13 @@ func (av *ASTVisitor[T]) VisitMethod(method *ast.Method) T {
 
 func (av *ASTVisitor[T]) VisitConstructor(constructor *ast.Constructor) T {
 	av.CurrentMethod = constructor
-	constructor.Class = av.CurrentClass
+	constructor.ClassScope = av.CurrentClass
 
 	return av.VisitChildren(constructor)
 }
 
 func (av *ASTVisitor[T]) VisitField(field *ast.Field) T {
-	field.Class = av.CurrentClass
+	field.ClassScope = av.CurrentClass
 
 	return av.VisitChildren(field)
 }

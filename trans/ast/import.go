@@ -8,16 +8,17 @@ import (
 )
 
 type Import struct {
+	*BaseClassScope
+
 	ImportString      string
 	Star              bool
 	ImportPackageName string
 	ImportPackage     *Package
-	Class             *Class
 	ImportClass       *Class
 }
 
 func NewImport(s string) *Import {
-	return &Import{ImportString: s}
+	return &Import{BaseClassScope: NewClassScope(), ImportString: s}
 }
 
 func (i *Import) String() string {

@@ -39,7 +39,7 @@ func (pkg *Package) GetClass(className string) *Class {
 
 	class := NewClass()
 
-	class.Package = pkg
+	class.PackageScope = pkg
 
 	return class
 }

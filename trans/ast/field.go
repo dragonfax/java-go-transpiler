@@ -20,13 +20,16 @@ func (fl FieldList) Children() []node.Node {
 }
 
 type Field struct {
-	VariableDeclNode
+	*BaseClassScope
+	*VariableDeclNode
 
 	Public    bool
 	Transient bool
 	Static    bool
+}
 
-	Class *Class
+func NewField(vardecl *VariableDeclNode) *Field {
+	return &Field{BaseClassScope: NewClassScope(), VariableDeclNode: vardecl}
 }
 
 func (f *Field) Children() []node.Node {
@@ -54,7 +57,7 @@ func NewFields(ctx *parser.FieldDeclarationContext) FieldList {
 		}
 
 		node := NewVariableDecl(typ, name, init)
-		members = append(members, &Field{VariableDeclNode: *node})
+		members = append(members, NewField(node))
 	}
 
 	return members

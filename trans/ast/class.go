@@ -9,17 +9,18 @@ import (
 )
 
 type Class struct {
-	Name        string
-	Imports     []*Import
-	BaseClass   string
-	Interfaces  []TypeNode
-	Members     []node.Node
-	Fields      []*Field
-	Package     *Package
-	PackageName string
-	Interface   bool
-	Enum        bool
-	Constants   []*EnumConstant // for enums
+	Name          string
+	Imports       []*Import
+	BaseClassName string
+	BaseClass     *Class
+	Interfaces    []TypeNode
+	Members       []node.Node
+	Fields        []*Field
+	PackageScope  *Package
+	PackageName   string
+	Interface     bool
+	Enum          bool
+	Constants     []*EnumConstant // for enums
 }
 
 func (c *Class) Children() []node.Node {
@@ -38,7 +39,7 @@ var classTemplate = `
 {{range .Interfaces }}var _ {{ . }} = &{{ $className}}{}
 {{end}}
 type {{ .Name }} struct {
-    {{if .BaseClass}}*{{ .BaseClass }}{{end}}
+    {{if .BaseClassName}}*{{ .BaseClassName }}{{end}}
 
     {{range .Fields}}{{ .Declaration }}
 	{{end}}

@@ -7,13 +7,14 @@ import (
 )
 
 type Method struct {
+	*BaseClassScope
+
 	Name string
 
 	TypeParameters TypeParameterList // implies generic method
 	Body           node.Node
 	Arguments      []node.Node
 	ReturnType     node.Node
-	Class          *Class
 	Throws         string
 
 	Public       bool
@@ -28,6 +29,8 @@ func (m *Method) Children() []node.Node {
 
 func NewMethod(name string, arguments []node.Node, returnType node.Node, body node.Node) *Method {
 	return &Method{
+		BaseClassScope: NewClassScope(),
+
 		Name:       name,
 		Arguments:  arguments,
 		ReturnType: returnType,
@@ -71,5 +74,5 @@ func (m *Method) String() string {
 		throws = " /* TODO throws " + m.Throws + "*/"
 	}
 
-	return fmt.Sprintf("func (this *%s) %s(%s) %s%s{\n%s\n}\n\n", m.Class.Name, m.Name, arguments, m.ReturnType, throws, body)
+	return fmt.Sprintf("func (this *%s) %s(%s) %s%s{\n%s\n}\n\n", m.ClassScope.Name, m.Name, arguments, m.ReturnType, throws, body)
 }

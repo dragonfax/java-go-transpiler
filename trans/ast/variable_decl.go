@@ -8,7 +8,7 @@ import (
 )
 
 type VariableDeclNode struct {
-	*BaseScope
+	*BaseMethodScope
 
 	Type       TypeNode
 	Name       string
@@ -33,7 +33,7 @@ func NewVariableDecl(typ TypeNode, name string, expression node.Node) *VariableD
 	if name == "" {
 		panic("no variable name")
 	}
-	return &VariableDeclNode{BaseScope: NewScope(), Type: typ, Name: name, Expression: expression}
+	return &VariableDeclNode{BaseMethodScope: NewMethodScope(), Type: typ, Name: name, Expression: expression}
 }
 
 func NewVariableDeclNodeList(decl *parser.LocalVariableDeclarationContext) []node.Node {
