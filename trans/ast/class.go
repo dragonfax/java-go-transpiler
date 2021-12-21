@@ -16,6 +16,8 @@ type Class struct {
 	Members    []Member
 	Fields     []*Field
 	Package    string
+	Interface  bool
+	Enum       bool
 }
 
 func (c *Class) OutputFilename() string {
@@ -51,18 +53,26 @@ func New{{.Name}}() *{{.Name}}{
 
 var classTpl = template.Must(template.New("name").Parse(classTemplate))
 
+var interfaceTemplate = `
+type {{ .Name }} interface {
+{{range .Members}}
+	{{.Name}}({{.ArgumentsString}}) .ReturnType
+{{end}}
+}
+
+`
+
+var interfaceTemplateCompiled = template.Must(template.New("interface").Parse(interfaceTemplate))
+
 func (c *Class) String() string {
-	for _, m := range c.Members {
-		if m == c {
-			panic("recursion")
-		}
+	if c.Interface {
+		return exp.ExecuteTemplateToString(interfaceTemplateCompiled, c)
 	}
-	b := &strings.Builder{}
-	err := classTpl.Execute(b, c)
-	if err != nil {
-		return err.Error()
+	if c.Enum {
+		return exp.ExecuteTemplateToString(enumTemplateCompiled, c)
 	}
-	return b.String()
+
+	return exp.ExecuteTemplateToString(classTpl, c)
 }
 
 func (c *Class) PackageBasename() string {

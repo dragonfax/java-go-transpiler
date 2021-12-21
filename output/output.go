@@ -2,6 +2,7 @@ package output
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
@@ -59,6 +60,7 @@ func Translate(path string) error {
 
 // input filename to go-code string
 func parseFile(h *hier.Hierarchy, filename string) {
+	fmt.Println(filename)
 	tree := input.ParseToTree(filename)
 
 	trans.BuildAST(h, tree)

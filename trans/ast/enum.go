@@ -7,15 +7,21 @@ import (
 	"github.com/dragonfax/java_converter/trans/ast/exp"
 )
 
+/*
 type Enum struct {
 	Name        string
 	Interfaces  []exp.TypeNode
 	Constants   []*EnumConstant
 	BodyWarning bool
 }
+*/
 
 type EnumConstant struct {
 	Name string
+}
+
+func (ec *EnumConstant) String() string {
+	return ec.Name
 }
 
 var enumTemplate = `
@@ -32,40 +38,19 @@ const (
 
 var enumTemplateCompiled = template.Must(template.New("enum").Parse(enumTemplate))
 
-func (e *Enum) String() string {
-	return exp.ExecuteTemplateToString(enumTemplateCompiled, e)
-}
-
-func NewEnum(ctx *parser.EnumDeclarationContext) *Enum {
-	this := &Enum{
+func NewEnum(ctx *parser.EnumDeclarationContext, fields FieldList, members []Member) *Class {
+	this := &Class{
 		Name:       ctx.IDENTIFIER().GetText(),
 		Interfaces: make([]exp.TypeNode, 0),
+		Members:    members,
+		Fields:     fields,
+		Enum:       true,
 	}
 
 	if ctx.TypeList() != nil {
 		for _, typeType := range ctx.TypeList().AllTypeType() {
 			this.Interfaces = append(this.Interfaces, exp.NewTypeNode(typeType))
 		}
-	}
-
-	if ctx.EnumConstants() != nil {
-		for _, constant := range ctx.EnumConstants().AllEnumConstant() {
-			if constant.ClassBody() != nil {
-				panic("enum constant has its own class body")
-			}
-
-			if constant.Arguments() != nil {
-				panic("enum constant has arguments")
-			}
-
-			this.Constants = append(this.Constants, &EnumConstant{
-				Name: constant.IDENTIFIER().GetText(),
-			})
-		}
-	}
-
-	if ctx.EnumBodyDeclarations() != nil {
-		this.BodyWarning = true
 	}
 
 	return this

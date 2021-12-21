@@ -40,20 +40,21 @@ func (gv *TreeVisitor) VisitCompilationUnit(ctx *parser.CompilationUnitContext) 
 		return nil
 	}
 
-	if _, ok := node.(*ast.Enum); ok {
-		panic("top level enum detected")
+	packageName := ctx.PackageDeclaration().QualifiedName().GetText()
+
+	class, ok := node.(*ast.Class)
+	if ok {
+		class.Package = packageName
+
+		for _, importCtx := range ctx.AllImportDeclaration() {
+			importedPackageName := importCtx.QualifiedName().GetText()
+			class.Imports = append(class.Imports, ast.NewImport(importedPackageName))
+			gv.Hierarchy.AddClass(importedPackageName, class)
+		}
+		return class
 	}
 
-	class := node.(*ast.Class)
-	class.Package = ctx.PackageDeclaration().QualifiedName().GetText()
-
-	for _, importCtx := range ctx.AllImportDeclaration() {
-		importedPackageName := importCtx.QualifiedName().GetText()
-		class.Imports = append(class.Imports, ast.NewImport(importedPackageName))
-		gv.Hierarchy.AddClass(importedPackageName, class)
-	}
-
-	return class
+	panic("got something unknown from children")
 }
 
 func (gv *TreeVisitor) VisitClassDeclaration(ctx *parser.ClassDeclarationContext) ast.Node {
@@ -179,5 +180,29 @@ func (v *TreeVisitor) VisitConstructorDeclaration(ctx *parser.ConstructorDeclara
 }
 
 func (gv *TreeVisitor) VisitEnumDeclaration(ctx *parser.EnumDeclarationContext) ast.Node {
-	return ast.NewEnum(ctx)
+	members := make([]ast.Member, 0)
+	fields := make(ast.FieldList, 0)
+	if ctx.EnumBodyDeclarations() != nil {
+		for _, decl := range ctx.EnumBodyDeclarations().AllClassBodyDeclaration() {
+			member := gv.VisitClassBodyDeclaration(decl)
+			if member == nil && decl.GetText() != ";" {
+				fmt.Printf("WARNING: skipping class member: %s\n", decl.GetText())
+				continue
+			}
+			if subClass, ok := member.(*ast.Class); ok {
+				// We don't do subclasses
+				members = append(members, ast.NewSubClassTODO(subClass.Name))
+			} else if fl, ok := member.(ast.FieldList); ok {
+				fields = append(fields, fl...)
+			} else {
+				members = append(members, member)
+			}
+		}
+	}
+
+	return ast.NewEnum(ctx, fields, members)
+}
+
+func (gv *TreeVisitor) VisitInterfaceDeclaration(ctx *parser.InterfaceDeclarationContext) ast.Node {
+	return ast.NewInterface(ctx)
 }
