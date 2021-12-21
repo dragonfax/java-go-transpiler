@@ -25,6 +25,8 @@ type Field struct {
 	Public    bool
 	Transient bool
 	Static    bool
+
+	Class *Class
 }
 
 func (f *Field) Children() []node.Node {

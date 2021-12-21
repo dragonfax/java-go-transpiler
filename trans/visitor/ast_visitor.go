@@ -57,6 +57,10 @@ func (av *ASTVisitor[T]) VisitNode(tree node.Node) T {
 		return av.VisitMethod(method)
 	} else if con, ok := tree.(*ast.Constructor); ok {
 		return av.VisitConstructor(con)
+	} else if imp, ok := tree.(*ast.Import); ok {
+		return av.VisitImport(imp)
+	} else if field, ok := tree.(*ast.Field); ok {
+		return av.VisitField(field)
 	} else {
 		return av.VisitChildren(tree)
 	}

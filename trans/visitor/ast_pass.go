@@ -69,3 +69,9 @@ func (av *ASTVisitor[T]) VisitConstructor(constructor *ast.Constructor) T {
 
 	return av.VisitChildren(constructor)
 }
+
+func (av *ASTVisitor[T]) VisitField(field *ast.Field) T {
+	field.Class = av.CurrentClass
+
+	return av.VisitChildren(field)
+}
