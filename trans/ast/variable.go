@@ -2,26 +2,26 @@ package ast
 
 import "github.com/dragonfax/java_converter/trans/node"
 
-type VariableNode struct {
-	*node.BaseNode
+type Variable struct {
+	*node.Base
 
 	Name string
 }
 
-func NewVariableNode(name string) *VariableNode {
+func NewVariable(name string) *Variable {
 	if name == "" {
 		panic("missing name")
 	}
-	return &VariableNode{
-		BaseNode: node.NewNode(),
-		Name:     name,
+	return &Variable{
+		Base: node.New(),
+		Name: name,
 	}
 }
 
-func (vn *VariableNode) Children() []node.Node {
+func (vn *Variable) Children() []node.Node {
 	return nil
 }
 
-func (vn *VariableNode) String() string {
+func (vn *Variable) String() string {
 	return vn.Name
 }

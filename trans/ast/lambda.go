@@ -7,17 +7,17 @@ import (
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
-type LambdaNode struct {
-	*node.BaseNode
+type Lambda struct {
+	*node.Base
 	Arguments []node.Node
 	Body      node.Node
 }
 
-func (ln *LambdaNode) Children() []node.Node {
+func (ln *Lambda) Children() []node.Node {
 	return node.AppendNodeLists(ln.Arguments, ln.Body)
 }
 
-func NewLambdaNode(lambda *parser.LambdaExpressionContext) *LambdaNode {
+func NewLambda(lambda *parser.LambdaExpressionContext) *Lambda {
 	lambdaCtx := lambda
 
 	bodyCtx := lambdaCtx.LambdaBody()
@@ -25,7 +25,7 @@ func NewLambdaNode(lambda *parser.LambdaExpressionContext) *LambdaNode {
 	if bodyCtx.Expression() != nil {
 		body = ExpressionProcessor(bodyCtx.Expression())
 	} else if bodyCtx.Block() != nil {
-		body = NewBlockNode(bodyCtx.Block())
+		body = NewBlock(bodyCtx.Block())
 	} else {
 		panic("no body for lambda")
 	}
@@ -39,17 +39,17 @@ func NewLambdaNode(lambda *parser.LambdaExpressionContext) *LambdaNode {
 	if len(parametersCtx.AllIDENTIFIER()) > 0 {
 		// java lambda can have just parameter names, without types. thats valid
 		for _, id := range parametersCtx.AllIDENTIFIER() {
-			arguments = append(arguments, NewIdentifierNode(id.GetText()))
+			arguments = append(arguments, NewIdentifier(id.GetText()))
 		}
 	} else {
 		// must have formal parameters list
 		arguments = FormalParameterListProcessor(parametersCtx.FormalParameterList())
 	}
 
-	return &LambdaNode{BaseNode: node.NewNode(), Arguments: arguments, Body: body}
+	return &Lambda{Base: node.New(), Arguments: arguments, Body: body}
 }
 
-func (ln *LambdaNode) String() string {
+func (ln *Lambda) String() string {
 	arguments := ""
 	if ln.Arguments != nil {
 		arguments = ArgumentListToString(ln.Arguments)

@@ -3,7 +3,7 @@ package ast
 import "github.com/dragonfax/java_converter/trans/node"
 
 type Package struct {
-	*node.BaseNode
+	*node.Base
 
 	Name             string
 	Classes          map[string]*Class
@@ -12,7 +12,7 @@ type Package struct {
 
 func NewPackage(name string) *Package {
 	return &Package{
-		BaseNode:         node.NewNode(),
+		Base:             node.New(),
 		Name:             name,
 		Classes:          make(map[string]*Class),
 		ImportReferences: make([]*Import, 0),

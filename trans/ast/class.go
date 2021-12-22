@@ -9,13 +9,13 @@ import (
 )
 
 type Class struct {
-	*node.BaseNode
+	*node.Base
 
 	Name          string
 	Imports       []*Import
 	BaseClassName string
 	BaseClass     *Class
-	Interfaces    []*TypeNode
+	Interfaces    []*Type
 	Members       []node.Node
 	Fields        []*Field
 	PackageScope  *Package
@@ -95,9 +95,9 @@ func (c *Class) AsFile() string {
 
 func NewClass() *Class {
 	c := &Class{
-		BaseNode:   node.NewNode(),
+		Base:       node.New(),
 		Members:    make([]node.Node, 0),
-		Interfaces: make([]*TypeNode, 0),
+		Interfaces: make([]*Type, 0),
 		Fields:     make([]*Field, 0),
 		Imports:    make([]*Import, 0),
 		Constants:  make([]*EnumConstant, 0),

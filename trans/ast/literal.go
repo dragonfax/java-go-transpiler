@@ -18,18 +18,18 @@ const (
 	Null
 )
 
-type LiteralNode struct {
-	*node.BaseNode
+type Literal struct {
+	*node.Base
 
 	Type  LiteralType
 	Value string
 }
 
-func (ln *LiteralNode) Children() []node.Node {
+func (ln *Literal) Children() []node.Node {
 	return nil
 }
 
-func NewLiteralNode(literal *parser.LiteralContext) *LiteralNode {
+func NewLiteral(literal *parser.LiteralContext) *Literal {
 	if literal == nil {
 		panic("no literal value")
 	}
@@ -55,14 +55,14 @@ func NewLiteralNode(literal *parser.LiteralContext) *LiteralNode {
 		typ = Integer
 	}
 
-	return &LiteralNode{
-		BaseNode: node.NewNode(),
-		Type:     typ,
-		Value:    literal.GetText(),
+	return &Literal{
+		Base:  node.New(),
+		Type:  typ,
+		Value: literal.GetText(),
 	}
 }
 
-func (ln *LiteralNode) String() string {
+func (ln *Literal) String() string {
 	if ln.Type == Float {
 		return strings.TrimSuffix(ln.Value, "f")
 	}

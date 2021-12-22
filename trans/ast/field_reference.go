@@ -10,7 +10,7 @@ import (
  * we won't have the instance expression until after resolving
  */
 type FieldReference struct {
-	*node.BaseNode
+	*node.Base
 
 	FieldName          string
 	InstanceExpression node.Node
@@ -24,7 +24,7 @@ func NewFieldReference(fieldName string) *FieldReference {
 	if fieldName == "" {
 		panic("no fielde")
 	}
-	this := &FieldReference{BaseNode: node.NewNode(), FieldName: fieldName}
+	this := &FieldReference{Base: node.New(), FieldName: fieldName}
 	return this
 }
 

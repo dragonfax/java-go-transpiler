@@ -9,10 +9,10 @@ import (
 )
 
 type ConstructorCall struct {
-	*node.BaseNode
+	*node.Base
 
 	Class         string
-	TypeArguments []*TypeNode
+	TypeArguments []*Type
 	Arguments     []node.Node
 }
 
@@ -36,7 +36,7 @@ func NewConstructorCall(creator *parser.CreatorContext) *ConstructorCall {
 		panic("constructor call with no class name")
 	}
 
-	typeArguments := make([]*TypeNode, 0)
+	typeArguments := make([]*Type, 0)
 	if creatorNameCtx.TypeArgumentsOrDiamond(0) != nil {
 		if creatorNameCtx.TypeArgumentsOrDiamond(0).TypeArguments() != nil {
 			for _, typeArg := range creatorNameCtx.TypeArgumentsOrDiamond(0).TypeArguments().AllTypeArgument() {
@@ -61,7 +61,7 @@ func NewConstructorCall(creator *parser.CreatorContext) *ConstructorCall {
 	}
 
 	return &ConstructorCall{
-		BaseNode:      node.NewNode(),
+		Base:          node.New(),
 		Class:         class,
 		TypeArguments: typeArguments,
 		Arguments:     arguments,

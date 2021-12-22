@@ -7,7 +7,7 @@ import (
 )
 
 type NestedClass struct {
-	*node.BaseNode
+	*node.Base
 
 	Name string
 }
@@ -17,7 +17,7 @@ func (sc *NestedClass) Children() []node.Node {
 }
 
 func NewNestedClass(name string) *NestedClass {
-	return &NestedClass{BaseNode: node.NewNode(), Name: name}
+	return &NestedClass{Base: node.New(), Name: name}
 }
 
 func (sc *NestedClass) String() string {

@@ -7,7 +7,7 @@ import (
 )
 
 type Method struct {
-	*node.BaseNode
+	*node.Base
 	*BaseClassScope
 
 	Name string
@@ -30,7 +30,7 @@ func (m *Method) Children() []node.Node {
 
 func NewMethod(name string, arguments []node.Node, returnType node.Node, body node.Node) *Method {
 	return &Method{
-		BaseNode:       node.NewNode(),
+		Base:           node.New(),
 		BaseClassScope: NewClassScope(),
 
 		Name:       name,

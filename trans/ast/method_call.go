@@ -14,7 +14,7 @@ import (
  * Doesn't have the class its connected to until after resolution phase is complete
  */
 type MethodCall struct {
-	*node.BaseNode
+	*node.Base
 
 	MethodName string
 	Arguments  []node.Node
@@ -54,7 +54,7 @@ func NewMethodCall(methodCall *parser.MethodCallContext) *MethodCall {
 		}
 	}
 
-	this := &MethodCall{BaseNode: node.NewNode(), MethodName: methodName, Arguments: arguments}
+	this := &MethodCall{Base: node.New(), MethodName: methodName, Arguments: arguments}
 	return this
 }
 

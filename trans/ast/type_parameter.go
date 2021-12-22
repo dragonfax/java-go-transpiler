@@ -17,7 +17,7 @@ func NewTypeParameterList(ctx *parser.TypeParametersContext) TypeParameterList {
 }
 
 type TypeParameter struct {
-	*node.BaseNode
+	*node.Base
 
 	Name string
 }
@@ -26,5 +26,5 @@ func NewTypeParameter(ctx *parser.TypeParameterContext) *TypeParameter {
 	if ctx.EXTENDS() != nil {
 		panic("type parameter with bounds")
 	}
-	return &TypeParameter{BaseNode: node.NewNode(), Name: ctx.IDENTIFIER().GetText()}
+	return &TypeParameter{Base: node.New(), Name: ctx.IDENTIFIER().GetText()}
 }

@@ -10,7 +10,7 @@ import (
 )
 
 type Switch struct {
-	*node.BaseNode
+	*node.Base
 
 	Condition node.Node
 	Cases     []*SwitchCase
@@ -48,7 +48,7 @@ func (s *Switch) String() string {
 }
 
 type SwitchCase struct {
-	*node.BaseNode
+	*node.Base
 
 	Labels     []node.Node
 	Statements []node.Node
@@ -63,12 +63,12 @@ func (sc *SwitchCase) Children() []node.Node {
 }
 
 func NewSwitch(ctx *parser.StatementContext) *Switch {
-	s := &Switch{BaseNode: node.NewNode(), Cases: make([]*SwitchCase, 0)}
+	s := &Switch{Base: node.New(), Cases: make([]*SwitchCase, 0)}
 
 	s.Condition = ExpressionProcessor(ctx.ParExpression().Expression())
 
 	for _, group := range ctx.AllSwitchBlockStatementGroup() {
-		c := &SwitchCase{BaseNode: node.NewNode()}
+		c := &SwitchCase{Base: node.New()}
 		for _, labelCtx := range group.AllSwitchLabel() {
 			labels := switchLabelsFromContext(labelCtx)
 			c.Labels = append(c.Labels, labels...)
@@ -95,7 +95,7 @@ func NewSwitch(ctx *parser.StatementContext) *Switch {
 
 func switchLabelsFromContext(ctx *parser.SwitchLabelContext) []node.Node {
 	if ctx.DEFAULT() != nil {
-		return []node.Node{NewIdentifierNode("default")}
+		return []node.Node{NewIdentifier("default")}
 	}
 
 	if ctx.GetEnumConstantName() != nil {

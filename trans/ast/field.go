@@ -8,17 +8,17 @@ import (
 )
 
 type Field struct {
-	*node.BaseNode
+	*node.Base
 	*BaseClassScope
-	*VariableDeclNode
+	*VariableDecl
 
 	Public    bool
 	Transient bool
 	Static    bool
 }
 
-func NewField(vardecl *VariableDeclNode) *Field {
-	return &Field{BaseNode: node.NewNode(), BaseClassScope: NewClassScope(), VariableDeclNode: vardecl}
+func NewField(vardecl *VariableDecl) *Field {
+	return &Field{Base: node.New(), BaseClassScope: NewClassScope(), VariableDecl: vardecl}
 }
 
 func (f *Field) Children() []node.Node {

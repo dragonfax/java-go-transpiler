@@ -14,7 +14,7 @@ import (
  */
 
 type FieldList struct {
-	*node.BaseNode
+	*node.Base
 
 	Fields []*Field
 }
@@ -43,7 +43,7 @@ func NewFieldList(ctx *parser.FieldDeclarationContext) *FieldList {
 		members = append(members, NewField(node))
 	}
 
-	return &FieldList{BaseNode: node.NewNode(), Fields: members}
+	return &FieldList{Base: node.New(), Fields: members}
 }
 
 func (fl *FieldList) Children() []node.Node {

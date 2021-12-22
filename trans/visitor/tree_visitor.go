@@ -156,8 +156,8 @@ func (gv *TreeVisitor) VisitGenericConstructorDeclaration(ctx *parser.GenericCon
 func (gv *TreeVisitor) VisitMethodDeclaration(ctx *parser.MethodDeclarationContext) node.Node {
 	name := ctx.IDENTIFIER().GetText()
 
-	body := ast.NewBlockNode(ctx.MethodBody().Block())
-	m := ast.NewMethod(name, ast.FormalParameterListProcessor(ctx.FormalParameters().FormalParameterList()), ast.NewTypeOrVoidNode(ctx.TypeTypeOrVoid()), body)
+	body := ast.NewBlock(ctx.MethodBody().Block())
+	m := ast.NewMethod(name, ast.FormalParameterListProcessor(ctx.FormalParameters().FormalParameterList()), ast.NewTypeOrVoid(ctx.TypeTypeOrVoid()), body)
 
 	if ctx.THROWS() != nil {
 		m.Throws = ctx.QualifiedNameList().GetText()

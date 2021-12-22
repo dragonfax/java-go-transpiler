@@ -7,15 +7,15 @@ import (
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
-type IfNode struct {
-	*node.BaseNode
+type If struct {
+	*node.Base
 
 	Condition node.Node
 	Body      node.Node
 	Else      node.Node
 }
 
-func (in *IfNode) Children() []node.Node {
+func (in *If) Children() []node.Node {
 	list := []node.Node{in.Body}
 	if in.Condition != nil {
 		list = append(list, in.Condition)
@@ -26,22 +26,22 @@ func (in *IfNode) Children() []node.Node {
 	return list
 }
 
-func NewIfNode(condition, body, els node.Node) *IfNode {
+func NewIf(condition, body, els node.Node) *If {
 	if tool.IsNilInterface(body) {
 		panic("missing body")
 	}
 	if tool.IsNilInterface(condition) {
 		panic("missing condition")
 	}
-	return &IfNode{
-		BaseNode:  node.NewNode(),
+	return &If{
+		Base:      node.New(),
 		Condition: condition,
 		Body:      body,
 		Else:      els,
 	}
 }
 
-func (in *IfNode) String() string {
+func (in *If) String() string {
 	if tool.IsNilInterface(in.Else) {
 		return fmt.Sprintf("if %s {\n%s}\n", in.Condition, in.Body)
 	}

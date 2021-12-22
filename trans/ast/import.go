@@ -8,7 +8,7 @@ import (
 )
 
 type Import struct {
-	*node.BaseNode
+	*node.Base
 	*BaseClassScope
 
 	ImportString      string
@@ -19,7 +19,7 @@ type Import struct {
 }
 
 func NewImport(s string) *Import {
-	return &Import{BaseNode: node.NewNode(), BaseClassScope: NewClassScope(), ImportString: s}
+	return &Import{Base: node.New(), BaseClassScope: NewClassScope(), ImportString: s}
 }
 
 func (i *Import) String() string {

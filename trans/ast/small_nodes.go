@@ -8,24 +8,24 @@ import (
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
-type ReturnNode struct {
-	*node.BaseNode
+type Return struct {
+	*node.Base
 
 	Expression node.Node
 }
 
-func (rn *ReturnNode) Children() []node.Node {
+func (rn *Return) Children() []node.Node {
 	if rn.Expression != nil {
 		return []node.Node{rn.Expression}
 	}
 	return nil
 }
 
-func NewReturnNode(exp node.Node) *ReturnNode {
-	return &ReturnNode{BaseNode: node.NewNode(), Expression: exp}
+func NewReturn(exp node.Node) *Return {
+	return &Return{Base: node.New(), Expression: exp}
 }
 
-func (rn *ReturnNode) String() string {
+func (rn *Return) String() string {
 	exp := ""
 	if !tool.IsNilInterface(rn.Expression) {
 		exp = rn.Expression.String()
@@ -33,98 +33,98 @@ func (rn *ReturnNode) String() string {
 	return fmt.Sprintf("return %s\n", exp)
 }
 
-type ThrowNode struct {
-	*node.BaseNode
+type Throw struct {
+	*node.Base
 	Expression string
 }
 
-func (tn *ThrowNode) Children() []node.Node {
+func (tn *Throw) Children() []node.Node {
 	return nil
 }
 
-func NewThrowNode(exp string) *ThrowNode {
-	return &ThrowNode{BaseNode: node.NewNode(), Expression: exp}
+func NewThrow(exp string) *Throw {
+	return &Throw{Base: node.New(), Expression: exp}
 }
 
-func (tn *ThrowNode) String() string {
+func (tn *Throw) String() string {
 	return fmt.Sprintf("panic(%s) // TODO\n", strconv.Quote(tn.Expression))
 }
 
-type BreakNode struct {
-	*node.BaseNode
+type Break struct {
+	*node.Base
 
 	Label string
 }
 
-func (b *BreakNode) Children() []node.Node {
+func (b *Break) Children() []node.Node {
 	return nil
 }
 
-func NewBreakNode(label string) *BreakNode {
-	return &BreakNode{BaseNode: node.NewNode(), Label: label}
+func NewBreak(label string) *Break {
+	return &Break{Base: node.New(), Label: label}
 }
 
-func (bn *BreakNode) String() string {
+func (bn *Break) String() string {
 	return fmt.Sprintf("break %s\n", bn.Label)
 }
 
-type ContinueNode struct {
-	*node.BaseNode
+type Continue struct {
+	*node.Base
 
 	Label string
 }
 
-func (c *ContinueNode) Children() []node.Node {
+func (c *Continue) Children() []node.Node {
 	return nil
 }
 
-func NewContinueNode(label string) *ContinueNode {
-	return &ContinueNode{BaseNode: node.NewNode(), Label: label}
+func NewContinue(label string) *Continue {
+	return &Continue{Base: node.New(), Label: label}
 }
 
-func (cn *ContinueNode) String() string {
+func (cn *Continue) String() string {
 	return fmt.Sprintf("continue %s\n", cn.Label)
 }
 
-type LabelNode struct {
-	*node.BaseNode
+type Label struct {
+	*node.Base
 
 	Label      string
 	Expression node.Node
 }
 
-func (l *LabelNode) Children() []node.Node {
+func (l *Label) Children() []node.Node {
 	return []node.Node{l.Expression}
 }
 
-func NewLabelNode(label string, exp node.Node) *LabelNode {
+func NewLabel(label string, exp node.Node) *Label {
 	if label == "" {
 		panic("label missing")
 	}
 	if tool.IsNilInterface(exp) {
 		panic("expression missing")
 	}
-	return &LabelNode{BaseNode: node.NewNode(), Label: label, Expression: exp}
+	return &Label{Base: node.New(), Label: label, Expression: exp}
 }
 
-func (ln *LabelNode) String() string {
+func (ln *Label) String() string {
 	return fmt.Sprintf("%s: %s\n", ln.Label, ln.Expression)
 }
 
-type IdentifierNode struct {
-	*node.BaseNode
+type Identifier struct {
+	*node.Base
 
 	Identifier string
 }
 
-func (i *IdentifierNode) Children() []node.Node {
+func (i *Identifier) Children() []node.Node {
 	return nil
 }
 
-func NewIdentifierNode(id string) *IdentifierNode {
-	return &IdentifierNode{BaseNode: node.NewNode(), Identifier: id}
+func NewIdentifier(id string) *Identifier {
+	return &Identifier{Base: node.New(), Identifier: id}
 }
 
-func (in *IdentifierNode) String() string {
+func (in *Identifier) String() string {
 	return in.Identifier
 }

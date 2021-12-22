@@ -7,26 +7,26 @@ import (
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
-type BaseOperatorNode struct {
-	*node.BaseNode
+type BaseOperator struct {
+	*node.Base
 
 	Operator string
 }
 
-var _ node.Node = &BinaryOperatorNode{}
+var _ node.Node = &BinaryOperator{}
 
-type BinaryOperatorNode struct {
-	BaseOperatorNode
+type BinaryOperator struct {
+	BaseOperator
 
 	Left  node.Node
 	Right node.Node
 }
 
-func (bo *BinaryOperatorNode) Children() []node.Node {
+func (bo *BinaryOperator) Children() []node.Node {
 	return []node.Node{bo.Left, bo.Right}
 }
 
-func NewBinaryOperatorNode(operator string, left node.Node, right node.Node) *BinaryOperatorNode {
+func NewBinaryOperator(operator string, left node.Node, right node.Node) *BinaryOperator {
 	if operator == "" {
 		panic("no operator")
 	}
@@ -36,13 +36,13 @@ func NewBinaryOperatorNode(operator string, left node.Node, right node.Node) *Bi
 	if tool.IsNilInterface(right) {
 		panic("no right expression")
 	}
-	this := &BinaryOperatorNode{Left: left, Right: right}
-	this.BaseNode = node.NewNode()
+	this := &BinaryOperator{Left: left, Right: right}
+	this.Base = node.New()
 	this.Operator = operator
 	return this
 }
 
-func (bo *BinaryOperatorNode) String() string {
+func (bo *BinaryOperator) String() string {
 	if bo.Operator == "[" {
 		return fmt.Sprintf("%s[%s]", bo.Left, bo.Right)
 	}
@@ -53,52 +53,52 @@ func (bo *BinaryOperatorNode) String() string {
 	return fmt.Sprintf("%s%s%s", bo.Left, bo.Operator, bo.Right)
 }
 
-var _ node.Node = &UnaryOperatorNode{}
+var _ node.Node = &UnaryOperator{}
 
-type UnaryOperatorNode struct {
-	BaseOperatorNode
+type UnaryOperator struct {
+	BaseOperator
 	Prefix bool
 
 	Left node.Node
 }
 
-func (uo *UnaryOperatorNode) Children() []node.Node {
+func (uo *UnaryOperator) Children() []node.Node {
 	return []node.Node{uo.Left}
 }
 
-func NewUnaryOperatorNode(prefix bool, operator string, left node.Node) *UnaryOperatorNode {
+func NewUnaryOperator(prefix bool, operator string, left node.Node) *UnaryOperator {
 	if operator == "" {
 		panic("no operator")
 	}
 	if tool.IsNilInterface(left) {
 		panic("no expression")
 	}
-	this := &UnaryOperatorNode{Left: left, Prefix: prefix}
-	this.BaseNode = node.NewNode()
+	this := &UnaryOperator{Left: left, Prefix: prefix}
+	this.Base = node.New()
 	this.Operator = operator
 	return this
 }
 
-func (uo *UnaryOperatorNode) String() string {
+func (uo *UnaryOperator) String() string {
 	if uo.Prefix {
 		return fmt.Sprintf("%s%s", uo.Operator, uo.Left)
 	}
 	return fmt.Sprintf("%s%s", uo.Left, uo.Operator)
 }
 
-type TernaryOperatorNode struct {
-	BaseOperatorNode
+type TernaryOperator struct {
+	BaseOperator
 
 	Left   node.Node
 	Middle node.Node
 	Right  node.Node
 }
 
-func (to *TernaryOperatorNode) Children() []node.Node {
+func (to *TernaryOperator) Children() []node.Node {
 	return []node.Node{to.Left, to.Middle, to.Right}
 }
 
-func NewTernaryOperatorNode(operator string, left node.Node, middle node.Node, right node.Node) *TernaryOperatorNode {
+func NewTernaryOperator(operator string, left node.Node, middle node.Node, right node.Node) *TernaryOperator {
 	if operator == "" {
 		panic("no operator")
 	}
@@ -111,12 +111,12 @@ func NewTernaryOperatorNode(operator string, left node.Node, middle node.Node, r
 	if tool.IsNilInterface(right) {
 		panic("no right expression")
 	}
-	this := &TernaryOperatorNode{Left: left, Middle: middle, Right: right}
-	this.BaseNode = node.NewNode()
+	this := &TernaryOperator{Left: left, Middle: middle, Right: right}
+	this.Base = node.New()
 	this.Operator = operator
 	return this
 }
 
-func (bo *TernaryOperatorNode) String() string {
+func (bo *TernaryOperator) String() string {
 	return fmt.Sprintf("ternary(%s,%s,%s)", bo.Left, bo.Middle, bo.Right)
 }

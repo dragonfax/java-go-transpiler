@@ -8,15 +8,15 @@ import (
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
-type TryCatchNode struct {
-	*node.BaseNode
+type TryCatch struct {
+	*node.Base
 
 	Body         node.Node
 	Finally      node.Node
 	CatchClauses []*CatchClause
 }
 
-func (tc *TryCatchNode) Children() []node.Node {
+func (tc *TryCatch) Children() []node.Node {
 	list := []node.Node{tc.Body}
 	if tc.Finally != nil {
 		list = append(list, tc.Finally)
@@ -25,7 +25,7 @@ func (tc *TryCatchNode) Children() []node.Node {
 	return list
 }
 
-func (tn *TryCatchNode) String() string {
+func (tn *TryCatch) String() string {
 	clauses := make([]string, 0)
 	for _, clause := range tn.CatchClauses {
 		s := fmt.Sprintf("catch (%s %s)%s", strings.Join(clause.CatchType, "."), clause.Variable, clause.Body)
@@ -61,7 +61,7 @@ if err != nil {
 }
 
 type CatchClause struct {
-	*node.BaseNode
+	*node.Base
 
 	Body      node.Node
 	CatchType []string
@@ -76,7 +76,7 @@ func (cc *CatchClause) Children() []node.Node {
 	return []node.Node{cc.Body}
 }
 
-func NewTryCatchNode(statement *parser.StatementContext) *TryCatchNode {
+func NewTryCatch(statement *parser.StatementContext) *TryCatch {
 
 	ctx := statement
 
@@ -84,12 +84,12 @@ func NewTryCatchNode(statement *parser.StatementContext) *TryCatchNode {
 		panic("resource try/catch found.")
 	}
 
-	block := NewBlockNode(ctx.Block())
+	block := NewBlock(ctx.Block())
 
 	var finallyBlock node.Node
 	finally := ctx.FinallyBlock()
 	if finally != nil {
-		finallyBlock = NewBlockNode(finally.Block())
+		finallyBlock = NewBlock(finally.Block())
 	}
 
 	clauses := make([]*CatchClause, 0)
@@ -108,16 +108,16 @@ func NewTryCatchNode(statement *parser.StatementContext) *TryCatchNode {
 		}
 
 		clauses = append(clauses, &CatchClause{
-			BaseNode: node.NewNode(),
+			Base: node.New(),
 
 			Variable:  variable,
-			Body:      NewBlockNode(catchCtx.Block()),
+			Body:      NewBlock(catchCtx.Block()),
 			CatchType: catchType,
 		})
 	}
 
-	return &TryCatchNode{
-		BaseNode:     node.NewNode(),
+	return &TryCatch{
+		Base:         node.New(),
 		Body:         block,
 		Finally:      finallyBlock,
 		CatchClauses: clauses,

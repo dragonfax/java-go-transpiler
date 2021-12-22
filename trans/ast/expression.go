@@ -15,7 +15,7 @@ func ExpressionProcessor(expressionI *parser.ExpressionContext) node.Node {
 	expression := expressionI
 
 	if expression.LambdaExpression() != nil {
-		return NewLambdaNode(expression.LambdaExpression())
+		return NewLambda(expression.LambdaExpression())
 	}
 
 	if expression.Primary() != nil {
@@ -38,11 +38,11 @@ func ExpressionProcessor(expressionI *parser.ExpressionContext) node.Node {
 
 	if expression.GetPrefix() != nil {
 		// prefix operator
-		return NewUnaryOperatorNode(true, expression.GetPrefix().GetText(), ExpressionProcessor(expression.Expression(0)))
+		return NewUnaryOperator(true, expression.GetPrefix().GetText(), ExpressionProcessor(expression.Expression(0)))
 	}
 
 	if expression.GetPostfix() != nil {
-		return NewUnaryOperatorNode(false, expression.GetPostfix().GetText(), ExpressionProcessor(expression.Expression(0)))
+		return NewUnaryOperator(false, expression.GetPostfix().GetText(), ExpressionProcessor(expression.Expression(0)))
 	}
 
 	if expression.GetBop() != nil {
@@ -56,10 +56,10 @@ func ExpressionProcessor(expressionI *parser.ExpressionContext) node.Node {
 				panic("qualified 'this'. For referencing outer class from inner class")
 			}
 			if expression.IDENTIFIER() != nil {
-				return NewBinaryOperatorNode(".", firstExpression, NewFieldReference(expression.IDENTIFIER().GetText()))
+				return NewBinaryOperator(".", firstExpression, NewFieldReference(expression.IDENTIFIER().GetText()))
 			}
 			if expression.MethodCall() != nil {
-				return NewBinaryOperatorNode(".", firstExpression, NewMethodCall(expression.MethodCall()))
+				return NewBinaryOperator(".", firstExpression, NewMethodCall(expression.MethodCall()))
 			}
 			if expression.NEW() != nil {
 				panic("qualified constructor, for constructing inner class from outer class")
@@ -76,12 +76,12 @@ func ExpressionProcessor(expressionI *parser.ExpressionContext) node.Node {
 			left := ExpressionProcessor(expression.Expression(0))
 			middle := ExpressionProcessor(expression.Expression(1))
 			right := ExpressionProcessor(expression.Expression(2))
-			return NewTernaryOperatorNode(expression.GetBop().GetText(), left, middle, right)
+			return NewTernaryOperator(expression.GetBop().GetText(), left, middle, right)
 		}
 		if expression.INSTANCEOF() != nil {
 			left := ExpressionProcessor(expression.Expression(0))
 			right := NewTypeNodeFromContext(expression.TypeType(0))
-			return NewBinaryOperatorNode("instanceof", left, right)
+			return NewBinaryOperator("instanceof", left, right)
 		}
 
 		// just some regular binary operator, between 2 expressions.
@@ -90,14 +90,14 @@ func ExpressionProcessor(expressionI *parser.ExpressionContext) node.Node {
 		if right == nil {
 			panic("missing right for binary: " + expression.GetText() + "\n\n" + expression.ToStringTree(parser.RuleNames, nil))
 		}
-		return NewBinaryOperatorNode(expression.GetBop().GetText(), left, right)
+		return NewBinaryOperator(expression.GetBop().GetText(), left, right)
 	}
 
 	if expression.LBRACK() != nil {
 		// array index
 		left := ExpressionProcessor(expression.Expression(0))
 		right := ExpressionProcessor(expression.Expression(1))
-		return NewBinaryOperatorNode("[", left, right)
+		return NewBinaryOperator("[", left, right)
 	}
 
 	if len(expression.AllGT())+len(expression.AllLT()) > 0 {
@@ -114,14 +114,14 @@ func ExpressionProcessor(expressionI *parser.ExpressionContext) node.Node {
 			operator += t.GetText()
 		}
 
-		return NewBinaryOperatorNode(operator, left, right)
+		return NewBinaryOperator(operator, left, right)
 	}
 
 	if expression.LPAREN() != nil {
 		// cast
 		left := NewTypeNodeFromContext(expression.TypeType(0))
 		right := ExpressionProcessor(expression.Expression(0))
-		return NewBinaryOperatorNode("(", left, right)
+		return NewBinaryOperator("(", left, right)
 	}
 
 	panic("unknown expression: " + expression.GetText() + "\n" + expression.ToStringTree(parser.RuleNames, nil))
@@ -133,15 +133,15 @@ func expressionFromPrimary(primary *parser.PrimaryContext) node.Node {
 	primaryCtx := primary
 
 	if primaryCtx.IDENTIFIER() != nil {
-		return NewIdentifierNode(primaryCtx.IDENTIFIER().GetText())
+		return NewIdentifier(primaryCtx.IDENTIFIER().GetText())
 	}
 
 	if primaryCtx.THIS() != nil {
-		return NewIdentifierNode("this")
+		return NewIdentifier("this")
 	}
 
 	if primaryCtx.SUPER() != nil {
-		return NewIdentifierNode("super")
+		return NewIdentifier("super")
 	}
 
 	if primaryCtx.Expression() != nil {
@@ -150,7 +150,7 @@ func expressionFromPrimary(primary *parser.PrimaryContext) node.Node {
 
 	if primaryCtx.Literal() != nil {
 		literal := primaryCtx.Literal()
-		return NewLiteralNode(literal)
+		return NewLiteral(literal)
 	}
 
 	if primaryCtx.CLASS() != nil {

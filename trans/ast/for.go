@@ -8,27 +8,27 @@ import (
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
-func NewForNode(statementCtx *parser.StatementContext) node.Node {
+func NewFor(statementCtx *parser.StatementContext) node.Node {
 
 	if statementCtx.ForControl().EnhancedForControl() != nil {
-		return NewEnhancedForNode(statementCtx)
+		return NewEnhancedFor(statementCtx)
 	}
-	return NewClassicForNode(statementCtx)
+	return NewClassicFor(statementCtx)
 }
 
-type EnhancedForNode struct {
-	*node.BaseNode
+type EnhancedFor struct {
+	*node.Base
 
-	Variable *VariableDeclNode
+	Variable *VariableDecl
 	Instance node.Node
 	Body     node.Node
 }
 
-func (ef *EnhancedForNode) Children() []node.Node {
+func (ef *EnhancedFor) Children() []node.Node {
 	return []node.Node{ef.Variable, ef.Instance, ef.Body}
 }
 
-func NewEnhancedForNode(statementCtx *parser.StatementContext) *EnhancedForNode {
+func NewEnhancedFor(statementCtx *parser.StatementContext) *EnhancedFor {
 
 	forControlCtx := statementCtx.ForControl()
 	enhancedCtx := forControlCtx.EnhancedForControl()
@@ -37,8 +37,8 @@ func NewEnhancedForNode(statementCtx *parser.StatementContext) *EnhancedForNode 
 	variable := NewVariableDecl(NewTypeNodeFromContext(enhancedCtx.TypeType()), enhancedCtx.VariableDeclaratorId().GetText(), nil)
 
 	body := StatementProcessor(statementCtx.Statement(0))
-	return &EnhancedForNode{
-		BaseNode: node.NewNode(),
+	return &EnhancedFor{
+		Base: node.New(),
 
 		Variable: variable,
 		Instance: instance,
@@ -46,12 +46,12 @@ func NewEnhancedForNode(statementCtx *parser.StatementContext) *EnhancedForNode 
 	}
 }
 
-func (ef *EnhancedForNode) String() string {
+func (ef *EnhancedFor) String() string {
 	return fmt.Sprintf("for %s := range %s %s", ef.Variable.Name, ef.Instance, ef.Body)
 }
 
-type ClassicForNode struct {
-	*node.BaseNode
+type ClassicFor struct {
+	*node.Base
 
 	Condition     node.Node
 	Init          []node.Node
@@ -60,7 +60,7 @@ type ClassicForNode struct {
 	ConditionLast bool // Do...While
 }
 
-func (cf *ClassicForNode) Children() []node.Node {
+func (cf *ClassicFor) Children() []node.Node {
 	list := []node.Node{cf.Body}
 	list = append(list, cf.Init...)
 	list = append(list, cf.Increment...)
@@ -70,7 +70,7 @@ func (cf *ClassicForNode) Children() []node.Node {
 	return list
 }
 
-func (fn *ClassicForNode) String() string {
+func (fn *ClassicFor) String() string {
 	// TODO ConditionLast
 	// TODO remove unnecessary semicolons
 
@@ -87,10 +87,10 @@ func (fn *ClassicForNode) String() string {
 	return fmt.Sprintf("for %s;%s;%s {\n%s}\n", strings.Join(init, ",'"), fn.Condition, strings.Join(incr, ","), fn.Body)
 }
 
-func NewClassicForNode(statementCtx *parser.StatementContext) *ClassicForNode {
+func NewClassicFor(statementCtx *parser.StatementContext) *ClassicFor {
 	init, condition, increment := classicForControlProcessor(statementCtx.ForControl())
-	return &ClassicForNode{
-		BaseNode: node.NewNode(),
+	return &ClassicFor{
+		Base: node.New(),
 
 		Condition: condition,
 		Init:      init,

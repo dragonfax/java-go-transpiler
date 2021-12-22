@@ -19,11 +19,11 @@ func StatementProcessor(statementCtxI *parser.StatementContext) node.Node {
 	statementCtx := statementCtxI
 
 	if statementCtx.GetBlockLabel() != nil {
-		return NewBlockNode(statementCtx.GetBlockLabel())
+		return NewBlock(statementCtx.GetBlockLabel())
 	}
 
 	if statementCtx.IF() != nil {
-		return NewIfNode(
+		return NewIf(
 			ExpressionProcessor(statementCtx.ParExpression().Expression()),
 			StatementProcessor(statementCtx.Statement(0)),
 			StatementProcessor(statementCtx.Statement(1)),
@@ -31,18 +31,18 @@ func StatementProcessor(statementCtxI *parser.StatementContext) node.Node {
 	}
 
 	if statementCtx.FOR() != nil {
-		return NewForNode(statementCtx)
+		return NewFor(statementCtx)
 	}
 
 	if statementCtx.WHILE() != nil {
-		return &ClassicForNode{
+		return &ClassicFor{
 			Condition: ExpressionProcessor(statementCtx.ParExpression().Expression()),
 			Body:      StatementProcessor(statementCtx.Statement(0)),
 		}
 	}
 
 	if statementCtx.DO() != nil {
-		return &ClassicForNode{
+		return &ClassicFor{
 			Condition:     ExpressionProcessor(statementCtx.ParExpression().Expression()),
 			Body:          StatementProcessor(statementCtx.Statement(0)),
 			ConditionLast: true,
@@ -50,29 +50,29 @@ func StatementProcessor(statementCtxI *parser.StatementContext) node.Node {
 	}
 
 	if statementCtx.RETURN() != nil {
-		return NewReturnNode(ExpressionProcessor(statementCtx.Expression(0)))
+		return NewReturn(ExpressionProcessor(statementCtx.Expression(0)))
 	}
 
 	if statementCtx.THROW() != nil {
-		return NewThrowNode(statementCtx.Expression(0).GetText())
+		return NewThrow(statementCtx.Expression(0).GetText())
 	}
 
 	if statementCtx.BREAK() != nil {
 		if statementCtx.IDENTIFIER() != nil {
-			return NewBreakNode(statementCtx.IDENTIFIER().GetText())
+			return NewBreak(statementCtx.IDENTIFIER().GetText())
 		}
-		return NewBreakNode("")
+		return NewBreak("")
 	}
 
 	if statementCtx.CONTINUE() != nil {
 		if statementCtx.IDENTIFIER() != nil {
-			return NewContinueNode(statementCtx.IDENTIFIER().GetText())
+			return NewContinue(statementCtx.IDENTIFIER().GetText())
 		}
-		return NewContinueNode("")
+		return NewContinue("")
 	}
 
 	if statementCtx.TRY() != nil {
-		return NewTryCatchNode(statementCtx)
+		return NewTryCatch(statementCtx)
 	}
 
 	if statementCtx.SWITCH() != nil {
@@ -85,7 +85,7 @@ func StatementProcessor(statementCtxI *parser.StatementContext) node.Node {
 
 	if statementCtx.GetIdentifierLabel() != nil {
 		// must be a statement, with a label
-		return NewLabelNode(
+		return NewLabel(
 			statementCtx.GetIdentifierLabel().GetText(),
 			StatementProcessor(statementCtx.Statement(0)),
 		)
@@ -126,5 +126,5 @@ func StatementProcessor(statementCtxI *parser.StatementContext) node.Node {
 	// TODO log them
 	msg := "unimplemented code: " + statementCtxI.GetText() + "\n\n" + statementCtxI.ToStringTree(parser.RuleNames, nil)
 	fmt.Printf("WARNING: %s\n", msg)
-	return NewUnimplementedNode(msg)
+	return NewUnimplemented(msg)
 }

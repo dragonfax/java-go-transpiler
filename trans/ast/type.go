@@ -15,33 +15,33 @@ var primitiveTranslation = map[string]string{
 	"long":    "int64",
 }
 
-type TypeNode struct {
-	*node.BaseNode
+type Type struct {
+	*node.Base
 
-	Elements []*TypeElementNode
+	Elements []*TypeElement
 }
 
-func NewTypeNode(elements []*TypeElementNode) *TypeNode {
-	return &TypeNode{BaseNode: node.NewNode(), Elements: elements}
+func NewType(elements []*TypeElement) *Type {
+	return &Type{Base: node.New(), Elements: elements}
 }
 
-func NewTypeOrVoidNode(typ *parser.TypeTypeOrVoidContext) *TypeNode {
+func NewTypeOrVoid(typ *parser.TypeTypeOrVoidContext) *Type {
 	typCtx := typ
 	if typCtx.VOID() != nil {
-		return NewTypeNode([]*TypeElementNode{{BaseNode: node.NewNode(), Class: "void"}})
+		return NewType([]*TypeElement{{Base: node.New(), Class: "void"}})
 	} else {
 		return NewTypeNodeFromContext(typCtx.TypeType())
 	}
 }
 
-func NewTypeNodeFromContext(typ *parser.TypeTypeContext) *TypeNode {
+func NewTypeNodeFromContext(typ *parser.TypeTypeContext) *Type {
 	if typ == nil {
 		return nil
 	}
 	ctx := typ
 	if ctx.PrimitiveType() != nil {
 		// simple primitive type, easy to parse
-		return NewTypeNode([]*TypeElementNode{
+		return NewType([]*TypeElement{
 			{
 				Class: ctx.PrimitiveType().GetText(),
 			},
@@ -51,14 +51,14 @@ func NewTypeNodeFromContext(typ *parser.TypeTypeContext) *TypeNode {
 	classCtx := ctx.ClassOrInterfaceType()
 
 	// multile components to one type. Say Car.WheelEnum
-	elements := make([]*TypeElementNode, 0)
+	elements := make([]*TypeElement, 0)
 	for i, typID := range classCtx.AllIDENTIFIER() {
 		class := typID.GetText()
 
 		typeComp := classCtx.TypeArguments(i)
 		if typeComp == nil {
 			// no typ arguments for this element of the type
-			elements = append(elements, &TypeElementNode{
+			elements = append(elements, &TypeElement{
 				Class: class,
 			})
 			continue
@@ -67,25 +67,25 @@ func NewTypeNodeFromContext(typ *parser.TypeTypeContext) *TypeNode {
 		typeCompCtx := typeComp
 
 		// (typeArguments) multiple type args between <> seperated by commas
-		thisTypeArguments := make([]*TypeNode, 0)
+		thisTypeArguments := make([]*Type, 0)
 		for _, typCompArg := range typeCompCtx.AllTypeArgument() {
 
-			childTypeNode := NewTypeNodeFromContext(typCompArg.TypeType())
-			thisTypeArguments = append(thisTypeArguments, childTypeNode)
+			childType := NewTypeNodeFromContext(typCompArg.TypeType())
+			thisTypeArguments = append(thisTypeArguments, childType)
 		}
 
-		node := &TypeElementNode{
-			BaseNode:      node.NewNode(),
+		node := &TypeElement{
+			Base:          node.New(),
 			Class:         class,
 			TypeArguments: thisTypeArguments,
 		}
 		elements = append(elements, node)
 	}
 
-	return NewTypeNode(elements)
+	return NewType(elements)
 }
 
-func (tn TypeNode) String() string {
+func (tn Type) String() string {
 	list := make([]string, 0)
 	for _, ten := range tn.Elements {
 		list = append(list, ten.String())
@@ -93,22 +93,22 @@ func (tn TypeNode) String() string {
 	return strings.Join(list, ".")
 }
 
-func (tn TypeNode) Children() []node.Node {
+func (tn Type) Children() []node.Node {
 	return node.ListOfNodesToNodeList(tn.Elements)
 }
 
 // used when defining the type of variable/return value/parameter/etc
-type TypeElementNode struct {
-	*node.BaseNode
+type TypeElement struct {
+	*node.Base
 	Class         string
-	TypeArguments []*TypeNode
+	TypeArguments []*Type
 }
 
-func (te *TypeElementNode) Children() []node.Node {
+func (te *TypeElement) Children() []node.Node {
 	return node.ListOfNodesToNodeList(te.TypeArguments)
 }
 
-func (tn *TypeElementNode) String() string {
+func (tn *TypeElement) String() string {
 	class := tn.Class
 	if tClass, ok := primitiveTranslation[class]; ok {
 		class = tClass

@@ -8,27 +8,27 @@ import (
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
-type BlockNode struct {
-	*node.BaseNode
+type Block struct {
+	*node.Base
 
 	Body []node.Node
 }
 
-func (bn *BlockNode) Children() []node.Node {
+func (bn *Block) Children() []node.Node {
 	if bn == nil {
 		panic("block node was nil")
 	}
 	return node.ListOfNodesToNodeList(bn.Body)
 }
 
-func (bn *BlockNode) String() string {
+func (bn *Block) String() string {
 	if bn == nil {
 		panic("nil block")
 	}
 	return fmt.Sprintf("{\n%s}\n", expressionListToString(bn.Body))
 }
 
-func NewBlockNode(block *parser.BlockContext) *BlockNode {
+func NewBlock(block *parser.BlockContext) *Block {
 	if tool.IsNilInterface(block) {
 		return nil
 	}
@@ -41,7 +41,7 @@ func NewBlockNode(block *parser.BlockContext) *BlockNode {
 		l = append(l, s...)
 	}
 
-	return &BlockNode{BaseNode: node.NewNode(), Body: l}
+	return &Block{Base: node.New(), Body: l}
 }
 
 func BlockStatementProcessor(ctx *parser.BlockStatementContext) []node.Node {

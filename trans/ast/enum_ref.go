@@ -3,7 +3,7 @@ package ast
 import "github.com/dragonfax/java_converter/trans/node"
 
 type EnumRef struct {
-	*node.BaseNode
+	*node.Base
 	Name string
 }
 
@@ -12,7 +12,7 @@ func (er *EnumRef) Children() []node.Node {
 }
 
 func NewEnumRef(name string) *EnumRef {
-	return &EnumRef{BaseNode: node.NewNode(), Name: name}
+	return &EnumRef{Base: node.New(), Name: name}
 }
 
 func (er *EnumRef) String() string {

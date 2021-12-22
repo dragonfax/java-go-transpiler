@@ -6,14 +6,14 @@ type Node interface {
 	SetParent(Node)
 }
 
-type BaseNode struct {
+type Base struct {
 	Parent Node
 }
 
-func NewNode() *BaseNode {
-	return &BaseNode{}
+func New() *Base {
+	return &Base{}
 }
 
-func (bn *BaseNode) SetParent(p Node) {
+func (bn *Base) SetParent(p Node) {
 	bn.Parent = p
 }

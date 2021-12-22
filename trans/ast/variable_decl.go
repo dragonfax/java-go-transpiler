@@ -7,34 +7,34 @@ import (
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
-type VariableDeclNode struct {
-	*node.BaseNode
+type VariableDecl struct {
+	*node.Base
 	*BaseMethodScope
 
-	Type       *TypeNode
+	Type       *Type
 	Name       string
 	Expression node.Node // for now
 }
 
-func (vn *VariableDeclNode) Children() []node.Node {
+func (vn *VariableDecl) Children() []node.Node {
 	return []node.Node{vn.Type, vn.Expression}
 }
 
-func (vn *VariableDeclNode) String() string {
+func (vn *VariableDecl) String() string {
 	if vn.Expression == nil {
 		return fmt.Sprintf("var %s %s", vn.Name, vn.Type)
 	}
 	return fmt.Sprintf("%s := %s", vn.Name, vn.Expression) // we'll assume the type matches the expression.
 }
 
-func NewVariableDecl(typ *TypeNode, name string, expression node.Node) *VariableDeclNode {
+func NewVariableDecl(typ *Type, name string, expression node.Node) *VariableDecl {
 	if typ == nil {
 		panic(" no variable type")
 	}
 	if name == "" {
 		panic("no variable name")
 	}
-	return &VariableDeclNode{BaseNode: node.NewNode(), BaseMethodScope: NewMethodScope(), Type: typ, Name: name, Expression: expression}
+	return &VariableDecl{Base: node.New(), BaseMethodScope: NewMethodScope(), Type: typ, Name: name, Expression: expression}
 }
 
 func NewVariableDeclNodeList(decl *parser.LocalVariableDeclarationContext) []node.Node {

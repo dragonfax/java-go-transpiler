@@ -8,7 +8,7 @@ import (
 )
 
 type Constructor struct {
-	*node.BaseNode
+	*node.Base
 	*BaseClassScope
 
 	Name       string
@@ -29,10 +29,10 @@ func (c *Constructor) SetPublic(public bool) {
 
 func NewConstructor(ctx *parser.ConstructorDeclarationContext) *Constructor {
 
-	c := &Constructor{BaseNode: node.NewNode(), BaseClassScope: NewClassScope(), Name: ctx.IDENTIFIER().GetText()}
+	c := &Constructor{Base: node.New(), BaseClassScope: NewClassScope(), Name: ctx.IDENTIFIER().GetText()}
 
 	if ctx.GetConstructorBody() != nil {
-		c.Body = NewBlockNode(ctx.GetConstructorBody())
+		c.Body = NewBlock(ctx.GetConstructorBody())
 	}
 
 	if ctx.FormalParameters().FormalParameterList() != nil {

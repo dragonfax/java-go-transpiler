@@ -3,7 +3,7 @@ package ast
 import "github.com/dragonfax/java_converter/trans/node"
 
 type ClassReference struct {
-	*node.BaseNode
+	*node.Base
 
 	Class string
 }
@@ -16,7 +16,7 @@ func NewClassReference(class string) *ClassReference {
 	if class == "" {
 		panic("no class name")
 	}
-	return &ClassReference{BaseNode: node.NewNode(), Class: class}
+	return &ClassReference{Base: node.New(), Class: class}
 }
 
 func (cr *ClassReference) String() string {
