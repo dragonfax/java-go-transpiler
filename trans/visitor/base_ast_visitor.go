@@ -54,6 +54,8 @@ func (av *BaseASTVisitor[T]) VisitNode(tree node.Node) T {
 		return av.root.VisitImport(imp)
 	} else if field, ok := tree.(*ast.Field); ok {
 		return av.root.VisitField(field)
+	} else if varRef, ok := tree.(*ast.VarRef); ok {
+		return av.root.VisitVarRef(varRef)
 	} else {
 		return av.root.VisitChildren(tree)
 	}
@@ -85,6 +87,11 @@ func (av *BaseASTVisitor[T]) VisitChildren(tree node.Node) T {
 	return result
 }
 
+func (av *BaseASTVisitor[T]) AggregateResult(result, nextResult T) T {
+	// just throws away siblings, and returns the last one in the list.
+	return nextResult
+}
+
 func (av *BaseASTVisitor[T]) VisitField(tree *ast.Field) T {
 	return av.root.VisitChildren(tree)
 }
@@ -109,7 +116,6 @@ func (av *BaseASTVisitor[T]) VisitMethod(tree *ast.Method) T {
 	return av.root.VisitChildren(tree)
 }
 
-func (av *BaseASTVisitor[T]) AggregateResult(result, nextResult T) T {
-	// just throws away siblings, and returns the last one in the list.
-	return nextResult
+func (av *BaseASTVisitor[T]) VisitVarRef(tree *ast.VarRef) T {
+	return av.root.VisitChildren(tree)
 }

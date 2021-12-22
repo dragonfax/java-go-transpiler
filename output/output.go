@@ -100,6 +100,8 @@ func Translate(path string) error {
 	//fmt.Println("resolve walk")
 	//resolver := visitor.NewResolverVisitor(h)
 	//resolver.VisitNode(h)
+	check := visitor.NewCheckVisitor(h)
+	check.VisitNode(h)
 	fmt.Println("ast walking complete")
 
 	// output
