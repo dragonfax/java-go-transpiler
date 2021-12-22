@@ -36,7 +36,7 @@ func NewMethodReference(expression *parser.ExpressionContext) node.Node {
 	if ctx.Expression(0) != nil {
 		instance = ExpressionProcessor(ctx.Expression(0))
 	} else if ctx.TypeType(0) != nil {
-		instance = NewTypeNode(ctx.TypeType(0))
+		instance = NewTypeNodeFromContext(ctx.TypeType(0))
 	} else if ctx.ClassType() != nil {
 		instance = NewIdentifierNode(ctx.ClassType().GetText())
 	}

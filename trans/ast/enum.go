@@ -36,10 +36,10 @@ const (
 
 var enumTemplateCompiled = template.Must(template.New("enum").Parse(enumTemplate))
 
-func NewEnum(ctx *parser.EnumDeclarationContext, fields FieldList, members []node.Node) *Class {
+func NewEnum(ctx *parser.EnumDeclarationContext, fields []*Field, members []node.Node) *Class {
 	this := &Class{
 		Name:       ctx.IDENTIFIER().GetText(),
-		Interfaces: make([]TypeNode, 0),
+		Interfaces: make([]*TypeNode, 0),
 		Members:    members,
 		Fields:     fields,
 		Enum:       true,
@@ -47,7 +47,7 @@ func NewEnum(ctx *parser.EnumDeclarationContext, fields FieldList, members []nod
 
 	if ctx.TypeList() != nil {
 		for _, typeType := range ctx.TypeList().AllTypeType() {
-			this.Interfaces = append(this.Interfaces, NewTypeNode(typeType))
+			this.Interfaces = append(this.Interfaces, NewTypeNodeFromContext(typeType))
 		}
 	}
 

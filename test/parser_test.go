@@ -48,7 +48,7 @@ func TestTypeNode(t *testing.T) {
 	p.BuildParseTrees = true
 	ptree := p.TypeType()
 
-	source := ast.NewTypeNode(ptree)
+	source := ast.NewTypeNodeFromContext(ptree)
 
 	if "Level.Source" != source.String() {
 		t.Fatal("differnces")

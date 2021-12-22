@@ -64,7 +64,7 @@ func (gv *TreeVisitor) VisitClassDeclaration(ctx *parser.ClassDeclarationContext
 
 	if ctx.TypeList() != nil {
 		for _, typeType := range ctx.TypeList().AllTypeType() {
-			class.Interfaces = append(class.Interfaces, ast.NewTypeNode(typeType))
+			class.Interfaces = append(class.Interfaces, ast.NewTypeNodeFromContext(typeType))
 		}
 	}
 
@@ -84,8 +84,10 @@ func (gv *TreeVisitor) VisitClassBody(ctx *parser.ClassBodyContext) node.Node {
 		if subClass, ok := member.(*ast.Class); ok {
 			// We don't do nested
 			class.Members = append(class.Members, ast.NewSubClassTODO(subClass.Name))
-		} else if fl, ok := member.(ast.FieldList); ok {
-			class.Fields = append(class.Fields, fl...)
+		} else if f, ok := member.(*ast.Field); ok {
+			class.Fields = append(class.Fields, f)
+		} else if fl, ok := member.(*ast.FieldList); ok {
+			class.Fields = append(class.Fields, fl.Fields...)
 		} else {
 			class.Members = append(class.Members, member)
 		}
@@ -165,7 +167,7 @@ func (gv *TreeVisitor) VisitMethodDeclaration(ctx *parser.MethodDeclarationConte
 }
 
 func (v *TreeVisitor) VisitFieldDeclaration(ctx *parser.FieldDeclarationContext) node.Node {
-	return ast.NewFields(ctx)
+	return ast.NewFieldList(ctx)
 }
 
 func (v *TreeVisitor) VisitConstructorDeclaration(ctx *parser.ConstructorDeclarationContext) node.Node {
@@ -175,7 +177,7 @@ func (v *TreeVisitor) VisitConstructorDeclaration(ctx *parser.ConstructorDeclara
 
 func (gv *TreeVisitor) VisitEnumDeclaration(ctx *parser.EnumDeclarationContext) node.Node {
 	members := make([]node.Node, 0)
-	fields := make(ast.FieldList, 0)
+	fields := make([]*ast.Field, 0)
 	if ctx.EnumBodyDeclarations() != nil {
 		for _, decl := range ctx.EnumBodyDeclarations().AllClassBodyDeclaration() {
 			member := gv.VisitClassBodyDeclaration(decl)
@@ -186,8 +188,10 @@ func (gv *TreeVisitor) VisitEnumDeclaration(ctx *parser.EnumDeclarationContext) 
 			if subClass, ok := member.(*ast.Class); ok {
 				// We don't do subclasses
 				members = append(members, ast.NewSubClassTODO(subClass.Name))
-			} else if fl, ok := member.(ast.FieldList); ok {
-				fields = append(fields, fl...)
+			} else if f, ok := member.(*ast.Field); ok {
+				fields = append(fields, f)
+			} else if fl, ok := member.(*ast.FieldList); ok {
+				fields = append(fields, fl.Fields...)
 			} else {
 				members = append(members, member)
 			}

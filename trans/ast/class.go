@@ -15,7 +15,7 @@ type Class struct {
 	Imports       []*Import
 	BaseClassName string
 	BaseClass     *Class
-	Interfaces    []TypeNode
+	Interfaces    []*TypeNode
 	Members       []node.Node
 	Fields        []*Field
 	PackageScope  *Package
@@ -97,7 +97,7 @@ func NewClass() *Class {
 	c := &Class{
 		BaseNode:   node.NewNode(),
 		Members:    make([]node.Node, 0),
-		Interfaces: make([]TypeNode, 0),
+		Interfaces: make([]*TypeNode, 0),
 		Fields:     make([]*Field, 0),
 		Imports:    make([]*Import, 0),
 		Constants:  make([]*EnumConstant, 0),

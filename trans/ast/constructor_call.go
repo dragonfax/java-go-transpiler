@@ -12,7 +12,7 @@ type ConstructorCall struct {
 	*node.BaseNode
 
 	Class         string
-	TypeArguments []TypeNode
+	TypeArguments []*TypeNode
 	Arguments     []node.Node
 }
 
@@ -36,12 +36,12 @@ func NewConstructorCall(creator *parser.CreatorContext) *ConstructorCall {
 		panic("constructor call with no class name")
 	}
 
-	typeArguments := make([]TypeNode, 0)
+	typeArguments := make([]*TypeNode, 0)
 	if creatorNameCtx.TypeArgumentsOrDiamond(0) != nil {
 		if creatorNameCtx.TypeArgumentsOrDiamond(0).TypeArguments() != nil {
 			for _, typeArg := range creatorNameCtx.TypeArgumentsOrDiamond(0).TypeArguments().AllTypeArgument() {
 				typeArgCtx := typeArg
-				node := NewTypeNode(typeArgCtx.TypeType())
+				node := NewTypeNodeFromContext(typeArgCtx.TypeType())
 				typeArguments = append(typeArguments, node)
 			}
 		}

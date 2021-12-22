@@ -11,7 +11,7 @@ type VariableDeclNode struct {
 	*node.BaseNode
 	*BaseMethodScope
 
-	Type       TypeNode
+	Type       *TypeNode
 	Name       string
 	Expression node.Node // for now
 }
@@ -27,7 +27,7 @@ func (vn *VariableDeclNode) String() string {
 	return fmt.Sprintf("%s := %s", vn.Name, vn.Expression) // we'll assume the type matches the expression.
 }
 
-func NewVariableDecl(typ TypeNode, name string, expression node.Node) *VariableDeclNode {
+func NewVariableDecl(typ *TypeNode, name string, expression node.Node) *VariableDeclNode {
 	if typ == nil {
 		panic(" no variable type")
 	}
@@ -41,7 +41,7 @@ func NewVariableDeclNodeList(decl *parser.LocalVariableDeclarationContext) []nod
 
 	l := make([]node.Node, 0)
 
-	typ := NewTypeNode(decl.TypeType())
+	typ := NewTypeNodeFromContext(decl.TypeType())
 
 	for _, varDecl := range decl.VariableDeclarators().AllVariableDeclarator() {
 

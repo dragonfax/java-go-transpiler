@@ -80,7 +80,7 @@ func ExpressionProcessor(expressionI *parser.ExpressionContext) node.Node {
 		}
 		if expression.INSTANCEOF() != nil {
 			left := ExpressionProcessor(expression.Expression(0))
-			right := NewTypeNode(expression.TypeType(0))
+			right := NewTypeNodeFromContext(expression.TypeType(0))
 			return NewBinaryOperatorNode("instanceof", left, right)
 		}
 
@@ -119,7 +119,7 @@ func ExpressionProcessor(expressionI *parser.ExpressionContext) node.Node {
 
 	if expression.LPAREN() != nil {
 		// cast
-		left := NewTypeNode(expression.TypeType(0))
+		left := NewTypeNodeFromContext(expression.TypeType(0))
 		right := ExpressionProcessor(expression.Expression(0))
 		return NewBinaryOperatorNode("(", left, right)
 	}
@@ -169,14 +169,14 @@ func FormalParameterListProcessor(formal *parser.FormalParameterListContext) []n
 	parameters := make([]node.Node, 0)
 	for _, formalParam := range ctx.AllFormalParameter() {
 		formalParamCtx := formalParam
-		t := NewTypeNode(formalParamCtx.TypeType())
+		t := NewTypeNodeFromContext(formalParamCtx.TypeType())
 		name := formalParamCtx.VariableDeclaratorId().GetText()
 		parameters = append(parameters, NewArgument(t, name, false))
 	}
 
 	if ctx.LastFormalParameter() != nil {
 		lastParameterCtx := ctx.LastFormalParameter()
-		t := NewTypeNode(lastParameterCtx.TypeType())
+		t := NewTypeNodeFromContext(lastParameterCtx.TypeType())
 		name := lastParameterCtx.VariableDeclaratorId().GetText()
 		parameters = append(parameters, NewArgument(t, name, true))
 	}
