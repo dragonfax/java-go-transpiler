@@ -17,6 +17,8 @@ func NewForNode(statementCtx *parser.StatementContext) node.Node {
 }
 
 type EnhancedForNode struct {
+	*node.BaseNode
+
 	Variable *VariableDeclNode
 	Instance node.Node
 	Body     node.Node
@@ -36,6 +38,8 @@ func NewEnhancedForNode(statementCtx *parser.StatementContext) *EnhancedForNode 
 
 	body := StatementProcessor(statementCtx.Statement(0))
 	return &EnhancedForNode{
+		BaseNode: node.NewNode(),
+
 		Variable: variable,
 		Instance: instance,
 		Body:     body,
@@ -47,6 +51,8 @@ func (ef *EnhancedForNode) String() string {
 }
 
 type ClassicForNode struct {
+	*node.BaseNode
+
 	Condition     node.Node
 	Init          []node.Node
 	Increment     []node.Node
@@ -84,6 +90,8 @@ func (fn *ClassicForNode) String() string {
 func NewClassicForNode(statementCtx *parser.StatementContext) *ClassicForNode {
 	init, condition, increment := classicForControlProcessor(statementCtx.ForControl())
 	return &ClassicForNode{
+		BaseNode: node.NewNode(),
+
 		Condition: condition,
 		Init:      init,
 		Increment: increment,

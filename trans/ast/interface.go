@@ -6,6 +6,8 @@ import (
 )
 
 type InterfaceMember struct {
+	*node.BaseNode
+
 	Name       string
 	Arguments  []node.Node
 	ReturnType node.Node
@@ -35,6 +37,7 @@ func NewInterface(ctx *parser.InterfaceDeclarationContext) *Class {
 		}
 
 		member := &InterfaceMember{
+			BaseNode:   node.NewNode(),
 			Name:       declCtx.IDENTIFIER().GetText(),
 			Arguments:  FormalParameterListProcessor(declCtx.FormalParameters().FormalParameterList()),
 			ReturnType: NewTypeOrVoidNode(declCtx.TypeTypeOrVoid()),

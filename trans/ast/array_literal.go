@@ -9,6 +9,8 @@ import (
 )
 
 type ArrayLiteral struct {
+	*node.BaseNode
+
 	Type     string
 	Elements []node.Node
 }
@@ -46,6 +48,7 @@ func NewArrayLiteral(lit *parser.ArrayInitializerContext) *ArrayLiteral {
 	}
 
 	return &ArrayLiteral{
+		BaseNode: node.NewNode(),
 		Elements: l,
 	}
 }

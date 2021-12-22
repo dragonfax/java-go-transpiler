@@ -12,12 +12,38 @@ type ScopeVisitor struct {
 	CurrentPackage *ast.Package
 	CurrentClass   *ast.Class
 	CurrentMethod  node.Node
+	ParentNode     node.Node
 }
 
 func NewScopeVisitor(h *ast.Hierarchy) *ScopeVisitor {
 	this := &ScopeVisitor{}
 	this.BaseASTVisitor = NewASTVisitor[int](h, this)
 	return this
+}
+
+func (av *ScopeVisitor) VisitNode(tree node.Node) int {
+
+	// fill in parents for all nodes.
+	tree.SetParent(av.ParentNode)
+
+	return av.BaseASTVisitor.VisitNode(tree)
+}
+
+func (av *ScopeVisitor) VisitChildren(tree node.Node) int {
+
+	/* set the method and class scope */
+	if scope, ok := tree.(ast.MethodScope); av.CurrentMethod != nil && ok {
+		scope.SetMethodScope(av.CurrentMethod)
+	}
+
+	if scope, ok := tree.(ast.ClassScope); av.CurrentClass != nil && ok {
+		scope.SetClassScope(av.CurrentClass)
+	}
+
+	av.ParentNode = tree
+
+	// resume normal operation
+	return av.BaseASTVisitor.VisitChildren(tree)
 }
 
 func (av *ScopeVisitor) VisitPackage(pkg *ast.Package) int {
@@ -78,16 +104,4 @@ func (av *ScopeVisitor) VisitField(field *ast.Field) int {
 	field.ClassScope = av.CurrentClass
 
 	return av.VisitChildren(field)
-}
-
-func (av *ScopeVisitor) VisitChildren(tree node.Node) int {
-	if scope, ok := tree.(ast.MethodScope); av.CurrentMethod != nil && ok {
-		scope.SetMethodScope(av.CurrentMethod)
-	}
-
-	if scope, ok := tree.(ast.ClassScope); av.CurrentClass != nil && ok {
-		scope.SetClassScope(av.CurrentClass)
-	}
-
-	return av.BaseASTVisitor.VisitChildren(tree)
 }

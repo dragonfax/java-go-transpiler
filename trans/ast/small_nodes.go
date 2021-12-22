@@ -9,6 +9,8 @@ import (
 )
 
 type ReturnNode struct {
+	*node.BaseNode
+
 	Expression node.Node
 }
 
@@ -20,7 +22,7 @@ func (rn *ReturnNode) Children() []node.Node {
 }
 
 func NewReturnNode(exp node.Node) *ReturnNode {
-	return &ReturnNode{Expression: exp}
+	return &ReturnNode{BaseNode: node.NewNode(), Expression: exp}
 }
 
 func (rn *ReturnNode) String() string {
@@ -32,6 +34,7 @@ func (rn *ReturnNode) String() string {
 }
 
 type ThrowNode struct {
+	*node.BaseNode
 	Expression string
 }
 
@@ -40,7 +43,7 @@ func (tn *ThrowNode) Children() []node.Node {
 }
 
 func NewThrowNode(exp string) *ThrowNode {
-	return &ThrowNode{Expression: exp}
+	return &ThrowNode{BaseNode: node.NewNode(), Expression: exp}
 }
 
 func (tn *ThrowNode) String() string {
@@ -48,6 +51,8 @@ func (tn *ThrowNode) String() string {
 }
 
 type BreakNode struct {
+	*node.BaseNode
+
 	Label string
 }
 
@@ -56,7 +61,7 @@ func (b *BreakNode) Children() []node.Node {
 }
 
 func NewBreakNode(label string) *BreakNode {
-	return &BreakNode{Label: label}
+	return &BreakNode{BaseNode: node.NewNode(), Label: label}
 }
 
 func (bn *BreakNode) String() string {
@@ -64,6 +69,8 @@ func (bn *BreakNode) String() string {
 }
 
 type ContinueNode struct {
+	*node.BaseNode
+
 	Label string
 }
 
@@ -72,7 +79,7 @@ func (c *ContinueNode) Children() []node.Node {
 }
 
 func NewContinueNode(label string) *ContinueNode {
-	return &ContinueNode{Label: label}
+	return &ContinueNode{BaseNode: node.NewNode(), Label: label}
 }
 
 func (cn *ContinueNode) String() string {
@@ -80,6 +87,8 @@ func (cn *ContinueNode) String() string {
 }
 
 type LabelNode struct {
+	*node.BaseNode
+
 	Label      string
 	Expression node.Node
 }
@@ -95,7 +104,7 @@ func NewLabelNode(label string, exp node.Node) *LabelNode {
 	if tool.IsNilInterface(exp) {
 		panic("expression missing")
 	}
-	return &LabelNode{Label: label, Expression: exp}
+	return &LabelNode{BaseNode: node.NewNode(), Label: label, Expression: exp}
 }
 
 func (ln *LabelNode) String() string {
@@ -103,6 +112,8 @@ func (ln *LabelNode) String() string {
 }
 
 type IdentifierNode struct {
+	*node.BaseNode
+
 	Identifier string
 }
 
@@ -111,7 +122,7 @@ func (i *IdentifierNode) Children() []node.Node {
 }
 
 func NewIdentifierNode(id string) *IdentifierNode {
-	return &IdentifierNode{Identifier: id}
+	return &IdentifierNode{BaseNode: node.NewNode(), Identifier: id}
 }
 
 func (in *IdentifierNode) String() string {

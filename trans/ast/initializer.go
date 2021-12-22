@@ -11,14 +11,17 @@ import (
  * act as members of a class.
  */
 type Initializer struct {
+	*node.BaseNode
+
 	Static bool
 	Block  *BlockNode
 }
 
 func NewInitializerBlock(ctx *parser.ClassBodyDeclarationContext) *Initializer {
 	this := &Initializer{
-		Static: ctx.Block() != nil,
-		Block:  NewBlockNode(ctx.Block()),
+		BaseNode: node.NewNode(),
+		Static:   ctx.Block() != nil,
+		Block:    NewBlockNode(ctx.Block()),
 	}
 	return this
 }

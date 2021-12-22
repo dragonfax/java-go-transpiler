@@ -8,6 +8,7 @@ import (
 )
 
 type LambdaNode struct {
+	*node.BaseNode
 	Arguments []node.Node
 	Body      node.Node
 }
@@ -45,7 +46,7 @@ func NewLambdaNode(lambda *parser.LambdaExpressionContext) *LambdaNode {
 		arguments = FormalParameterListProcessor(parametersCtx.FormalParameterList())
 	}
 
-	return &LambdaNode{Arguments: arguments, Body: body}
+	return &LambdaNode{BaseNode: node.NewNode(), Arguments: arguments, Body: body}
 }
 
 func (ln *LambdaNode) String() string {

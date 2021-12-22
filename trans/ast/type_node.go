@@ -31,6 +31,7 @@ func (tn TypeNode) Children() []node.Node {
 
 // used when defining the type of variable/return value/parameter/etc
 type TypeElementNode struct {
+	*node.BaseNode
 	Class         string
 	TypeArguments []TypeNode
 }
@@ -61,7 +62,7 @@ func (tn *TypeElementNode) String() string {
 func NewTypeOrVoidNode(typ *parser.TypeTypeOrVoidContext) TypeNode {
 	typCtx := typ
 	if typCtx.VOID() != nil {
-		return TypeNode([]*TypeElementNode{{Class: "void"}})
+		return TypeNode([]*TypeElementNode{{BaseNode: node.NewNode(), Class: "void"}})
 	} else {
 		return NewTypeNode(typCtx.TypeType())
 	}
@@ -108,6 +109,7 @@ func NewTypeNode(typ *parser.TypeTypeContext) TypeNode {
 		}
 
 		node := &TypeElementNode{
+			BaseNode:      node.NewNode(),
 			Class:         class,
 			TypeArguments: thisTypeArguments,
 		}

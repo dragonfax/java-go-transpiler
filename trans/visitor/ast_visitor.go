@@ -6,13 +6,16 @@ import (
 )
 
 type ASTVisitor[T comparable] interface {
+	// pattern methods
 	VisitNode(tree node.Node) T
 	VisitChildren(tree node.Node) T
+	AggregateResult(result, nextResult T) T
+
+	// specific nodes
 	VisitField(tree *ast.Field) T
 	VisitConstructor(tree *ast.Constructor) T
 	VisitPackage(tree *ast.Package) T
 	VisitClass(tree *ast.Class) T
 	VisitImport(tree *ast.Import) T
 	VisitMethod(tree *ast.Method) T
-	AggregateResult(result, nextResult T) T
 }

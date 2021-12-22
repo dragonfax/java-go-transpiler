@@ -8,6 +8,8 @@ import (
 )
 
 type MethodReference struct {
+	*node.BaseNode
+
 	Instance node.Node
 	Method   string
 }
@@ -43,7 +45,7 @@ func NewMethodReference(expression *parser.ExpressionContext) node.Node {
 		panic("no instance/expression for method reference")
 	}
 
-	return &MethodReference{Method: method, Instance: instance}
+	return &MethodReference{BaseNode: node.NewNode(), Method: method, Instance: instance}
 }
 
 func (mf *MethodReference) String() string {

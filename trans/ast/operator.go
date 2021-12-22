@@ -8,6 +8,8 @@ import (
 )
 
 type BaseOperatorNode struct {
+	*node.BaseNode
+
 	Operator string
 }
 
@@ -35,6 +37,7 @@ func NewBinaryOperatorNode(operator string, left node.Node, right node.Node) *Bi
 		panic("no right expression")
 	}
 	this := &BinaryOperatorNode{Left: left, Right: right}
+	this.BaseNode = node.NewNode()
 	this.Operator = operator
 	return this
 }
@@ -71,6 +74,7 @@ func NewUnaryOperatorNode(prefix bool, operator string, left node.Node) *UnaryOp
 		panic("no expression")
 	}
 	this := &UnaryOperatorNode{Left: left, Prefix: prefix}
+	this.BaseNode = node.NewNode()
 	this.Operator = operator
 	return this
 }
@@ -108,6 +112,7 @@ func NewTernaryOperatorNode(operator string, left node.Node, middle node.Node, r
 		panic("no right expression")
 	}
 	this := &TernaryOperatorNode{Left: left, Middle: middle, Right: right}
+	this.BaseNode = node.NewNode()
 	this.Operator = operator
 	return this
 }

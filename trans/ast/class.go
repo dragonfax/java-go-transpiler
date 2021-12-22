@@ -9,6 +9,8 @@ import (
 )
 
 type Class struct {
+	*node.BaseNode
+
 	Name          string
 	Imports       []*Import
 	BaseClassName string
@@ -92,16 +94,20 @@ func (c *Class) AsFile() string {
 }
 
 func NewClass() *Class {
-	c := &Class{}
-	c.Members = make([]node.Node, 0)
-	c.Interfaces = make([]TypeNode, 0)
-	c.Fields = make([]*Field, 0)
-	c.Imports = make([]*Import, 0)
-	c.Constants = make([]*EnumConstant, 0)
+	c := &Class{
+		BaseNode:   node.NewNode(),
+		Members:    make([]node.Node, 0),
+		Interfaces: make([]TypeNode, 0),
+		Fields:     make([]*Field, 0),
+		Imports:    make([]*Import, 0),
+		Constants:  make([]*EnumConstant, 0),
+	}
 	return c
 }
 
 type SubClassTODO struct {
+	*node.BaseNode
+
 	Name string
 }
 
@@ -110,7 +116,7 @@ func (sc *SubClassTODO) Children() []node.Node {
 }
 
 func NewSubClassTODO(name string) *SubClassTODO {
-	return &SubClassTODO{Name: name}
+	return &SubClassTODO{BaseNode: node.NewNode(), Name: name}
 }
 
 func (sc *SubClassTODO) String() string {

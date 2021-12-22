@@ -9,6 +9,8 @@ import (
 )
 
 type TryCatchNode struct {
+	*node.BaseNode
+
 	Body         node.Node
 	Finally      node.Node
 	CatchClauses []*CatchClause
@@ -59,6 +61,8 @@ if err != nil {
 }
 
 type CatchClause struct {
+	*node.BaseNode
+
 	Body      node.Node
 	CatchType []string
 	Variable  string
@@ -104,6 +108,8 @@ func NewTryCatchNode(statement *parser.StatementContext) *TryCatchNode {
 		}
 
 		clauses = append(clauses, &CatchClause{
+			BaseNode: node.NewNode(),
+
 			Variable:  variable,
 			Body:      NewBlockNode(catchCtx.Block()),
 			CatchType: catchType,
@@ -111,6 +117,7 @@ func NewTryCatchNode(statement *parser.StatementContext) *TryCatchNode {
 	}
 
 	return &TryCatchNode{
+		BaseNode:     node.NewNode(),
 		Body:         block,
 		Finally:      finallyBlock,
 		CatchClauses: clauses,

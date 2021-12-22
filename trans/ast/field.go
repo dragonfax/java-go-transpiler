@@ -20,6 +20,7 @@ func (fl FieldList) Children() []node.Node {
 }
 
 type Field struct {
+	*node.BaseNode
 	*BaseClassScope
 	*VariableDeclNode
 
@@ -29,7 +30,7 @@ type Field struct {
 }
 
 func NewField(vardecl *VariableDeclNode) *Field {
-	return &Field{BaseClassScope: NewClassScope(), VariableDeclNode: vardecl}
+	return &Field{BaseNode: node.NewNode(), BaseClassScope: NewClassScope(), VariableDeclNode: vardecl}
 }
 
 func (f *Field) Children() []node.Node {

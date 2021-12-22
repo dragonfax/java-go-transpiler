@@ -3,6 +3,7 @@ package ast
 import "github.com/dragonfax/java_converter/trans/node"
 
 type UnimplementedNode struct {
+	*node.BaseNode
 	Msg string
 }
 
@@ -15,5 +16,5 @@ func (un *UnimplementedNode) String() string {
 }
 
 func NewUnimplementedNode(msg string) *UnimplementedNode {
-	return &UnimplementedNode{Msg: msg}
+	return &UnimplementedNode{BaseNode: node.NewNode(), Msg: msg}
 }

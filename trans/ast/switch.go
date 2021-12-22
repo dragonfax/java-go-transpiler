@@ -10,6 +10,8 @@ import (
 )
 
 type Switch struct {
+	*node.BaseNode
+
 	Condition node.Node
 	Cases     []*SwitchCase
 }
@@ -46,6 +48,8 @@ func (s *Switch) String() string {
 }
 
 type SwitchCase struct {
+	*node.BaseNode
+
 	Labels     []node.Node
 	Statements []node.Node
 }
@@ -59,12 +63,12 @@ func (sc *SwitchCase) Children() []node.Node {
 }
 
 func NewSwitch(ctx *parser.StatementContext) *Switch {
-	s := &Switch{Cases: make([]*SwitchCase, 0)}
+	s := &Switch{BaseNode: node.NewNode(), Cases: make([]*SwitchCase, 0)}
 
 	s.Condition = ExpressionProcessor(ctx.ParExpression().Expression())
 
 	for _, group := range ctx.AllSwitchBlockStatementGroup() {
-		c := &SwitchCase{}
+		c := &SwitchCase{BaseNode: node.NewNode()}
 		for _, labelCtx := range group.AllSwitchLabel() {
 			labels := switchLabelsFromContext(labelCtx)
 			c.Labels = append(c.Labels, labels...)

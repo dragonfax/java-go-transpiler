@@ -19,6 +19,8 @@ const (
 )
 
 type LiteralNode struct {
+	*node.BaseNode
+
 	Type  LiteralType
 	Value string
 }
@@ -54,8 +56,9 @@ func NewLiteralNode(literal *parser.LiteralContext) *LiteralNode {
 	}
 
 	return &LiteralNode{
-		Type:  typ,
-		Value: literal.GetText(),
+		BaseNode: node.NewNode(),
+		Type:     typ,
+		Value:    literal.GetText(),
 	}
 }
 

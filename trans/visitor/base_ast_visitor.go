@@ -16,6 +16,8 @@ import (
 	"github.com/schollz/progressbar/v3"
 )
 
+var _ ASTVisitor[int] = &BaseASTVisitor[int]{}
+
 /* this first attempt of an AST pass just defineds the interconnectedness between classes and packages */
 type BaseASTVisitor[T comparable] struct {
 	Hierarchy *ast.Hierarchy
@@ -108,5 +110,6 @@ func (av *BaseASTVisitor[T]) VisitMethod(tree *ast.Method) T {
 }
 
 func (av *BaseASTVisitor[T]) AggregateResult(result, nextResult T) T {
+	// just throws away siblings, and returns the last one in the list.
 	return nextResult
 }

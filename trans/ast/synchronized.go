@@ -8,6 +8,8 @@ import (
 )
 
 type SynchronizedBlock struct {
+	*node.BaseNode
+
 	Condition node.Node
 	Block     *BlockNode
 }
@@ -18,6 +20,7 @@ func (sb *SynchronizedBlock) Children() []node.Node {
 
 func NewSynchronizedBlock(ctx *parser.StatementContext) *SynchronizedBlock {
 	s := &SynchronizedBlock{
+		BaseNode:  node.NewNode(),
 		Condition: ExpressionProcessor(ctx.ParExpression().Expression()),
 		Block:     NewBlockNode(ctx.Block()),
 	}

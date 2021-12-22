@@ -1,6 +1,9 @@
 package ast
 
-import "github.com/dragonfax/java_converter/input/parser"
+import (
+	"github.com/dragonfax/java_converter/input/parser"
+	"github.com/dragonfax/java_converter/trans/node"
+)
 
 type TypeParameterList []*TypeParameter
 
@@ -14,6 +17,8 @@ func NewTypeParameterList(ctx *parser.TypeParametersContext) TypeParameterList {
 }
 
 type TypeParameter struct {
+	*node.BaseNode
+
 	Name string
 }
 
@@ -21,5 +26,5 @@ func NewTypeParameter(ctx *parser.TypeParameterContext) *TypeParameter {
 	if ctx.EXTENDS() != nil {
 		panic("type parameter with bounds")
 	}
-	return &TypeParameter{Name: ctx.IDENTIFIER().GetText()}
+	return &TypeParameter{BaseNode: node.NewNode(), Name: ctx.IDENTIFIER().GetText()}
 }

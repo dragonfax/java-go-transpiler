@@ -8,6 +8,8 @@ import (
 )
 
 type IfNode struct {
+	*node.BaseNode
+
 	Condition node.Node
 	Body      node.Node
 	Else      node.Node
@@ -32,6 +34,7 @@ func NewIfNode(condition, body, els node.Node) *IfNode {
 		panic("missing condition")
 	}
 	return &IfNode{
+		BaseNode:  node.NewNode(),
 		Condition: condition,
 		Body:      body,
 		Else:      els,

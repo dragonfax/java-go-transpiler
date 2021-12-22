@@ -8,6 +8,8 @@ import (
 )
 
 type EnumConstant struct {
+	*node.BaseNode
+
 	Name string
 }
 
@@ -60,7 +62,8 @@ func NewEnum(ctx *parser.EnumDeclarationContext, fields FieldList, members []nod
 			}
 
 			this.Constants = append(this.Constants, &EnumConstant{
-				Name: constant.IDENTIFIER().GetText(),
+				BaseNode: node.NewNode(),
+				Name:     constant.IDENTIFIER().GetText(),
 			})
 		}
 	}

@@ -9,6 +9,8 @@ import (
 )
 
 type ConstructorCall struct {
+	*node.BaseNode
+
 	Class         string
 	TypeArguments []TypeNode
 	Arguments     []node.Node
@@ -59,6 +61,7 @@ func NewConstructorCall(creator *parser.CreatorContext) *ConstructorCall {
 	}
 
 	return &ConstructorCall{
+		BaseNode:      node.NewNode(),
 		Class:         class,
 		TypeArguments: typeArguments,
 		Arguments:     arguments,

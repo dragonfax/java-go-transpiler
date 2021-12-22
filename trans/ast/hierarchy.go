@@ -3,11 +3,14 @@ package ast
 import "github.com/dragonfax/java_converter/trans/node"
 
 type Hierarchy struct {
+	*node.BaseNode
+
 	Packages map[string]*Package
 }
 
 func NewHierarchy() *Hierarchy {
 	return &Hierarchy{
+		BaseNode: node.NewNode(),
 		Packages: make(map[string]*Package),
 	}
 }

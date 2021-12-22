@@ -3,6 +3,8 @@ package ast
 import "github.com/dragonfax/java_converter/trans/node"
 
 type VariableNode struct {
+	*node.BaseNode
+
 	Name string
 }
 
@@ -11,7 +13,8 @@ func NewVariableNode(name string) *VariableNode {
 		panic("missing name")
 	}
 	return &VariableNode{
-		Name: name,
+		BaseNode: node.NewNode(),
+		Name:     name,
 	}
 }
 

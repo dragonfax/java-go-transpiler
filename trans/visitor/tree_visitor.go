@@ -82,7 +82,7 @@ func (gv *TreeVisitor) VisitClassBody(ctx *parser.ClassBodyContext) node.Node {
 			continue
 		}
 		if subClass, ok := member.(*ast.Class); ok {
-			// We don't do subclasses
+			// We don't do nested
 			class.Members = append(class.Members, ast.NewSubClassTODO(subClass.Name))
 		} else if fl, ok := member.(ast.FieldList); ok {
 			class.Fields = append(class.Fields, fl...)

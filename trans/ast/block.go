@@ -9,6 +9,8 @@ import (
 )
 
 type BlockNode struct {
+	*node.BaseNode
+
 	Body []node.Node
 }
 
@@ -39,7 +41,7 @@ func NewBlockNode(block *parser.BlockContext) *BlockNode {
 		l = append(l, s...)
 	}
 
-	return &BlockNode{Body: l}
+	return &BlockNode{BaseNode: node.NewNode(), Body: l}
 }
 
 func BlockStatementProcessor(ctx *parser.BlockStatementContext) []node.Node {
