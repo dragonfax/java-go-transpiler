@@ -83,7 +83,7 @@ func (gv *TreeVisitor) VisitClassBody(ctx *parser.ClassBodyContext) node.Node {
 		}
 		if subClass, ok := member.(*ast.Class); ok {
 			// We don't do nested
-			class.Members = append(class.Members, ast.NewSubClassTODO(subClass.Name))
+			class.Members = append(class.Members, ast.NewNestedClass(subClass.Name))
 		} else if f, ok := member.(*ast.Field); ok {
 			class.Fields = append(class.Fields, f)
 		} else if fl, ok := member.(*ast.FieldList); ok {
@@ -187,7 +187,7 @@ func (gv *TreeVisitor) VisitEnumDeclaration(ctx *parser.EnumDeclarationContext) 
 			}
 			if subClass, ok := member.(*ast.Class); ok {
 				// We don't do subclasses
-				members = append(members, ast.NewSubClassTODO(subClass.Name))
+				members = append(members, ast.NewNestedClass(subClass.Name))
 			} else if f, ok := member.(*ast.Field); ok {
 				fields = append(fields, f)
 			} else if fl, ok := member.(*ast.FieldList); ok {

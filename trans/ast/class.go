@@ -104,21 +104,3 @@ func NewClass() *Class {
 	}
 	return c
 }
-
-type SubClassTODO struct {
-	*node.BaseNode
-
-	Name string
-}
-
-func (sc *SubClassTODO) Children() []node.Node {
-	return nil
-}
-
-func NewSubClassTODO(name string) *SubClassTODO {
-	return &SubClassTODO{BaseNode: node.NewNode(), Name: name}
-}
-
-func (sc *SubClassTODO) String() string {
-	return fmt.Sprintf("\n// TODO elevate subclass %s (pre-translation)\n\n", sc.Name)
-}
