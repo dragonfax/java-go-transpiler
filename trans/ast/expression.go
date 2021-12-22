@@ -130,21 +130,33 @@ func ExpressionProcessor(expressionI *parser.ExpressionContext) node.Node {
 }
 
 func expressionFromPrimary(primary *parser.PrimaryContext) node.Node {
+	/* Turns out "primary" just means a single item expression .
+	 * Like a variable reference, or a literal, or a parenthesized expression.
+	 * A single atom, if you will. But not necessarily a terminal atom.
+	 */
 	primaryCtx := primary
 
 	if primaryCtx.IDENTIFIER() != nil {
-		return NewIdentifier(primaryCtx.IDENTIFIER().GetText())
+		// variable reference
+		return NewVarRef(primaryCtx.IDENTIFIER().GetText())
 	}
 
 	if primaryCtx.THIS() != nil {
-		return NewIdentifier("this")
+		v := NewVarRef("this")
+		v.This = true
+		return v
 	}
 
 	if primaryCtx.SUPER() != nil {
-		return NewIdentifier("super")
+		v := NewVarRef("super")
+		v.Super = true
+		return v
 	}
 
 	if primaryCtx.Expression() != nil {
+		// removes parenthesized expressions
+		// TODO may want to keep these in the future so I don't have to
+		//      recalculate where these are needed.
 		return ExpressionProcessor(primaryCtx.Expression())
 	}
 

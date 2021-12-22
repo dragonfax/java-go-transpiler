@@ -18,6 +18,8 @@ type MethodCall struct {
 
 	MethodName string
 	Arguments  []node.Node
+	Super      bool
+	This       bool
 }
 
 func (mc *MethodCall) Children() []node.Node {
@@ -55,6 +57,13 @@ func NewMethodCall(methodCall *parser.MethodCallContext) *MethodCall {
 	}
 
 	this := &MethodCall{Base: node.New(), MethodName: methodName, Arguments: arguments}
+
+	if methodCallCtx.SUPER() != nil {
+		this.Super = true
+	} else if methodCallCtx.THIS() != nil {
+		this.This = true
+	}
+
 	return this
 }
 
