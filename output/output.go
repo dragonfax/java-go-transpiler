@@ -102,8 +102,6 @@ func Translate(path string) error {
 	//resolver.VisitNode(h)
 	fmt.Println("ast walking complete")
 
-	fmt.Println(node.JSONMarshalNode(h))
-
 	// output
 	fmt.Println("writing files")
 	outputRoot := generateOutputRoot(dir)
@@ -130,6 +128,10 @@ func outputStructure(class *ast.Class, outputRoot string) {
 
 	targetDir := filepath.Dir(targetFilename)
 	err := os.MkdirAll(targetDir, 0775)
+
+	jsonFilename := targetFilename + ".json"
+	removeFileIfExists(jsonFilename)
+	outputFile(jsonFilename, node.JSONMarshalNode(class))
 
 	removeFileIfExists(targetFilename)
 	removeFileIfExists(targetErrorFilename)

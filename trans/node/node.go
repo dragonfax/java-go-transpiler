@@ -40,11 +40,11 @@ func MarshalNode(node Node) interface{} {
 	}
 
 	m := map[string]interface{}{
-		"Type": fmt.Sprintf("%T", node),
+		"go": fmt.Sprintf("%T", node),
 	}
 
 	if len(children) > 0 {
-		m["Children"] = children
+		m["children"] = children
 	}
 
 	obj := reflector.New(node)
