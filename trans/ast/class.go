@@ -23,6 +23,7 @@ type Class struct {
 	Interface     bool
 	Enum          bool
 	Constants     []*EnumConstant // for enums
+	Generated     bool
 }
 
 func (c *Class) Children() []node.Node {
@@ -37,13 +38,15 @@ func (c *Class) Children() []node.Node {
 }
 
 func (c *Class) OutputFilename() string {
-	if c.PackageName == "" {
-		panic("no package for class")
-	}
-	return fmt.Sprintf("%s/%s/%s.go", strings.ReplaceAll(c.PackageName, ".", "/"), c.Name, c.Name)
+	return fmt.Sprintf("%s/%s/%s.go", strings.ReplaceAll(c.PackageScope.Name, ".", "/"), c.Name, c.Name)
 }
 
 var classTemplate = `
+
+{{if .Generated}}
+// TODO This class was not included in the original source, but detected by code accessing it. It will have no implementation
+{{end}}
+
 {{ $className := .Name }}
 {{range .Interfaces }}var _ {{ . }} = &{{ $className}}{}
 {{end}}

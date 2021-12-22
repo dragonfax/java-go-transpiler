@@ -51,3 +51,16 @@ func (h *Hierarchy) AddClass(class *Class) {
 	class.PackageScope = pkg
 	pkg.AddClass(class)
 }
+
+/* GetClasses, list of all classes,
+ * used at the end of processesing to output all the classes as files in the target directory
+ */
+func (h *Hierarchy) GetClasses() []*Class {
+	list := make([]*Class, 0)
+	for _, pkg := range h.Packages {
+		for _, class := range pkg.Classes {
+			list = append(list, class)
+		}
+	}
+	return list
+}

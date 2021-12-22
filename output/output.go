@@ -93,14 +93,18 @@ func Translate(path string) error {
 		h.AddClass(class)
 	}
 	// process the hierarchy (all classes and packages) at once
+	fmt.Println("scope walk")
 	scopeVisitor := visitor.NewScopeVisitor(h)
 	scopeVisitor.VisitNode(h)
+	//fmt.Println("resolve walk")
+	//resolver := visitor.NewResolverVisitor(h)
+	//resolver.VisitNode(h)
 	fmt.Println("ast walking complete")
 
 	// output
 	fmt.Println("writing files")
 	outputRoot := generateOutputRoot(dir)
-	outputStructures(classes, outputRoot)
+	outputStructures(h.GetClasses(), outputRoot)
 	fmt.Println("writing files complete")
 
 	return nil
