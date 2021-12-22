@@ -47,13 +47,13 @@ func NewBlock(block *parser.BlockContext) *Block {
 func BlockStatementProcessor(ctx *parser.BlockStatementContext) []node.Node {
 	if ctx.LocalVariableDeclaration() != nil {
 		localVarCtx := ctx.LocalVariableDeclaration()
-		nodes := NewVariableDeclNodeList(localVarCtx)
+		nodes := NewLocalVarDeclNodeList(localVarCtx)
 		for _, n := range nodes {
 			if n == nil {
 				panic("nil in expression list")
 			}
 		}
-		return nodes
+		return node.ListOfNodesToNodeList(nodes)
 	} else if ctx.Statement() != nil {
 		statementCtx := ctx.Statement()
 		stmt := StatementProcessor(statementCtx)

@@ -39,8 +39,7 @@ func NewFieldList(ctx *parser.FieldDeclarationContext) *FieldList {
 			}
 		}
 
-		node := NewVariableDecl(typ, name, init)
-		members = append(members, NewField(node))
+		members = append(members, NewField(typ, name, init))
 	}
 
 	return &FieldList{Base: node.New(), Fields: members}

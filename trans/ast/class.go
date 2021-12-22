@@ -26,7 +26,14 @@ type Class struct {
 }
 
 func (c *Class) Children() []node.Node {
-	return node.AppendNodeLists(node.AppendNodeLists(node.AppendNodeLists(node.ListOfNodesToNodeList(c.Members), node.ListOfNodesToNodeList(c.Fields)...), node.ListOfNodesToNodeList(c.Constants)...), c.Imports...)
+	return node.AppendNodeLists(
+		node.AppendNodeLists(
+			node.AppendNodeLists(
+				node.ListOfNodesToNodeList(c.Members),
+				node.ListOfNodesToNodeList(c.Fields)...),
+			node.ListOfNodesToNodeList(c.Constants)...),
+		c.Imports...,
+	)
 }
 
 func (c *Class) OutputFilename() string {

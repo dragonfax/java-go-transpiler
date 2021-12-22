@@ -19,7 +19,7 @@ func NewFor(statementCtx *parser.StatementContext) node.Node {
 type EnhancedFor struct {
 	*node.Base
 
-	Variable *VariableDecl
+	Variable *LocalVarDecl
 	Instance node.Node
 	Body     node.Node
 }
@@ -34,7 +34,7 @@ func NewEnhancedFor(statementCtx *parser.StatementContext) *EnhancedFor {
 	enhancedCtx := forControlCtx.EnhancedForControl()
 
 	instance := ExpressionProcessor(enhancedCtx.Expression())
-	variable := NewVariableDecl(NewTypeNodeFromContext(enhancedCtx.TypeType()), enhancedCtx.VariableDeclaratorId().GetText(), nil)
+	variable := NewLocalVarDecl(NewTypeNodeFromContext(enhancedCtx.TypeType()), enhancedCtx.VariableDeclaratorId().GetText(), nil)
 
 	body := StatementProcessor(statementCtx.Statement(0))
 	return &EnhancedFor{
@@ -121,7 +121,7 @@ func classicForControlProcessor(forControlCtx *parser.ForControlContext) (init [
 		if initCtx.LocalVariableDeclaration() != nil {
 			// variable declaractions
 			declCtx := initCtx.LocalVariableDeclaration()
-			init = NewVariableDeclNodeList(declCtx)
+			init = node.ListOfNodesToNodeList(NewLocalVarDeclNodeList(declCtx))
 			for _, n := range init {
 				if n == nil {
 					panic("nil in node list")
