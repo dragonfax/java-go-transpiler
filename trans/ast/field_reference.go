@@ -3,30 +3,32 @@ package ast
 import (
 	"fmt"
 
-	"github.com/dragonfax/java_converter/tool"
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
-type InstanceAttributeReference struct {
-	Attribute         string
-	InstanceReference node.Node
+/* starts off as just the field name.
+ * we won't have the instance expression until after resolving
+ */
+type FieldReference struct {
+	FieldName          string
+	InstanceExpression node.Node
 }
 
-func (ia *InstanceAttributeReference) Children() []node.Node {
-	return []node.Node{ia.InstanceReference}
+func (ia *FieldReference) Children() []node.Node {
+	return []node.Node{ia.InstanceExpression}
 }
 
-func NewInstanceAttributeReference(attribute string, instanceExpression node.Node) *InstanceAttributeReference {
-	if attribute == "" {
-		panic("no attribute")
+func NewFieldReference(fieldName string) *FieldReference {
+	if fieldName == "" {
+		panic("no fielde")
 	}
-	if tool.IsNilInterface(instanceExpression) {
-		panic("no instance")
-	}
-	this := &InstanceAttributeReference{Attribute: attribute, InstanceReference: instanceExpression}
+	this := &FieldReference{FieldName: fieldName}
 	return this
 }
 
-func (ia *InstanceAttributeReference) String() string {
-	return fmt.Sprintf("%s.%s", ia.InstanceReference, ia.Attribute)
+func (ia *FieldReference) String() string {
+	if ia.InstanceExpression != nil {
+		return fmt.Sprintf("%s.%s", ia.InstanceExpression, ia.FieldName)
+	}
+	return fmt.Sprintf("%s", ia.FieldName)
 }

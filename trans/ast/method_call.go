@@ -8,19 +8,21 @@ import (
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
+/* method call
+ * more like a function call,
+ * just the method name, and arguments.
+ * Doesn't have the class its connected to until after resolution phase is complete
+ */
 type MethodCall struct {
-	Instance   node.Node
 	MethodName string
 	Arguments  []node.Node
 }
 
 func (mc *MethodCall) Children() []node.Node {
-	list := []node.Node{mc.Instance}
-	list = append(list, mc.Arguments...)
-	return list
+	return mc.Arguments
 }
 
-func NewMethodCall(instance node.Node, methodCall *parser.MethodCallContext) *MethodCall {
+func NewMethodCall(methodCall *parser.MethodCallContext) *MethodCall {
 	if tool.IsNilInterface(methodCall) {
 		panic("no method call")
 	}
@@ -50,13 +52,10 @@ func NewMethodCall(instance node.Node, methodCall *parser.MethodCallContext) *Me
 		}
 	}
 
-	this := &MethodCall{Instance: instance, MethodName: methodName, Arguments: arguments}
+	this := &MethodCall{MethodName: methodName, Arguments: arguments}
 	return this
 }
 
 func (mc *MethodCall) String() string {
-	if mc.Instance == nil {
-		return fmt.Sprintf("%s(%s)", mc.MethodName, ArgumentListToString(mc.Arguments))
-	}
-	return fmt.Sprintf("%s.%s(%s)", mc.Instance, mc.MethodName, ArgumentListToString(mc.Arguments))
+	return fmt.Sprintf("%s(%s)", mc.MethodName, ArgumentListToString(mc.Arguments))
 }

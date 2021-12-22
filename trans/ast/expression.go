@@ -31,29 +31,9 @@ func ExpressionProcessor(expressionI *parser.ExpressionContext) node.Node {
 		return NewConstructorCall(expression.Creator())
 	}
 
-	if expression.DOT() != nil {
-		if expression.IDENTIFIER() != nil {
-			return NewInstanceAttributeReference(expression.IDENTIFIER().GetText(), ExpressionProcessor(expression.Expression(0)))
-		}
-	}
-
 	if expression.MethodCall() != nil {
 		methodCall := expression.MethodCall()
-		if expression.DOT() != nil {
-
-			// method call
-
-			// (variable with instance, method call (Identifier =name, expressionList = parameters) )
-			if tool.IsNilInterface(expression.Expression(0)) {
-				panic("expression with dot and 1 expression, but no identifier (not method call?\n" + expression.GetText() + "\n")
-			}
-
-			instance := ExpressionProcessor(expression.Expression(0))
-
-			return NewMethodCall(instance, methodCall)
-		} else {
-			return NewMethodCall(nil, methodCall)
-		}
+		return NewMethodCall(methodCall)
 	}
 
 	if expression.GetPrefix() != nil {
@@ -66,6 +46,32 @@ func ExpressionProcessor(expressionI *parser.ExpressionContext) node.Node {
 	}
 
 	if expression.GetBop() != nil {
+		if expression.GetBop().GetText() == "." {
+			/* There is no regular binary operator for DOT
+			 * Its never between 2 simople expressions.
+			 * Its always between and expression and something else more specific.
+			 */
+			firstExpression := ExpressionProcessor(expression.Expression(0))
+			if expression.THIS() != nil {
+				panic("qualified 'this'. For referencing outer class from inner class")
+			}
+			if expression.IDENTIFIER() != nil {
+				return NewBinaryOperatorNode(".", firstExpression, NewFieldReference(expression.IDENTIFIER().GetText()))
+			}
+			if expression.MethodCall() != nil {
+				return NewBinaryOperatorNode(".", firstExpression, NewMethodCall(expression.MethodCall()))
+			}
+			if expression.NEW() != nil {
+				panic("qualified constructor, for constructing inner class from outer class")
+			}
+			if expression.SUPER() != nil {
+				panic("qualified super")
+			}
+			if expression.ExplicitGenericInvocation() != nil {
+				panic("explicit generic invocation")
+			}
+			panic("unknown DOT binary operator usage")
+		}
 		if expression.COLON() != nil {
 			left := ExpressionProcessor(expression.Expression(0))
 			middle := ExpressionProcessor(expression.Expression(1))
@@ -77,6 +83,8 @@ func ExpressionProcessor(expressionI *parser.ExpressionContext) node.Node {
 			right := NewTypeNode(expression.TypeType(0))
 			return NewBinaryOperatorNode("instanceof", left, right)
 		}
+
+		// just some regular binary operator, between 2 expressions.
 		left := ExpressionProcessor(expression.Expression(0))
 		right := ExpressionProcessor(expression.Expression(1))
 		if right == nil {
