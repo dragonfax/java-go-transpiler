@@ -16,7 +16,8 @@ type Block struct {
 
 func (bn *Block) Children() []node.Node {
 	if bn == nil {
-		panic("block node was nil")
+		fmt.Println("block node was nil")
+		return nil
 	}
 	return node.ListOfNodesToNodeList(bn.Body)
 }

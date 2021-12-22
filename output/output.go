@@ -10,6 +10,7 @@ import (
 	"github.com/dragonfax/java_converter/input"
 	"github.com/dragonfax/java_converter/trans"
 	"github.com/dragonfax/java_converter/trans/ast"
+	"github.com/dragonfax/java_converter/trans/node"
 	"github.com/dragonfax/java_converter/trans/visitor"
 	"github.com/schollz/progressbar/v3"
 )
@@ -100,6 +101,8 @@ func Translate(path string) error {
 	//resolver := visitor.NewResolverVisitor(h)
 	//resolver.VisitNode(h)
 	fmt.Println("ast walking complete")
+
+	fmt.Println(node.JSONMarshalNode(h))
 
 	// output
 	fmt.Println("writing files")

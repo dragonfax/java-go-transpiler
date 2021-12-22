@@ -93,7 +93,10 @@ func (tn Type) String() string {
 	return strings.Join(list, ".")
 }
 
-func (tn Type) Children() []node.Node {
+func (tn *Type) Children() []node.Node {
+	if tn == nil {
+		return nil
+	}
 	return node.ListOfNodesToNodeList(tn.Elements)
 }
 
