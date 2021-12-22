@@ -18,11 +18,9 @@ func (im *InterfaceMember) Children() []node.Node {
 }
 
 func NewInterface(ctx *parser.InterfaceDeclarationContext) *Class {
-	this := &Class{
-		Name:      ctx.IDENTIFIER().GetText(),
-		Members:   make([]node.Node, 0),
-		Interface: true,
-	}
+	this := NewClass()
+	this.Name = ctx.IDENTIFIER().GetText()
+	this.Interface = true
 
 	if ctx.EXTENDS() != nil {
 		panic("interface extending another interface")

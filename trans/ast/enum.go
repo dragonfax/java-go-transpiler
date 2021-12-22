@@ -37,13 +37,11 @@ const (
 var enumTemplateCompiled = template.Must(template.New("enum").Parse(enumTemplate))
 
 func NewEnum(ctx *parser.EnumDeclarationContext, fields []*Field, members []node.Node) *Class {
-	this := &Class{
-		Name:       ctx.IDENTIFIER().GetText(),
-		Interfaces: make([]*TypeNode, 0),
-		Members:    members,
-		Fields:     fields,
-		Enum:       true,
-	}
+	this := NewClass()
+	this.Name = ctx.IDENTIFIER().GetText()
+	this.Members = members
+	this.Fields = fields
+	this.Enum = true
 
 	if ctx.TypeList() != nil {
 		for _, typeType := range ctx.TypeList().AllTypeType() {
