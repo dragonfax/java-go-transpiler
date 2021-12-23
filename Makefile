@@ -3,15 +3,16 @@
 GRAMMAR_FILES = input/grammar/JavaLexer.g4 input/grammar/JavaParser.g4
 GO_SOURCE_FILES = $(shell find ./ -type f -name '*.go')
 GO=go1.18beta1
+BINARY=convert
 
-run: java_converter
-	./java_converter $(target)
+run: $(BINARY)
+	./$(BINARY) $(target)
 
 debug:
-	dlv --api-version 2 --headless --listen :40000 debug cmd/main.go -- $(target)
+	dlv --api-version 2 --headless --listen :40000 debug cmd/convert/main.go -- $(target)
 
-java_converter: go.* $(GO_SOURCE_FILES)
-	$(GO) build -o java_converter cmd/main.go
+$(BINARY): go.* $(GO_SOURCE_FILES)
+	$(GO) build -o $(BINARY) cmd/convert/main.go
 
 test:
 	$(GO) test ./...
