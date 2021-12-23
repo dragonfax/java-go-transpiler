@@ -14,7 +14,6 @@ func (av *BaseASTVisitor[T]) VisitNode(tree node.Node) T {
 		return av.zero
 	}
 
-
 	if n, ok := tree.(*ast.ArrayLiteral); ok {
 		return av.root.VisitArrayLiteral(n)
 
@@ -141,12 +140,10 @@ func (av *BaseASTVisitor[T]) VisitNode(tree node.Node) T {
 	} else if n, ok := tree.(*ast.VarRef); ok {
 		return av.root.VisitVarRef(n)
 
-
 	} else {
 		return av.root.VisitChildren(tree)
 	}
 }
-
 
 func (av *BaseASTVisitor[T]) VisitArrayLiteral(tree *ast.ArrayLiteral) T {
 	return av.root.VisitChildren(tree)

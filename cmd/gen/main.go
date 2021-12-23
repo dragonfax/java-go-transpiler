@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"go/ast"
+	"go/format"
 	"go/parser"
 	"go/token"
 	"io/fs"
@@ -103,22 +105,39 @@ func main() {
 	for _, templateFile := range templateFiles {
 		targetFile := targetDir + "/" + strings.TrimSuffix(templateFile, ".tmpl")
 
+		// read file
 		body, err := ioutil.ReadFile(templateDir + "/" + templateFile)
 		if err != nil {
 			panic(err)
 		}
+
+		// apply template
 		t, err := template.New("templateFile").Parse(string(body))
 		if err != nil {
 			panic(err)
 		}
-		writer, err := os.Create(targetFile)
-		if err != nil {
-			panic(err)
-		}
+		writer := bytes.NewBuffer(make([]byte, 0, 1024*20))
 		err = t.Execute(writer, nodeList)
 		if err != nil {
 			panic(err)
 		}
+
+		// gofmt source
+		source, err := format.Source(writer.Bytes())
+		if err != nil {
+			panic(err)
+		}
+
+		// write file
+		file, err := os.Create(targetFile)
+		if err != nil {
+			panic(err)
+		}
+		_, err = file.Write(source)
+		if err != nil {
+			panic(err)
+		}
+		file.Close()
 	}
 
 	fmt.Println("files generated")
