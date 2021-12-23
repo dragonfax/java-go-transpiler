@@ -98,3 +98,13 @@ func (av *ScopePass) VisitField(field *ast.Field) int {
 
 	return av.VisitChildren(field)
 }
+
+func (cv *ScopePass) VisitLocalVarDecl(localVarDecl *ast.LocalVarDecl) int {
+	localVarDecl.MemberScope = cv.CurrentMember
+
+	if localVarDecl.MemberScope == nil {
+		panic("no member found around local var decl")
+	}
+
+	return cv.VisitChildren(localVarDecl)
+}

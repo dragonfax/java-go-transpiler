@@ -15,10 +15,10 @@ type Member struct {
 	*BaseClassScope
 
 	Name           string
-	TypeParameters *TypeParameterList // implies generic method
-	Arguments      []node.Node
-	ReturnType     node.Node
-	Body           node.Node
+	TypeParameters *TypeParameterList // implies generic method, nullable
+	Arguments      []node.Node        // nullable
+	ReturnType     node.Node          // nullable
+	Body           node.Node          // nullable
 	Throws         string
 
 	Public       bool
@@ -69,7 +69,20 @@ func NewMethod(name string, arguments []node.Node, returnType node.Node, body no
 }
 
 func (m *Member) Children() []node.Node {
-	return node.AppendNodeLists(node.AppendNodeLists([]node.Node{m.Body, m.ReturnType}, m.Arguments...), m.TypeParameters)
+	list := make([]node.Node, 0)
+
+	list = append(list, m.Arguments...)
+	if m.TypeParameters != nil {
+		list = append(list, m.TypeParameters)
+	}
+	if m.ReturnType != nil {
+		list = append(list, m.ReturnType)
+	}
+	if m.Body != nil {
+		list = append(list, m.Body)
+	}
+
+	return list
 }
 
 func (m *Member) SetPublic(public bool) {

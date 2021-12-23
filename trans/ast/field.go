@@ -41,7 +41,10 @@ func NewField(typ *Type, name string, expression node.Node) *Field {
 }
 
 func (f *Field) Children() []node.Node {
-	return []node.Node{f.Type, f.Expression}
+	if f.Expression != nil {
+		return []node.Node{f.Type, f.Expression}
+	}
+	return []node.Node{f.Type}
 }
 
 func (f *Field) Declaration() string {

@@ -16,27 +16,56 @@ type Class struct {
 	BaseClassName string
 	BaseClass     *Class
 	Interfaces    []*Type
-	Members       []node.Node
-	Fields        []*Field
-	PackageScope  *Package
-	PackageName   string
-	Interface     bool
-	Enum          bool
-	Constants     []*EnumConstant // for enums
-	Generated     bool
+
+	/* could be a member, but could also be an interface, a nested class, or a few other things */
+	Members []node.Node
+
+	Fields       []*Field
+	PackageScope *Package
+	PackageName  string
+	Interface    bool
+	Enum         bool
+	Constants    []*EnumConstant // for enums
+	Generated    bool
 
 	FieldsByName map[string]*Field
 }
 
 func (c *Class) Children() []node.Node {
-	return node.AppendNodeLists(
-		node.AppendNodeLists(
-			node.AppendNodeLists(
-				node.ListOfNodesToNodeList(c.Members),
-				node.ListOfNodesToNodeList(c.Fields)...),
-			node.ListOfNodesToNodeList(c.Constants)...),
-		c.Imports...,
-	)
+	list := make([]node.Node, 0)
+
+	list = append(list, node.ListOfNodesToNodeList(c.Imports)...)
+	for _, n := range list {
+		if n == nil {
+			panic("nil in list")
+		}
+	}
+	list = append(list, node.ListOfNodesToNodeList(c.Interfaces)...)
+	for _, n := range list {
+		if n == nil {
+			panic("nil in list")
+		}
+	}
+	list = append(list, node.ListOfNodesToNodeList(c.Members)...)
+	for _, n := range list {
+		if n == nil {
+			panic("nil in list")
+		}
+	}
+	list = append(list, node.ListOfNodesToNodeList(c.Fields)...)
+	for _, n := range list {
+		if n == nil {
+			panic("nil in list")
+		}
+	}
+	list = append(list, node.ListOfNodesToNodeList(c.Constants)...)
+	for _, n := range list {
+		if n == nil {
+			panic("nil in list")
+		}
+	}
+
+	return list
 }
 
 func (c *Class) OutputFilename() string {

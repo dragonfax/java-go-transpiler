@@ -17,6 +17,9 @@ type FieldReference struct {
 }
 
 func (ia *FieldReference) Children() []node.Node {
+	if ia.InstanceExpression == nil {
+		return nil
+	}
 	return []node.Node{ia.InstanceExpression}
 }
 

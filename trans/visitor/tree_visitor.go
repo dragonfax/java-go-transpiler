@@ -77,8 +77,10 @@ func (gv *TreeVisitor) VisitClassBody(ctx *parser.ClassBodyContext) node.Node {
 
 	for _, decl := range ctx.AllClassBodyDeclaration() {
 		member := gv.VisitClassBodyDeclaration(decl)
-		if member == nil && decl.GetText() != ";" {
-			fmt.Printf("WARNING: skipping class member: %s\n", decl.GetText())
+		if member == nil {
+			if decl.GetText() != ";" {
+				fmt.Printf("WARNING: skipping class member: %s\n", decl.GetText())
+			}
 			continue
 		}
 		if subClass, ok := member.(*ast.Class); ok {
@@ -181,8 +183,10 @@ func (gv *TreeVisitor) VisitEnumDeclaration(ctx *parser.EnumDeclarationContext) 
 	if ctx.EnumBodyDeclarations() != nil {
 		for _, decl := range ctx.EnumBodyDeclarations().AllClassBodyDeclaration() {
 			member := gv.VisitClassBodyDeclaration(decl)
-			if member == nil && decl.GetText() != ";" {
-				fmt.Printf("WARNING: skipping class member: %s\n", decl.GetText())
+			if member == nil {
+				if decl.GetText() != ";" {
+					fmt.Printf("WARNING: skipping class member: %s\n", decl.GetText())
+				}
 				continue
 			}
 			if subClass, ok := member.(*ast.Class); ok {

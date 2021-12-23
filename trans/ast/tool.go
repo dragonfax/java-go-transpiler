@@ -37,10 +37,10 @@ func ArgumentListToString(list []node.Node) string {
 }
 func DebugPrint(n node.Node) {
 	fmt.Println(node.JSONMarshalNode(n))
-	if cs, ok := n.(ClassScope); ok {
+	if cs, ok := n.(ClassScope); ok && cs.GetClassScope() != nil {
 		fmt.Printf("from class %s\n", cs.GetClassScope().Name)
 	}
-	if ms, ok := n.(MemberScope); ok {
+	if ms, ok := n.(MemberScope); ok && ms.GetMemberScope() != nil {
 		memberScope := ms.GetMemberScope()
 		fmt.Printf("from class %s and method %s\n", memberScope.GetClassScope().Name, memberScope.Name)
 	}
