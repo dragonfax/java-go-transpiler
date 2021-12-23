@@ -24,8 +24,9 @@ type Member struct {
 	Abstract     bool
 	Static       bool
 	Synchronized bool
+	Constructor  bool
 
-	Constructor bool
+	LocalVars map[string]*LocalVarDecl
 }
 
 func NewConstructor(ctx *parser.ConstructorDeclarationContext) *Member {
@@ -35,6 +36,7 @@ func NewConstructor(ctx *parser.ConstructorDeclarationContext) *Member {
 		BaseClassScope: NewClassScope(),
 		Name:           ctx.IDENTIFIER().GetText(),
 		Constructor:    true,
+		LocalVars:      make(map[string]*LocalVarDecl),
 	}
 
 	if ctx.GetConstructorBody() != nil {
@@ -61,6 +63,7 @@ func NewMethod(name string, arguments []node.Node, returnType node.Node, body no
 		Arguments:  arguments,
 		ReturnType: returnType,
 		Body:       body,
+		LocalVars:  make(map[string]*LocalVarDecl),
 	}
 }
 
@@ -125,4 +128,8 @@ func (c *Member) ConstructorString() string {
 	}
 
 	return fmt.Sprintf("func New%s(%s) %s *%s{\n%s\n}\n\n", c.Name, ArgumentListToString(c.Arguments), throws, c.Name, body)
+}
+
+func (m *Member) AddLocalVar(localVarDecl *LocalVarDecl) {
+	m.LocalVars[localVarDecl.Name] = localVarDecl
 }

@@ -18,4 +18,5 @@ type ASTVisitor[T comparable] interface {
 	VisitImport(tree *ast.Import) T
 	VisitMember(tree *ast.Member) T
 	VisitVarRef(ctx *ast.VarRef) T
+	VisitLocalVarDecl(ctx *ast.LocalVarDecl) T
 }

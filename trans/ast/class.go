@@ -24,6 +24,8 @@ type Class struct {
 	Enum          bool
 	Constants     []*EnumConstant // for enums
 	Generated     bool
+
+	FieldsByName map[string]*Field
 }
 
 func (c *Class) Children() []node.Node {
@@ -105,12 +107,17 @@ func (c *Class) AsFile() string {
 
 func NewClass() *Class {
 	c := &Class{
-		Base:       node.New(),
-		Members:    make([]node.Node, 0),
-		Interfaces: make([]*Type, 0),
-		Fields:     make([]*Field, 0),
-		Imports:    make([]*Import, 0),
-		Constants:  make([]*EnumConstant, 0),
+		Base:         node.New(),
+		Members:      make([]node.Node, 0),
+		Interfaces:   make([]*Type, 0),
+		Fields:       make([]*Field, 0),
+		Imports:      make([]*Import, 0),
+		Constants:    make([]*EnumConstant, 0),
+		FieldsByName: make(map[string]*Field),
 	}
 	return c
+}
+
+func (c *Class) AddField(field *Field) {
+	c.FieldsByName[field.Name] = field
 }

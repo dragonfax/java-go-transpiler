@@ -13,7 +13,8 @@ type VarRef struct {
 	This         bool
 	Super        bool
 
-	VariableDecl *LocalVarDecl
+	// Field or LocalVarDecl (variable or method/constructor parameter)
+	VariableDecl node.Node
 }
 
 func NewVarRef(name string) *VarRef {
