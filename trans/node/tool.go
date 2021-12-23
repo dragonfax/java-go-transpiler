@@ -1,6 +1,9 @@
 package node
 
 func ListOfNodesToNodeList[T Node](list []T) []Node {
+	if list == nil {
+		return nil
+	}
 	l := make([]Node, len(list))
 	for i, n := range list {
 		l[i] = n

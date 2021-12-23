@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/dragonfax/java_converter/tool"
 	"github.com/tkrajina/go-reflector/reflector"
 )
 
@@ -27,7 +28,7 @@ func (bn *Base) SetParent(p Node) {
 }
 
 func MarshalNode(node Node) interface{} {
-	if node == nil {
+	if tool.IsNilInterface(node) {
 		return nil
 	}
 
@@ -49,6 +50,10 @@ func MarshalNode(node Node) interface{} {
 
 	obj := reflector.New(node)
 	for _, field := range obj.FieldsFlattened() {
+
+		if !field.IsValid() {
+			continue
+		}
 
 		if !field.IsExported() {
 			continue

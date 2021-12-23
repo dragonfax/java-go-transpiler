@@ -30,6 +30,9 @@ func (tl *TypeParameterList) String() string {
 }
 
 func (tl *TypeParameterList) Children() []node.Node {
+	if tl == nil {
+		panic("nil type parameter list")
+	}
 	return node.ListOfNodesToNodeList(tl.TypeParameters)
 }
 

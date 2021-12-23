@@ -6,6 +6,7 @@ package ast
 
 type ClassScope interface {
 	SetClassScope(*Class)
+	GetClassScope() *Class
 }
 
 type BaseClassScope struct {
@@ -18,4 +19,8 @@ func NewClassScope() *BaseClassScope {
 
 func (s *BaseClassScope) SetClassScope(scope *Class) {
 	s.ClassScope = scope
+}
+
+func (s *BaseClassScope) GetClassScope() *Class {
+	return s.ClassScope
 }

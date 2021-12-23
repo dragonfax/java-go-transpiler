@@ -1,6 +1,7 @@
 package ast
 
 import (
+	"fmt"
 	"runtime/debug"
 	"strings"
 
@@ -33,4 +34,14 @@ func ArgumentListToString(list []node.Node) string {
 		}
 	}
 	return strings.Join(s, ",")
+}
+func DebugPrint(n node.Node) {
+	fmt.Println(node.JSONMarshalNode(n))
+	if cs, ok := n.(ClassScope); ok {
+		fmt.Printf("from class %s\n", cs.GetClassScope().Name)
+	}
+	if ms, ok := n.(MemberScope); ok {
+		memberScope := ms.GetMemberScope()
+		fmt.Printf("from class %s and method %s\n", memberScope.GetClassScope().Name, memberScope.Name)
+	}
 }

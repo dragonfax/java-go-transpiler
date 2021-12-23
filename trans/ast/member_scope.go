@@ -6,6 +6,7 @@ package ast
 
 type MemberScope interface {
 	SetMemberScope(*Member)
+	GetMemberScope() *Member
 }
 
 type BaseMemberScope struct {
@@ -18,4 +19,8 @@ func NewMemberScope() *BaseMemberScope {
 
 func (s *BaseMemberScope) SetMemberScope(scope *Member) {
 	s.MemberScope = scope
+}
+
+func (s *BaseMemberScope) GetMemberScope() *Member {
+	return s.MemberScope
 }

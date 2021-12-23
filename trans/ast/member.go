@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/dragonfax/java_converter/input/parser"
+	"github.com/dragonfax/java_converter/tool"
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
@@ -88,6 +89,9 @@ func (m *Member) SetSynchronized(sync bool) {
 }
 
 func (m *Member) String() string {
+	if m == nil {
+		panic("nil member")
+	}
 	if m.Constructor {
 		return m.ConstructorString()
 	}
@@ -99,7 +103,7 @@ func (m *Member) MethodString() string {
 	}
 
 	body := ""
-	if m.Body != nil {
+	if !tool.IsNilInterface(m.Body) {
 		body = m.Body.String()
 	}
 
@@ -131,5 +135,8 @@ func (c *Member) ConstructorString() string {
 }
 
 func (m *Member) AddLocalVar(localVarDecl *LocalVarDecl) {
+	if m == nil {
+		panic("nil member")
+	}
 	m.LocalVars[localVarDecl.Name] = localVarDecl
 }
