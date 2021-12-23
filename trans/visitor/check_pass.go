@@ -12,7 +12,7 @@ type CheckPass struct {
 	*BaseASTVisitor[int] // throwaway return value
 }
 
-func NewCheckPass(h *ast.Hierarchy) *CheckPass {
+func NewCheckPass(h *ast.Hierarchy) ASTVisitor[int] {
 	this := &CheckPass{}
 	this.BaseASTVisitor = NewASTVisitor[int](h, this)
 	return this

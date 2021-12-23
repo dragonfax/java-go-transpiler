@@ -15,7 +15,7 @@ type ScopePass struct {
 	ParentNode     node.Node
 }
 
-func NewScopePass(h *ast.Hierarchy) *ScopePass {
+func NewScopePass(h *ast.Hierarchy) ASTVisitor[int] {
 	this := &ScopePass{}
 	this.BaseASTVisitor = NewASTVisitor[int](h, this)
 	return this

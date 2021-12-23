@@ -10,7 +10,7 @@ type ResolvePass struct {
 	*BaseASTVisitor[int] // throwaway return value
 }
 
-func NewResolvePass(h *ast.Hierarchy) *ResolvePass {
+func NewResolvePass(h *ast.Hierarchy) ASTVisitor[int] {
 	this := &ResolvePass{}
 	this.BaseASTVisitor = NewASTVisitor[int](h, this)
 	return this

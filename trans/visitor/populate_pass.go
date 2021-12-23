@@ -10,7 +10,7 @@ type PopulatePass struct {
 	*BaseASTVisitor[int] // throwaway return value
 }
 
-func NewPopulatePass(h *ast.Hierarchy) *PopulatePass {
+func NewPopulatePass(h *ast.Hierarchy) ASTVisitor[int] {
 	this := &PopulatePass{}
 	this.BaseASTVisitor = NewASTVisitor[int](h, this)
 	return this
