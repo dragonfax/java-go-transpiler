@@ -6,8 +6,9 @@
             "type": "go",
             "request": "launch",
             "mode": "debug",
-            "program": "./cmd/main.go",
-            "args": ["../delverengine/Dungeoneer/src/com/interrupt/dungeoneer/"]
+            "program": "./cmd/convert/main.go",
+            "args": ["../delverengine/"],
+            "cwd": "${workspaceFolder}"
         },
         {
             "name": "Remote Golang Debug",
