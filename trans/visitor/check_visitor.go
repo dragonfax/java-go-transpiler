@@ -29,7 +29,7 @@ func (cv *CheckVisitor) VisitVarRef(ctx *ast.VarRef) int {
 	}
 
 	if ctx.VariableDecl == nil {
-		fmt.Printf("Var Ref Unresolved: %s from %s\n", ctx.VariableName, ctx.MethodScope.String())
+		fmt.Printf("Var Ref Unresolved: %s from %s\n", ctx.VariableName, ctx.MemberScope.String())
 	}
 
 	return 0 // these have no chuildren

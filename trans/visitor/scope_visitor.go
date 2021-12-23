@@ -11,7 +11,7 @@ type ScopeVisitor struct {
 	// Context
 	CurrentPackage *ast.Package
 	CurrentClass   *ast.Class
-	CurrentMethod  node.Node
+	CurrentMember  *ast.Member
 	ParentNode     node.Node
 }
 
@@ -32,8 +32,8 @@ func (av *ScopeVisitor) VisitNode(tree node.Node) int {
 func (av *ScopeVisitor) VisitChildren(tree node.Node) int {
 
 	/* set the method and class scope */
-	if scope, ok := tree.(ast.MethodScope); av.CurrentMethod != nil && ok {
-		scope.SetMethodScope(av.CurrentMethod)
+	if scope, ok := tree.(ast.MemberScope); av.CurrentMember != nil && ok {
+		scope.SetMemberScope(av.CurrentMember)
 	}
 
 	if scope, ok := tree.(ast.ClassScope); av.CurrentClass != nil && ok {
@@ -84,20 +84,13 @@ func (av *ScopeVisitor) VisitImport(imp *ast.Import) int {
 	return av.zero // no children
 }
 
-func (av *ScopeVisitor) VisitMethod(method *ast.Method) int {
+func (av *ScopeVisitor) VisitMember(member *ast.Member) int {
 
-	av.CurrentMethod = method
-	method.ClassScope = av.CurrentClass
+	av.CurrentMember = member
+	member.ClassScope = av.CurrentClass
 
-	return av.VisitChildren(method)
+	return av.VisitChildren(member)
 
-}
-
-func (av *ScopeVisitor) VisitConstructor(constructor *ast.Constructor) int {
-	av.CurrentMethod = constructor
-	constructor.ClassScope = av.CurrentClass
-
-	return av.VisitChildren(constructor)
 }
 
 func (av *ScopeVisitor) VisitField(field *ast.Field) int {

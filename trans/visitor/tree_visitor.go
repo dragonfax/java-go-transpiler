@@ -144,7 +144,7 @@ func (gv *TreeVisitor) VisitClassBodyDeclaration(ctx *parser.ClassBodyDeclaratio
 func (gv *TreeVisitor) VisitGenericMethodDeclaration(ctx *parser.GenericMethodDeclarationContext) node.Node {
 
 	method := gv.VisitMethodDeclaration(ctx.MethodDeclaration())
-	method.(*ast.Method).TypeParameters = ast.NewTypeParameterList(ctx.TypeParameters())
+	method.(*ast.Member).TypeParameters = ast.NewTypeParameterList(ctx.TypeParameters())
 
 	return method
 }

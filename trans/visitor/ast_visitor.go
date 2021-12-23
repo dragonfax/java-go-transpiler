@@ -13,10 +13,9 @@ type ASTVisitor[T comparable] interface {
 
 	// specific nodes
 	VisitField(tree *ast.Field) T
-	VisitConstructor(tree *ast.Constructor) T
 	VisitPackage(tree *ast.Package) T
 	VisitClass(tree *ast.Class) T
 	VisitImport(tree *ast.Import) T
-	VisitMethod(tree *ast.Method) T
+	VisitMember(tree *ast.Member) T
 	VisitVarRef(ctx *ast.VarRef) T
 }

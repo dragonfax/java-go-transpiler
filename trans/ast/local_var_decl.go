@@ -9,7 +9,7 @@ import (
 
 type LocalVarDecl struct {
 	*node.Base
-	*BaseMethodScope
+	*BaseMemberScope
 
 	Name       string
 	Expression node.Node
@@ -19,7 +19,7 @@ type LocalVarDecl struct {
 func NewLocalVarDecl(typ *Type, name string, expression node.Node) *LocalVarDecl {
 	return &LocalVarDecl{
 		Base:            node.New(),
-		BaseMethodScope: NewMethodScope(),
+		BaseMemberScope: NewMemberScope(),
 		Type:            typ,
 		Name:            name,
 		Expression:      expression,

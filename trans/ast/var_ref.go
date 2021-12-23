@@ -7,7 +7,7 @@ import "github.com/dragonfax/java_converter/trans/node"
  */
 type VarRef struct {
 	*node.Base
-	*BaseMethodScope
+	*BaseMemberScope
 
 	VariableName string
 	This         bool
@@ -17,7 +17,7 @@ type VarRef struct {
 }
 
 func NewVarRef(name string) *VarRef {
-	return &VarRef{Base: node.New(), BaseMethodScope: NewMethodScope(), VariableName: name}
+	return &VarRef{Base: node.New(), BaseMemberScope: NewMemberScope(), VariableName: name}
 }
 
 func (vr *VarRef) String() string {

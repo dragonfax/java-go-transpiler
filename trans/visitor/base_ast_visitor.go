@@ -46,10 +46,8 @@ func (av *BaseASTVisitor[T]) VisitNode(tree node.Node) T {
 		return av.root.VisitClass(class)
 	} else if pkg, ok := tree.(*ast.Package); ok {
 		return av.root.VisitPackage(pkg)
-	} else if method, ok := tree.(*ast.Method); ok {
-		return av.root.VisitMethod(method)
-	} else if con, ok := tree.(*ast.Constructor); ok {
-		return av.root.VisitConstructor(con)
+	} else if method, ok := tree.(*ast.Member); ok {
+		return av.root.VisitMember(method)
 	} else if imp, ok := tree.(*ast.Import); ok {
 		return av.root.VisitImport(imp)
 	} else if field, ok := tree.(*ast.Field); ok {
@@ -96,10 +94,6 @@ func (av *BaseASTVisitor[T]) VisitField(tree *ast.Field) T {
 	return av.root.VisitChildren(tree)
 }
 
-func (av *BaseASTVisitor[T]) VisitConstructor(tree *ast.Constructor) T {
-	return av.root.VisitChildren(tree)
-}
-
 func (av *BaseASTVisitor[T]) VisitPackage(tree *ast.Package) T {
 	return av.root.VisitChildren(tree)
 }
@@ -112,7 +106,7 @@ func (av *BaseASTVisitor[T]) VisitImport(tree *ast.Import) T {
 	return av.root.VisitChildren(tree)
 }
 
-func (av *BaseASTVisitor[T]) VisitMethod(tree *ast.Method) T {
+func (av *BaseASTVisitor[T]) VisitMember(tree *ast.Member) T {
 	return av.root.VisitChildren(tree)
 }
 
