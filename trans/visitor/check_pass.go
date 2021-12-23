@@ -8,17 +8,17 @@ import (
 
 /* check that all var refs are resolved */
 
-type CheckVisitor struct {
+type CheckPass struct {
 	*BaseASTVisitor[int] // throwaway return value
 }
 
-func NewCheckVisitor(h *ast.Hierarchy) *CheckVisitor {
-	this := &CheckVisitor{}
+func NewCheckPass(h *ast.Hierarchy) *CheckPass {
+	this := &CheckPass{}
 	this.BaseASTVisitor = NewASTVisitor[int](h, this)
 	return this
 }
 
-func (cv *CheckVisitor) VisitVarRef(ctx *ast.VarRef) int {
+func (cv *CheckPass) VisitVarRef(ctx *ast.VarRef) int {
 
 	if ctx.Super {
 		return 0

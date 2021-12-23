@@ -6,17 +6,17 @@ import (
 
 /* populate some maps and lists in nodes. */
 
-type PopulateVisitor struct {
+type PopulatePass struct {
 	*BaseASTVisitor[int] // throwaway return value
 }
 
-func NewPopulateVisitor(h *ast.Hierarchy) *PopulateVisitor {
-	this := &PopulateVisitor{}
+func NewPopulatePass(h *ast.Hierarchy) *PopulatePass {
+	this := &PopulatePass{}
 	this.BaseASTVisitor = NewASTVisitor[int](h, this)
 	return this
 }
 
-func (cv *PopulateVisitor) VisitLocalVarDecl(localVarDecl *ast.LocalVarDecl) int {
+func (cv *PopulatePass) VisitLocalVarDecl(localVarDecl *ast.LocalVarDecl) int {
 
 	// this ends up covering both local var declarations and formal parameters in methods/constructors
 	localVarDecl.MemberScope.AddLocalVar(localVarDecl)
@@ -24,7 +24,7 @@ func (cv *PopulateVisitor) VisitLocalVarDecl(localVarDecl *ast.LocalVarDecl) int
 	return 0 // no children that need processesing.
 }
 
-func (cv *PopulateVisitor) VisitField(field *ast.Field) int {
+func (cv *PopulatePass) VisitField(field *ast.Field) int {
 
 	field.ClassScope.AddField(field)
 

@@ -95,12 +95,12 @@ func Translate(path string) error {
 	}
 	// process the hierarchy (all classes and packages) at once
 	fmt.Println("scope walk")
-	scopeVisitor := visitor.NewScopeVisitor(h)
-	scopeVisitor.VisitNode(h)
+	ScopePass := visitor.NewScopePass(h)
+	ScopePass.VisitNode(h)
 	fmt.Println("resolve walk")
-	resolver := visitor.NewResolverVisitor(h)
+	resolver := visitor.NewResolvePass(h)
 	resolver.VisitNode(h)
-	check := visitor.NewCheckVisitor(h)
+	check := visitor.NewCheckPass(h)
 	check.VisitNode(h)
 	fmt.Println("ast walking complete")
 

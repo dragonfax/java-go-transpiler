@@ -6,17 +6,17 @@ import (
 	"github.com/dragonfax/java_converter/trans/ast"
 )
 
-type ResolverVisitor struct {
+type ResolvePass struct {
 	*BaseASTVisitor[int] // throwaway return value
 }
 
-func NewResolverVisitor(h *ast.Hierarchy) *ResolverVisitor {
-	this := &ResolverVisitor{}
+func NewResolvePass(h *ast.Hierarchy) *ResolvePass {
+	this := &ResolvePass{}
 	this.BaseASTVisitor = NewASTVisitor[int](h, this)
 	return this
 }
 
-func (cv *ResolverVisitor) VisitVarRef(varRef *ast.VarRef) int {
+func (cv *ResolvePass) VisitVarRef(varRef *ast.VarRef) int {
 
 	if varRef.Super {
 		return 0

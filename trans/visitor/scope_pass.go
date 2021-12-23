@@ -5,7 +5,7 @@ import (
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
-type ScopeVisitor struct {
+type ScopePass struct {
 	*BaseASTVisitor[int] // throwaway return value
 
 	// Context
@@ -15,13 +15,13 @@ type ScopeVisitor struct {
 	ParentNode     node.Node
 }
 
-func NewScopeVisitor(h *ast.Hierarchy) *ScopeVisitor {
-	this := &ScopeVisitor{}
+func NewScopePass(h *ast.Hierarchy) *ScopePass {
+	this := &ScopePass{}
 	this.BaseASTVisitor = NewASTVisitor[int](h, this)
 	return this
 }
 
-func (av *ScopeVisitor) VisitNode(tree node.Node) int {
+func (av *ScopePass) VisitNode(tree node.Node) int {
 
 	// fill in parents for all nodes.
 	tree.SetParent(av.ParentNode)
@@ -29,7 +29,7 @@ func (av *ScopeVisitor) VisitNode(tree node.Node) int {
 	return av.BaseASTVisitor.VisitNode(tree)
 }
 
-func (av *ScopeVisitor) VisitChildren(tree node.Node) int {
+func (av *ScopePass) VisitChildren(tree node.Node) int {
 
 	/* set the method and class scope */
 	if scope, ok := tree.(ast.MemberScope); av.CurrentMember != nil && ok {
@@ -46,13 +46,13 @@ func (av *ScopeVisitor) VisitChildren(tree node.Node) int {
 	return av.BaseASTVisitor.VisitChildren(tree)
 }
 
-func (av *ScopeVisitor) VisitPackage(pkg *ast.Package) int {
+func (av *ScopePass) VisitPackage(pkg *ast.Package) int {
 	av.CurrentPackage = pkg
 
 	return av.VisitChildren(pkg)
 }
 
-func (av *ScopeVisitor) VisitClass(class *ast.Class) int {
+func (av *ScopePass) VisitClass(class *ast.Class) int {
 	defer av.ProgressBar.Add(1)
 
 	av.CurrentClass = class
@@ -63,7 +63,7 @@ func (av *ScopeVisitor) VisitClass(class *ast.Class) int {
 	return av.VisitChildren(class)
 }
 
-func (av *ScopeVisitor) VisitImport(imp *ast.Import) int {
+func (av *ScopePass) VisitImport(imp *ast.Import) int {
 
 	imp.ClassScope = av.CurrentClass
 
@@ -84,7 +84,7 @@ func (av *ScopeVisitor) VisitImport(imp *ast.Import) int {
 	return av.zero // no children
 }
 
-func (av *ScopeVisitor) VisitMember(member *ast.Member) int {
+func (av *ScopePass) VisitMember(member *ast.Member) int {
 
 	av.CurrentMember = member
 	member.ClassScope = av.CurrentClass
@@ -93,7 +93,7 @@ func (av *ScopeVisitor) VisitMember(member *ast.Member) int {
 
 }
 
-func (av *ScopeVisitor) VisitField(field *ast.Field) int {
+func (av *ScopePass) VisitField(field *ast.Field) int {
 	field.ClassScope = av.CurrentClass
 
 	return av.VisitChildren(field)
