@@ -1,0 +1,11 @@
+/* AUTO-GENERATED: do not edit */
+package visitor
+
+import (
+	"github.com/dragonfax/java_converter/trans/ast"
+)
+
+type GenASTVisitor[T comparable] interface {
+{{range .}}Visit{{.}}(tree *ast.{{.}}) T
+{{end}}
+}

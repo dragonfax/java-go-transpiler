@@ -1,0 +1,31 @@
+/* AUTO-GENERATED: do not edit */
+package visitor
+
+import (
+	"fmt"
+
+	"github.com/dragonfax/java_converter/trans/ast"
+	"github.com/dragonfax/java_converter/trans/node"
+)
+
+func (av *BaseASTVisitor[T]) VisitNode(tree node.Node) T {
+	if tree == nil {
+		fmt.Printf("someone gave us a nil node to visit\n")
+		return av.zero
+	}
+
+{{range $index, $element := .}}
+	{{if ne $index 0}}} else {{end}}if n, ok := tree.(*ast.{{.}}); ok {
+		return av.root.Visit{{.}}(n)
+{{end}}
+
+	} else {
+		return av.root.VisitChildren(tree)
+	}
+}
+
+{{range .}}
+func (av *BaseASTVisitor[T]) Visit{{.}}(tree *ast.{{.}}) T {
+	return av.root.VisitChildren(tree)
+}
+{{end}}

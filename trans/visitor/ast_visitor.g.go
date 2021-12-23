@@ -1,3 +1,4 @@
+/* AUTO-GENERATED: do not edit */
 package visitor
 
 import (
@@ -5,11 +6,47 @@ import (
 )
 
 type GenASTVisitor[T comparable] interface {
-	VisitField(tree *ast.Field) T
-	VisitPackage(tree *ast.Package) T
-	VisitClass(tree *ast.Class) T
-	VisitImport(tree *ast.Import) T
-	VisitMember(tree *ast.Member) T
-	VisitVarRef(ctx *ast.VarRef) T
-	VisitLocalVarDecl(ctx *ast.LocalVarDecl) T
+VisitArrayLiteral(tree *ast.ArrayLiteral) T
+VisitBlock(tree *ast.Block) T
+VisitClass(tree *ast.Class) T
+VisitClassReference(tree *ast.ClassReference) T
+VisitConstructorCall(tree *ast.ConstructorCall) T
+VisitEnumConstant(tree *ast.EnumConstant) T
+VisitEnumRef(tree *ast.EnumRef) T
+VisitField(tree *ast.Field) T
+VisitFieldList(tree *ast.FieldList) T
+VisitFieldReference(tree *ast.FieldReference) T
+VisitEnhancedFor(tree *ast.EnhancedFor) T
+VisitClassicFor(tree *ast.ClassicFor) T
+VisitHierarchy(tree *ast.Hierarchy) T
+VisitIf(tree *ast.If) T
+VisitImport(tree *ast.Import) T
+VisitInitializer(tree *ast.Initializer) T
+VisitInterfaceMember(tree *ast.InterfaceMember) T
+VisitLambda(tree *ast.Lambda) T
+VisitLiteral(tree *ast.Literal) T
+VisitLocalVarDecl(tree *ast.LocalVarDecl) T
+VisitMember(tree *ast.Member) T
+VisitMethodCall(tree *ast.MethodCall) T
+VisitMethodReference(tree *ast.MethodReference) T
+VisitNestedClass(tree *ast.NestedClass) T
+VisitPackage(tree *ast.Package) T
+VisitReturn(tree *ast.Return) T
+VisitThrow(tree *ast.Throw) T
+VisitBreak(tree *ast.Break) T
+VisitContinue(tree *ast.Continue) T
+VisitLabel(tree *ast.Label) T
+VisitIdentifier(tree *ast.Identifier) T
+VisitSwitch(tree *ast.Switch) T
+VisitSwitchCase(tree *ast.SwitchCase) T
+VisitSynchronizedBlock(tree *ast.SynchronizedBlock) T
+VisitTryCatch(tree *ast.TryCatch) T
+VisitCatchClause(tree *ast.CatchClause) T
+VisitType(tree *ast.Type) T
+VisitTypeElement(tree *ast.TypeElement) T
+VisitTypeParameterList(tree *ast.TypeParameterList) T
+VisitTypeParameter(tree *ast.TypeParameter) T
+VisitUnimplemented(tree *ast.Unimplemented) T
+VisitVarRef(tree *ast.VarRef) T
+
 }
