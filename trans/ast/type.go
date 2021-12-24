@@ -14,6 +14,7 @@ var primitiveTranslation = map[string]string{
 	"boolean": "bool",
 	"long":    "int64",
 	"String":  "string",
+	"void":    "",
 }
 
 type Type struct {
@@ -116,7 +117,7 @@ func (te *TypeElement) Children() []node.Node {
 
 func (te *TypeElement) IsPrimitive() bool {
 	switch te.Class {
-	case "bypte", "float", "short", "int", "long", "double", "boolean", "char", "String":
+	case "bypte", "float", "short", "int", "long", "double", "boolean", "char", "String", "void":
 		return true
 	default:
 		return false
