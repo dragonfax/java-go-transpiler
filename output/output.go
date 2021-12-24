@@ -70,9 +70,9 @@ func parseFile(filename string) *ast.Class {
 	return trans.BuildAST(tree)
 }
 
-func Translate(path string) error {
+func Translate(sourceDir, targetDir, targetPackage, targetStubDir string) error {
 
-	info, err := os.Stat(path)
+	info, err := os.Stat(sourceDir)
 	if err != nil {
 		panic(err)
 	}
@@ -80,14 +80,14 @@ func Translate(path string) error {
 	// parsing files
 
 	fmt.Println("parsing")
-	dir := path
+	dir := sourceDir
 	var classes []*ast.Class
 	if info.IsDir() {
-		filenames := gatherFilenames(path)
+		filenames := gatherFilenames(sourceDir)
 		classes = parseFiles(filenames)
 	} else {
-		dir = filepath.Dir(path)
-		class := parseFile(path)
+		dir = filepath.Dir(sourceDir)
+		class := parseFile(sourceDir)
 		classes = []*ast.Class{class}
 	}
 	if err != nil {
@@ -115,8 +115,11 @@ func Translate(path string) error {
 
 	// output
 	fmt.Println("writing files")
-	outputRoot := generateOutputRoot(dir)
-	outputStructures(h.GetClasses(), outputRoot)
+	if targetDir == "" {
+		targetDir = generateOutputRoot(dir)
+	}
+	h.RootPackage = targetPackage
+	outputStructures(h.GetClasses(), targetDir)
 	fmt.Println("writing files complete")
 
 	return nil

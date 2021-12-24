@@ -23,7 +23,7 @@ func NewImport(s string) *Import {
 }
 
 func (i *Import) String() string {
-	return fmt.Sprintf("import \"%s\"", strings.ReplaceAll(i.ImportPackage.QualifiedName, ".", "/"))
+	return fmt.Sprintf("import \"%s\"", i.ClassScope.PackageScope.RootPackage()+"/"+strings.ReplaceAll(i.ImportPackage.QualifiedName, ".", "/"))
 }
 
 func (i *Import) Children() []node.Node {

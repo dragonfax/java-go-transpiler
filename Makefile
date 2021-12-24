@@ -7,7 +7,7 @@ BINARY=convert
 GENERATED_VISITOR_FILES = trans/visitor/ast_visitor.g.go trans/visitor/base_ast_visitor.g.go
 
 run: $(BINARY)
-	./$(BINARY) $(target)
+	./$(BINARY) -source "$(source)" -target "$(target)" -package "$(package)"
 
 debug:
 	dlv --api-version 2 --headless --listen :40000 debug cmd/convert/main.go -- $(target)

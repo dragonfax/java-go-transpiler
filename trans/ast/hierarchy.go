@@ -6,6 +6,8 @@ type Hierarchy struct {
 	*node.Base
 
 	Packages map[string]*Package
+
+	RootPackage string
 }
 
 func NewHierarchy() *Hierarchy {

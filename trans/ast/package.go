@@ -34,6 +34,10 @@ func (pkg *Package) Dir() string {
 	return strings.Join(strings.Split(pkg.QualifiedName, "."), "/")
 }
 
+func (pkg *Package) RootPackage() string {
+	return pkg.GetParent().(*Hierarchy).RootPackage
+}
+
 /* AddClass, only for use before the AST walking phases begin
  * After that, the package is responsible for creating new classes,
  * since they will be empty reference classes.
