@@ -130,7 +130,12 @@ func (m *Member) MethodString() string {
 		throws = " /* TODO throws " + m.Throws + "*/"
 	}
 
-	return fmt.Sprintf("func (this *%s) %s(%s) %s%s{\n%s\n}\n\n", m.ClassScope.Name, m.Name, arguments, m.ReturnType, throws, body)
+	returnType := ""
+	if m.ReturnType != nil {
+		returnType = m.ReturnType.String()
+	}
+
+	return fmt.Sprintf("func (this *%s) %s(%s) %s%s{\n%s\n}\n\n", m.ClassScope.Name, m.Name, arguments, returnType, throws, body)
 }
 
 func (c *Member) ConstructorString() string {

@@ -12,21 +12,12 @@ type ScopePass struct {
 	CurrentPackage *ast.Package
 	CurrentClass   *ast.Class
 	CurrentMember  *ast.Member
-	ParentNode     node.Node
 }
 
 func NewScopePass(h *ast.Hierarchy) ASTVisitor[int] {
 	this := &ScopePass{}
 	this.BaseASTVisitor = NewASTVisitor[int](h, this)
 	return this
-}
-
-func (av *ScopePass) VisitNode(tree node.Node) int {
-
-	// fill in parents for all nodes.
-	tree.SetParent(av.ParentNode)
-
-	return av.BaseASTVisitor.VisitNode(tree)
 }
 
 func (av *ScopePass) VisitChildren(tree node.Node) int {
@@ -39,8 +30,6 @@ func (av *ScopePass) VisitChildren(tree node.Node) int {
 	if scope, ok := tree.(ast.ClassScope); av.CurrentClass != nil && ok {
 		scope.SetClassScope(av.CurrentClass)
 	}
-
-	av.ParentNode = tree
 
 	// resume normal operation
 	return av.BaseASTVisitor.VisitChildren(tree)
@@ -81,7 +70,7 @@ func (av *ScopePass) VisitImport(imp *ast.Import) int {
 		impPkg.AddImportReference(imp)
 	}
 
-	return av.zero // no children
+	return av.VisitChildren(imp)
 }
 
 func (av *ScopePass) VisitMember(member *ast.Member) int {

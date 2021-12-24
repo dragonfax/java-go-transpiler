@@ -56,10 +56,10 @@ func ExpressionProcessor(expressionI *parser.ExpressionContext) node.Node {
 				panic("qualified 'this'. For referencing outer class from inner class")
 			}
 			if expression.IDENTIFIER() != nil {
-				return NewBinaryOperator(".", firstExpression, NewFieldReference(expression.IDENTIFIER().GetText()))
+				return NewChain(firstExpression, NewFieldReference(expression.IDENTIFIER().GetText()))
 			}
 			if expression.MethodCall() != nil {
-				return NewBinaryOperator(".", firstExpression, NewMethodCall(expression.MethodCall()))
+				return NewChain(firstExpression, NewMethodCall(expression.MethodCall()))
 			}
 			if expression.NEW() != nil {
 				panic("qualified constructor, for constructing inner class from outer class")

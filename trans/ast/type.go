@@ -43,6 +43,7 @@ func NewTypeNodeFromContext(typ *parser.TypeTypeContext) *Type {
 		// simple primitive type, easy to parse
 		return NewType([]*TypeElement{
 			{
+				Base:  node.New(),
 				Class: ctx.PrimitiveType().GetText(),
 			},
 		})
@@ -59,6 +60,7 @@ func NewTypeNodeFromContext(typ *parser.TypeTypeContext) *Type {
 		if typeComp == nil {
 			// no typ arguments for this element of the type
 			elements = append(elements, &TypeElement{
+				Base:  node.New(),
 				Class: class,
 			})
 			continue

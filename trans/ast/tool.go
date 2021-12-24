@@ -35,7 +35,9 @@ func ArgumentListToString(list []node.Node) string {
 	}
 	return strings.Join(s, ",")
 }
+
 func DebugPrint(n node.Node) {
+	fmt.Println(BuildParentBreadcrumbs(n))
 	fmt.Println(node.JSONMarshalNode(n))
 	if cs, ok := n.(ClassScope); ok && cs.GetClassScope() != nil {
 		fmt.Printf("from class %s\n", cs.GetClassScope().Name)
@@ -44,4 +46,13 @@ func DebugPrint(n node.Node) {
 		memberScope := ms.GetMemberScope()
 		fmt.Printf("from class %s and method %s\n", memberScope.GetClassScope().Name, memberScope.Name)
 	}
+}
+
+func BuildParentBreadcrumbs(n node.Node) string {
+	s := n.String()
+	parent := n.GetParent()
+	if parent != nil {
+		s = BuildParentBreadcrumbs(parent) + "::" + s
+	}
+	return s
 }

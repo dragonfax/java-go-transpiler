@@ -31,7 +31,7 @@ func NewArrayLiteral(lit *parser.ArrayInitializerContext) *ArrayLiteral {
 	ctx := lit
 
 	if len(ctx.AllVariableInitializer()) == 0 {
-		return &ArrayLiteral{}
+		return &ArrayLiteral{Base: node.New()}
 	}
 
 	l := make([]node.Node, 0)

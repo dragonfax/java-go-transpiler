@@ -2,6 +2,7 @@ package visitor
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/dragonfax/java_converter/trans/ast"
 )
@@ -30,6 +31,11 @@ func (cv *CheckPass) VisitVarRef(ctx *ast.VarRef) int {
 
 	if ctx.VariableDecl == nil {
 		fmt.Printf("Var Ref Unresolved: %s\n", ctx.VariableName)
+		if ctx.GetParent() == nil {
+			fmt.Println("varref has no parent")
+			ast.DebugPrint(ctx)
+			os.Exit(1)
+		}
 	}
 
 	return 0 // these have no chuildren

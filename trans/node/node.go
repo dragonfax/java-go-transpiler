@@ -13,6 +13,7 @@ type Node interface {
 	String() string
 	Children() []Node
 	SetParent(Node)
+	GetParent() Node
 }
 
 type Base struct {
@@ -24,7 +25,14 @@ func New() *Base {
 }
 
 func (bn *Base) SetParent(p Node) {
+	if bn == nil {
+		panic("nil node in SetParent")
+	}
 	bn.Parent = p
+}
+
+func (bn *Base) GetParent() Node {
+	return bn.Parent
 }
 
 func MarshalNode(node Node) interface{} {

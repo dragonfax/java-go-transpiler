@@ -36,6 +36,7 @@ func StatementProcessor(statementCtxI *parser.StatementContext) node.Node {
 
 	if statementCtx.WHILE() != nil {
 		return &ClassicFor{
+			Base:      node.New(),
 			Condition: ExpressionProcessor(statementCtx.ParExpression().Expression()),
 			Body:      StatementProcessor(statementCtx.Statement(0)),
 		}
@@ -43,6 +44,7 @@ func StatementProcessor(statementCtxI *parser.StatementContext) node.Node {
 
 	if statementCtx.DO() != nil {
 		return &ClassicFor{
+			Base:          node.New(),
 			Condition:     ExpressionProcessor(statementCtx.ParExpression().Expression()),
 			Body:          StatementProcessor(statementCtx.Statement(0)),
 			ConditionLast: true,

@@ -22,7 +22,7 @@ var passes = map[string]passFunc{
 	"scope":    visitor.NewScopePass,
 	"populate": visitor.NewPopulatePass,
 	"resolve":  visitor.NewResolvePass,
-	"check":    visitor.NewCheckPass,
+	// "check":    visitor.NewCheckPass,
 }
 
 func walkFunc(filenames *[]string) fs.WalkDirFunc {
@@ -105,6 +105,7 @@ func Translate(path string) error {
 	}
 
 	// process the hierarchy (all classes and packages) at once
+	visitor.ParentPass(h)
 	for name, newFunc := range passes {
 		fmt.Printf("walking ast with %s\n", name)
 		v := newFunc(h)
