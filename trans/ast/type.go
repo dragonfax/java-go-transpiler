@@ -13,6 +13,7 @@ var primitiveTranslation = map[string]string{
 	"double":  "float64",
 	"boolean": "bool",
 	"long":    "int64",
+	"String":  "string",
 }
 
 type Type struct {
@@ -113,7 +114,23 @@ func (te *TypeElement) Children() []node.Node {
 	return node.ListOfNodesToNodeList(te.TypeArguments)
 }
 
+func (te *TypeElement) IsPrimitive() bool {
+	switch te.Class {
+	case "bypte", "float", "short", "int", "long", "double", "boolean", "char", "String":
+		return true
+	default:
+		return false
+	}
+
+}
+
 func (tn *TypeElement) String() string {
+
+	star := "*"
+	if tn.IsPrimitive() {
+		star = ""
+	}
+
 	class := tn.Class
 	if tClass, ok := primitiveTranslation[class]; ok {
 		class = tClass
@@ -126,8 +143,8 @@ func (tn *TypeElement) String() string {
 			list = append(list, s.String())
 		}
 
-		return fmt.Sprintf("%s[%s]", class, strings.Join(list, ","))
+		return fmt.Sprintf("%s%s[%s]", star, class, strings.Join(list, ","))
 	}
 
-	return class
+	return star + class
 }
