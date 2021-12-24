@@ -19,6 +19,7 @@ type LocalVarDecl struct {
 	Expression node.Node
 	Type       *Type
 	Ellipses   bool
+	IsArgument bool
 }
 
 func NewLocalVarDecl(typ *Type, name string, expression node.Node) *LocalVarDecl {
@@ -44,6 +45,7 @@ func NewArgument(typ *Type, name string, ellipses bool) *LocalVarDecl {
 		Type:            typ,
 		Name:            name,
 		Ellipses:        ellipses,
+		IsArgument:      true,
 	}
 }
 
@@ -69,8 +71,13 @@ func (f *LocalVarDecl) String() string {
 		return fmt.Sprintf("%s := %s", f.Name, f.Expression)
 	}
 
+	varTerm := "var "
+	if f.IsArgument {
+		varTerm = ""
+	}
+
 	// might be a formal parameter, or a local var declaration
-	return fmt.Sprintf("var %s %s", f.Name, f.Type)
+	return fmt.Sprintf("%s%s %s", varTerm, f.Name, f.Type)
 }
 
 func NewLocalVarDeclNodeList(decl *parser.LocalVariableDeclarationContext) []*LocalVarDecl {

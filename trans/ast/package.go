@@ -1,22 +1,37 @@
 package ast
 
-import "github.com/dragonfax/java_converter/trans/node"
+import (
+	"strings"
+
+	"github.com/dragonfax/java_converter/trans/node"
+)
 
 type Package struct {
 	*node.Base
 
-	Name             string
+	QualifiedName    string
 	Classes          map[string]*Class
 	ImportReferences []*Import
 }
 
 func NewPackage(name string) *Package {
 	return &Package{
-		Base:             node.New(),
-		Name:             name,
+		Base: node.New(),
+
+		/* a package name never has a class name in it (like an import name might have) */
+		QualifiedName:    name,
 		Classes:          make(map[string]*Class),
 		ImportReferences: make([]*Import, 0),
 	}
+}
+
+func (pkg *Package) Basename() string {
+	parts := strings.Split(pkg.QualifiedName, ".")
+	return parts[len(parts)-1]
+}
+
+func (pkg *Package) Dir() string {
+	return strings.Join(strings.Split(pkg.QualifiedName, "."), "/")
 }
 
 /* AddClass, only for use before the AST walking phases begin
@@ -31,7 +46,7 @@ func (pkg *Package) AddClass(class *Class) {
 }
 
 func (pkg *Package) String() string {
-	return "package " + pkg.Name
+	return "package " + pkg.Basename()
 }
 
 func (pkg *Package) Children() []node.Node {

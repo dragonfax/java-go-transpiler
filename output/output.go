@@ -19,9 +19,9 @@ type passFunc func(*ast.Hierarchy) visitor.ASTVisitor[int]
 
 // passes to run over the AST. in order.
 var passes = map[string]passFunc{
-	"scope":    visitor.NewScopePass,
-	"populate": visitor.NewPopulatePass,
-	"resolve":  visitor.NewResolvePass,
+	"scope": visitor.NewScopePass,
+	// "populate": visitor.NewPopulatePass,
+	// "resolve":  visitor.NewResolvePass,
 	// "check":    visitor.NewCheckPass,
 }
 
@@ -134,7 +134,7 @@ func outputStructures(classes []*ast.Class, outputRoot string) {
 
 func outputStructure(class *ast.Class, outputRoot string) {
 
-	targetFilename := outputRoot + "/" + class.OutputFilename()
+	targetFilename := outputRoot + "/" + class.Filename()
 	targetErrorFilename := targetFilename + ".err.txt"
 
 	targetDir := filepath.Dir(targetFilename)

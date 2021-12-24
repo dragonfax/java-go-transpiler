@@ -11,7 +11,7 @@ type Import struct {
 	*node.Base
 	*BaseClassScope
 
-	ImportString      string
+	ImportString      string // the original string from the java statement. package + (* or class)
 	Star              bool
 	ImportPackageName string
 	ImportPackage     *Package
@@ -23,7 +23,7 @@ func NewImport(s string) *Import {
 }
 
 func (i *Import) String() string {
-	return fmt.Sprintf("import \"%s\"", i.ImportString)
+	return fmt.Sprintf("import \"%s\"", strings.ReplaceAll(i.ImportPackage.QualifiedName, ".", "/"))
 }
 
 func (i *Import) Children() []node.Node {
@@ -31,8 +31,11 @@ func (i *Import) Children() []node.Node {
 }
 
 func SplitPackageName(importString string) (string, string) {
-	i := strings.LastIndex(importString, ".")
-	packageName := importString[0:i]
-	className := importString[i+1:]
+	index := strings.LastIndex(importString, ".")
+	if index == -1 {
+		panic("unable to split imported package name")
+	}
+	packageName := importString[0:index]
+	className := importString[index+1:]
 	return packageName, className
 }

@@ -2,7 +2,6 @@ package ast
 
 import (
 	"fmt"
-	"strings"
 	"text/template"
 
 	"github.com/dragonfax/java_converter/trans/node"
@@ -68,14 +67,14 @@ func (c *Class) Children() []node.Node {
 	return list
 }
 
-func (c *Class) OutputFilename() string {
-	return fmt.Sprintf("%s/%s/%s.go", strings.ReplaceAll(c.PackageScope.Name, ".", "/"), c.Name, c.Name)
-}
-
 var classTemplate = `
 
 {{if .Generated}}
 // TODO This class was not included in the original source, but detected by code accessing it. It will have no implementation
+{{end}}
+
+{{range .Imports}}
+{{.}}
 {{end}}
 
 {{ $className := .Name }}
@@ -125,13 +124,12 @@ func (c *Class) String() string {
 	return ExecuteTemplateToString(classTpl, c)
 }
 
-func (c *Class) PackageBasename() string {
-	last := strings.LastIndex(c.PackageName, ".")
-	return c.PackageName[last+1 : len(c.PackageName)]
+func (c *Class) Filename() string {
+	return c.PackageScope.Dir() + "/" + c.Name + ".go"
 }
 
 func (c *Class) AsFile() string {
-	return fmt.Sprintf("package %s\n\n%s", c.PackageBasename(), c)
+	return fmt.Sprintf("%s\n\n%s", c.PackageScope, c)
 }
 
 func NewClass() *Class {
