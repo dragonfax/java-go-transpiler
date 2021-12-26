@@ -45,7 +45,6 @@ func (cv *ResolvePass) VisitVarRef(varRef *ast.VarRef) int {
 		ast.DebugPrint(varRef.GetParent())
 		fmt.Println("no member scope for var ref")
 		os.Exit(1)
-		return 0
 	}
 
 	localVar, ok := varRef.MemberScope.LocalVars[name]
@@ -56,23 +55,36 @@ func (cv *ResolvePass) VisitVarRef(varRef *ast.VarRef) int {
 	}
 
 	// check in the class fields
-	if varRef.MemberScope.ClassScope == nil {
+	class := varRef.MemberScope.ClassScope
+	if class == nil {
 		fmt.Println("didn't find class for var ref.")
-		return 0
+		os.Exit(1)
 	}
 
-	field, ok := varRef.MemberScope.ClassScope.FieldsByName[name]
+	field, ok := class.FieldsByName[name]
 	if ok {
 		fmt.Println("found var ref in class")
 		varRef.VariableDecl = field
 		return 0
 	}
 
-	// TODO check through the list of imported clases.
+	// check base class
+	baseClass := class.BaseClass
+	if baseClass != nil {
+		field, ok := baseClass.FieldsByName[name]
+		if ok {
+			fmt.Println("found var ref in base class")
+			varRef.VariableDecl = field
+			return 0
+		}
 
-	//ast.DebugPrint(varRef.GetParent())
-	//fmt.Println("didn't find source of var ref.")
-	////os.Exit(1)
+	}
+
+	refClass := class.ResolveClassName(name)
+	if refClass != nil {
+		fmt.Println("found var ref as a class")
+		varRef.VariableDecl = refClass
+	}
 
 	return 0 // these have no chuildren
 }
