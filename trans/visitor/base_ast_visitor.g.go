@@ -65,9 +65,6 @@ func (av *BaseASTVisitor[T]) VisitNode(tree node.Node) T {
 	} else if n, ok := tree.(*ast.Initializer); ok {
 		return av.root.VisitInitializer(n)
 
-	} else if n, ok := tree.(*ast.InterfaceMember); ok {
-		return av.root.VisitInterfaceMember(n)
-
 	} else if n, ok := tree.(*ast.Lambda); ok {
 		return av.root.VisitLambda(n)
 
@@ -213,10 +210,6 @@ func (av *BaseASTVisitor[T]) VisitImport(tree *ast.Import) T {
 }
 
 func (av *BaseASTVisitor[T]) VisitInitializer(tree *ast.Initializer) T {
-	return av.root.VisitChildren(tree)
-}
-
-func (av *BaseASTVisitor[T]) VisitInterfaceMember(tree *ast.InterfaceMember) T {
 	return av.root.VisitChildren(tree)
 }
 

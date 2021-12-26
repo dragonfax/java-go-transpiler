@@ -23,7 +23,6 @@ type GenASTVisitor[T comparable] interface {
 	VisitIf(tree *ast.If) T
 	VisitImport(tree *ast.Import) T
 	VisitInitializer(tree *ast.Initializer) T
-	VisitInterfaceMember(tree *ast.InterfaceMember) T
 	VisitLambda(tree *ast.Lambda) T
 	VisitLiteral(tree *ast.Literal) T
 	VisitLocalVarDecl(tree *ast.LocalVarDecl) T

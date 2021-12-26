@@ -17,7 +17,8 @@ type Class struct {
 	Interfaces    []*Type
 
 	/* could be a member, but could also be an interface, a nested class, or a few other things */
-	Members []node.Node
+	Members      []*Member
+	OtherMembers []node.Node
 
 	Fields       []*Field
 	PackageScope *Package
@@ -93,6 +94,11 @@ type {{ .Name }} struct {
 	{{end}}
 }
 
+{{range .OtherMembers}}
+// TODO other member in class
+{{printf "%T" . }}
+{{end}}
+
 {{range .Members}}{{ . }}
 {{end}}
 `
@@ -138,7 +144,8 @@ func (c *Class) AsFile() string {
 func NewClass() *Class {
 	c := &Class{
 		Base:         node.New(),
-		Members:      make([]node.Node, 0),
+		Members:      make([]*Member, 0),
+		OtherMembers: make([]node.Node, 0),
 		Interfaces:   make([]*Type, 0),
 		Fields:       make([]*Field, 0),
 		Imports:      make([]*Import, 0),

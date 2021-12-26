@@ -2,20 +2,7 @@ package ast
 
 import (
 	"github.com/dragonfax/java_converter/input/parser"
-	"github.com/dragonfax/java_converter/trans/node"
 )
-
-type InterfaceMember struct {
-	*node.Base
-
-	Name       string
-	Arguments  []node.Node
-	ReturnType node.Node
-}
-
-func (im *InterfaceMember) Children() []node.Node {
-	return node.AppendNodeLists(im.Arguments, im.ReturnType)
-}
 
 func NewInterface(ctx *parser.InterfaceDeclarationContext) *Class {
 	this := NewClass()
@@ -34,24 +21,16 @@ func NewInterface(ctx *parser.InterfaceDeclarationContext) *Class {
 			panic("some unsupported type of member inside interface declaration")
 		}
 
-		member := &InterfaceMember{
-			Base:       node.New(),
-			Name:       declCtx.IDENTIFIER().GetText(),
-			Arguments:  FormalParameterListProcessor(declCtx.FormalParameters().FormalParameterList()),
-			ReturnType: NewTypeOrVoid(declCtx.TypeTypeOrVoid()),
-		}
+		member := NewMethod(
+			declCtx.IDENTIFIER().GetText(),
+			FormalParameterListProcessor(declCtx.FormalParameters().FormalParameterList()),
+			NewTypeOrVoid(declCtx.TypeTypeOrVoid()),
+			nil,
+		)
 
 		this.Members = append(this.Members, member)
 
 	}
 
 	return this
-}
-
-func (im *InterfaceMember) String() string {
-	return im.Name
-}
-
-func (im *InterfaceMember) ArgumentsString() string {
-	return ArgumentListToString(im.Arguments)
 }

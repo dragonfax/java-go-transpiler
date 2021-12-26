@@ -28,6 +28,7 @@ type Member struct {
 	Static       bool
 	Synchronized bool
 	Constructor  bool
+	Interface    bool
 
 	LocalVars map[string]*LocalVarDecl
 }
@@ -142,6 +143,10 @@ func (m *Member) MethodString() string {
 	}
 
 	return fmt.Sprintf("func (this *%s) %s(%s) %s%s{\n%s\n}\n\n", m.ClassScope.Name, m.Name, arguments, returnType, throws, body)
+}
+
+func (im *Member) ArgumentsString() string {
+	return ArgumentListToString(im.Arguments)
 }
 
 func ArgumentCount(method *Member) string {

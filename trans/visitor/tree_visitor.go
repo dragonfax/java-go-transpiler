@@ -85,13 +85,15 @@ func (gv *TreeVisitor) VisitClassBody(ctx *parser.ClassBodyContext) node.Node {
 		}
 		if subClass, ok := member.(*ast.Class); ok {
 			// We don't do nested
-			class.Members = append(class.Members, ast.NewNestedClass(subClass.Name))
+			class.OtherMembers = append(class.OtherMembers, subClass)
 		} else if f, ok := member.(*ast.Field); ok {
 			class.Fields = append(class.Fields, f)
 		} else if fl, ok := member.(*ast.FieldList); ok {
 			class.Fields = append(class.Fields, fl.Fields...)
+		} else if m, ok := member.(*ast.Member); ok {
+			class.Members = append(class.Members, m)
 		} else {
-			class.Members = append(class.Members, member)
+			class.OtherMembers = append(class.OtherMembers, member)
 		}
 	}
 
@@ -178,8 +180,9 @@ func (v *TreeVisitor) VisitConstructorDeclaration(ctx *parser.ConstructorDeclara
 }
 
 func (gv *TreeVisitor) VisitEnumDeclaration(ctx *parser.EnumDeclarationContext) node.Node {
-	members := make([]node.Node, 0)
+	members := make([]*ast.Member, 0)
 	fields := make([]*ast.Field, 0)
+	otherMembers := make([]node.Node, 0)
 	if ctx.EnumBodyDeclarations() != nil {
 		for _, decl := range ctx.EnumBodyDeclarations().AllClassBodyDeclaration() {
 			member := gv.VisitClassBodyDeclaration(decl)
@@ -191,18 +194,20 @@ func (gv *TreeVisitor) VisitEnumDeclaration(ctx *parser.EnumDeclarationContext) 
 			}
 			if subClass, ok := member.(*ast.Class); ok {
 				// We don't do subclasses
-				members = append(members, ast.NewNestedClass(subClass.Name))
+				otherMembers = append(otherMembers, subClass)
 			} else if f, ok := member.(*ast.Field); ok {
 				fields = append(fields, f)
 			} else if fl, ok := member.(*ast.FieldList); ok {
 				fields = append(fields, fl.Fields...)
+			} else if m, ok := member.(*ast.Member); ok {
+				members = append(members, m)
 			} else {
-				members = append(members, member)
+				otherMembers = append(otherMembers, member)
 			}
 		}
 	}
 
-	return ast.NewEnum(ctx, fields, members)
+	return ast.NewEnum(ctx, fields, members, otherMembers)
 }
 
 func (gv *TreeVisitor) VisitInterfaceDeclaration(ctx *parser.InterfaceDeclarationContext) node.Node {
