@@ -23,6 +23,10 @@ type MethodCall struct {
 	This       bool
 }
 
+func (mc *MethodCall) Name() string {
+	return mc.MethodName
+}
+
 func (mc *MethodCall) Children() []node.Node {
 	return mc.Arguments
 }

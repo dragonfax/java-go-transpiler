@@ -15,6 +15,10 @@ type BaseOperator struct {
 
 var _ node.Node = &BinaryOperator{}
 
+func (bo *BaseOperator) Name() string {
+	return bo.Operator
+}
+
 type BinaryOperator struct {
 	BaseOperator
 

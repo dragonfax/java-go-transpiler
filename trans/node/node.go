@@ -49,7 +49,8 @@ func MarshalNode(node Node) interface{} {
 	}
 
 	m := map[string]interface{}{
-		"go": fmt.Sprintf("%T", node),
+		"Name": Name(node),
+		"go":   fmt.Sprintf("%T", node),
 	}
 
 	if len(children) > 0 {
@@ -89,4 +90,21 @@ func JSONMarshalNode(node Node) string {
 		panic(err)
 	}
 	return string(js)
+}
+
+func Name(node Node) string {
+	if nameNode, ok := node.(interface{ Name() string }); ok {
+		return nameNode.Name()
+	}
+
+	obj := reflector.New(node)
+	field := obj.Field("Name")
+	if field.IsValid() {
+		nameValue, _ := field.Get()
+		if s, ok := nameValue.(string); ok {
+			return s
+		}
+	}
+
+	return fmt.Sprintf("%T", node)
 }

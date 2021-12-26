@@ -26,3 +26,7 @@ func NewClassReference(className string) *ClassReference {
 func (cr *ClassReference) String() string {
 	return cr.ClassName + ".class"
 }
+
+func (cr *ClassReference) Name() string {
+	return cr.String()
+}

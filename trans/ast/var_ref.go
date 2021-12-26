@@ -21,6 +21,10 @@ func NewVarRef(name string) *VarRef {
 	return &VarRef{Base: node.New(), BaseMemberScope: NewMemberScope(), VariableName: name}
 }
 
+func (vr *VarRef) Name() string {
+	return vr.String()
+}
+
 func (vr *VarRef) String() string {
 	if !vr.This && !vr.Super && vr.VariableDecl == nil {
 		return vr.VariableName + " /* unresolved */"

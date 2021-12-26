@@ -111,6 +111,10 @@ type TypeElement struct {
 	TypeArguments []*Type
 }
 
+func (te *TypeElement) Name() string {
+	return te.Class
+}
+
 func (te *TypeElement) Children() []node.Node {
 	return node.ListOfNodesToNodeList(te.TypeArguments)
 }

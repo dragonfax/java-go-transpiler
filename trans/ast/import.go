@@ -22,6 +22,10 @@ func NewImport(s string) *Import {
 	return &Import{Base: node.New(), BaseClassScope: NewClassScope(), ImportString: s}
 }
 
+func (i *Import) Name() string {
+	return i.ImportString
+}
+
 func (i *Import) String() string {
 	return fmt.Sprintf("import \"%s\"", i.ClassScope.PackageScope.RootPackage()+"/"+strings.ReplaceAll(i.ImportPackage.QualifiedName, ".", "/"))
 }
