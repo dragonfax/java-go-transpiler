@@ -15,6 +15,7 @@ import (
  */
 type MethodCall struct {
 	*node.Base
+	*BaseMemberScope
 
 	MethodName string
 	Arguments  []node.Node
@@ -56,7 +57,12 @@ func NewMethodCall(methodCall *parser.MethodCallContext) *MethodCall {
 		}
 	}
 
-	this := &MethodCall{Base: node.New(), MethodName: methodName, Arguments: arguments}
+	this := &MethodCall{
+		Base:            node.New(),
+		BaseMemberScope: NewMemberScope(),
+		MethodName:      methodName,
+		Arguments:       arguments,
+	}
 
 	if methodCallCtx.SUPER() != nil {
 		this.Super = true
