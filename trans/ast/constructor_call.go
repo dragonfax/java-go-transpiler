@@ -77,5 +77,12 @@ func (cc *ConstructorCall) String() string {
 	for _, ta := range cc.TypeArguments {
 		list = append(list, ta.String())
 	}
-	return fmt.Sprintf("New%s[%s](%s)", cc.Class, strings.Join(list, ","), ArgumentListToString(cc.Arguments))
+
+	// We include the argument count to methods and constructors (when its > 0), as golang doesn't support method overloading
+	argumentCount := ""
+	if len(cc.Arguments) > 0 {
+		argumentCount = fmt.Sprintf("%d", len(cc.Arguments))
+	}
+
+	return fmt.Sprintf("New%s%s[%s](%s)", cc.Class, argumentCount, strings.Join(list, ","), ArgumentListToString(cc.Arguments))
 }

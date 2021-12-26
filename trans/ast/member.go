@@ -2,6 +2,8 @@ package ast
 
 import (
 	"fmt"
+	"strings"
+	"text/template"
 
 	"github.com/dragonfax/java_converter/input/parser"
 	"github.com/dragonfax/java_converter/tool"
@@ -30,15 +32,27 @@ type Member struct {
 	LocalVars map[string]*LocalVarDecl
 }
 
-func NewConstructor(ctx *parser.ConstructorDeclarationContext) *Member {
-
+func NewEmptyConstructor() *Member {
 	c := &Member{
 		Base:           node.New(),
 		BaseClassScope: NewClassScope(),
-		Name:           ctx.IDENTIFIER().GetText(),
 		Constructor:    true,
 		LocalVars:      make(map[string]*LocalVarDecl),
 	}
+	return c
+}
+
+func NewEmptyConstructorFromClass(class *Class) *Member {
+	c := NewEmptyConstructor()
+	c.Name = class.Name
+	c.ClassScope = class
+	return c
+}
+
+func NewConstructor(ctx *parser.ConstructorDeclarationContext) *Member {
+
+	c := NewEmptyConstructor()
+	c.Name = ctx.IDENTIFIER().GetText()
 
 	if ctx.GetConstructorBody() != nil {
 		c.Body = NewBlock(ctx.GetConstructorBody())
@@ -142,18 +156,33 @@ func (m *Member) MethodString() string {
 	return fmt.Sprintf("func (this *%s) %s(%s) %s%s{\n%s\n}\n\n", m.ClassScope.Name, m.Name, arguments, returnType, throws, body)
 }
 
+func ArgumentCount(method *Member) string {
+	if len(method.Arguments) == 0 {
+		return ""
+	}
+	return fmt.Sprintf("%d", len(method.Arguments))
+}
+
+var constructorTemplate = `
+func New{{.Name}}{{ ArgumentCount . }}({{ Arguments .Arguments }})
+	{{- if .Throws -}} 
+		/* TODO throws {{ .Throws }} */
+	{{- end -}}
+	{{- .ClassScope.Name }} {
+	{{if .Body}}
+	{{- .Body -}}
+	{{end}}
+}
+`
+var constructorTemplateCompiled = template.Must(template.New("constructor").Funcs(map[string]interface{}{
+	"Arguments":     ArgumentListToString,
+	"ArgumentCount": ArgumentCount,
+}).Parse(constructorTemplate))
+
 func (c *Member) ConstructorString() string {
-	body := ""
-	if c.Body != nil {
-		body = c.Body.String()
-	}
-
-	throws := ""
-	if c.Throws != "" {
-		throws = " /* TODO throws " + c.Throws + " */"
-	}
-
-	return fmt.Sprintf("func New%s(%s) %s *%s{\n%s\n}\n\n", c.Name, ArgumentListToString(c.Arguments), throws, c.Name, body)
+	writer := strings.Builder{}
+	constructorTemplateCompiled.Execute(&writer, c)
+	return writer.String()
 }
 
 func (m *Member) AddLocalVar(localVarDecl *LocalVarDecl) {
