@@ -32,27 +32,15 @@ type Member struct {
 	LocalVars map[string]*LocalVarDecl
 }
 
-func NewEmptyConstructor() *Member {
+func NewConstructor(ctx *parser.ConstructorDeclarationContext) *Member {
+
 	c := &Member{
 		Base:           node.New(),
 		BaseClassScope: NewClassScope(),
+		Name:           ctx.IDENTIFIER().GetText(),
 		Constructor:    true,
 		LocalVars:      make(map[string]*LocalVarDecl),
 	}
-	return c
-}
-
-func NewEmptyConstructorFromClass(class *Class) *Member {
-	c := NewEmptyConstructor()
-	c.Name = class.Name
-	c.ClassScope = class
-	return c
-}
-
-func NewConstructor(ctx *parser.ConstructorDeclarationContext) *Member {
-
-	c := NewEmptyConstructor()
-	c.Name = ctx.IDENTIFIER().GetText()
 
 	if ctx.GetConstructorBody() != nil {
 		c.Body = NewBlock(ctx.GetConstructorBody())
@@ -168,10 +156,26 @@ func New{{.Name}}{{ ArgumentCount . }}({{ Arguments .Arguments }})
 	{{- if .Throws -}} 
 		/* TODO throws {{ .Throws }} */
 	{{- end -}}
-	{{- .ClassScope.Name }} {
+
+	{{- with .ClassScope -}}
+	*{{ .Name }} {
+
+	this := &{{.Name}}{
+		{{- if .BaseClass -}}
+		{{- .BaseClass.Name}}: {{.BaseClass.PackageScope.Basename}}.New{{.BaseClass.Name}}(),
+		{{- end -}}
+	}
+
+	{{range .Fields}} {{if .HasInitializer}}this.{{ .Initializer }}{{end}}
+	{{end}}
+
+	{{end}}
+
 	{{if .Body}}
 	{{- .Body -}}
 	{{end}}
+
+	return this
 }
 `
 var constructorTemplateCompiled = template.Must(template.New("constructor").Funcs(map[string]interface{}{

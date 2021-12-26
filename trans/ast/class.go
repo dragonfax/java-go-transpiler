@@ -93,19 +93,6 @@ type {{ .Name }} struct {
 	{{end}}
 }
 
-func New{{.Name}}() *{{.Name}}{
-    this := &{{.Name}}{
-		{{- if .BaseClass -}}
-		{{- .BaseClass.Name}}: {{.BaseClass.PackageScope.Basename}}.New{{.BaseClass.Name}}(),
-		{{- end -}}
-	}
-
-    {{range .Fields}} {{if .HasInitializer}}this.{{ .Initializer }}{{end}}
-    {{end}}
-
-    return this
-}
-
 {{range .Members}}{{ . }}
 {{end}}
 `
