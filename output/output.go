@@ -15,16 +15,6 @@ import (
 	"github.com/schollz/progressbar/v3"
 )
 
-type passFunc func(*ast.Hierarchy) visitor.ASTVisitor[int]
-
-// passes to run over the AST. in order.
-var passes = map[string]passFunc{
-	"scope": visitor.NewScopePass,
-	// "populate": visitor.NewPopulatePass,
-	// "resolve":  visitor.NewResolvePass,
-	// "check":    visitor.NewCheckPass,
-}
-
 func walkFunc(filenames *[]string) fs.WalkDirFunc {
 	return func(filename string, entry fs.DirEntry, err error) error {
 		if err != nil {
@@ -105,13 +95,13 @@ func Translate(sourceDir, targetDir, targetPackage, targetStubDir string) error 
 	}
 
 	// process the hierarchy (all classes and packages) at once
+
 	visitor.ParentPass(h)
-	for name, newFunc := range passes {
-		fmt.Printf("walking ast with %s\n", name)
-		v := newFunc(h)
-		v.VisitNode(h)
-		fmt.Printf("ast walking complete (%s)\n", name)
-	}
+	visitor.NewScopePass(h).VisitNode(h)
+	visitor.NewPopulatePass(h).VisitNode(h)
+	visitor.NewResolvePass(h).VisitNode(h)
+	visitor.BaseClassPass(h)
+	// "check":    visitor.NewCheckPass,
 
 	// output
 	fmt.Println("writing files")

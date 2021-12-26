@@ -81,14 +81,24 @@ var classTemplate = `
 {{range .Interfaces }}var _ {{ . }} = &{{ $className}}{}
 {{end}}
 type {{ .Name }} struct {
-    {{if .BaseClassName}}*{{ .BaseClassName }}{{end}}
+    {{if .BaseClassName -}}
+		{{- if .BaseClass -}} 
+			{{- .BaseClass.Reference -}}
+		{{- else -}}
+			*{{ .BaseClassName }} /* unresolved */
+		{{- end -}}
+	{{- end}}
 
     {{range .Fields}}{{ .Declaration }}
 	{{end}}
 }
 
 func New{{.Name}}() *{{.Name}}{
-    this := &{{.Name}}{}
+    this := &{{.Name}}{
+		{{- if .BaseClass -}}
+		{{- .BaseClass.Name}}: {{.BaseClass.PackageScope.Basename}}.New{{.BaseClass.Name}}(),
+		{{- end -}}
+	}
 
     {{range .Fields}} {{if .HasInitializer}}this.{{ .Initializer }}{{end}}
     {{end}}
@@ -124,6 +134,12 @@ func (c *Class) String() string {
 	return ExecuteTemplateToString(classTpl, c)
 }
 
+// Code is referning to this class by name.
+// include the basename of the package its in.
+func (c *Class) Reference() string {
+	return "*" + c.PackageScope.Basename() + "." + c.Name
+}
+
 func (c *Class) Filename() string {
 	return c.PackageScope.Dir() + "/" + c.Name + ".go"
 }
@@ -147,4 +163,35 @@ func NewClass() *Class {
 
 func (c *Class) AddField(field *Field) {
 	c.FieldsByName[field.Name] = field
+}
+
+func (thisClass *Class) ResolveClassName(className string) *Class {
+	// resolve a classname to a class from the scope of this class.
+	// class could come from the same package as this class, or an imported class, or an imported package
+
+	for _, imp := range thisClass.Imports {
+		if imp.ImportClass != nil && imp.ImportClass.Name == className {
+			// the referenced class is from this import.
+			return imp.ImportClass
+		}
+	}
+
+	resolvedClass := thisClass.PackageScope.HasClass(className)
+	if resolvedClass != nil {
+		// the references class is from the same package
+		return resolvedClass
+	}
+
+	// go through all start imported packages
+	for _, imp := range thisClass.Imports {
+		if imp.Star {
+			resolvedClass := imp.ImportPackage.HasClass(className)
+			if resolvedClass != nil {
+				// the referenced class game from a star imported package
+				return resolvedClass
+			}
+		}
+	}
+
+	return nil
 }

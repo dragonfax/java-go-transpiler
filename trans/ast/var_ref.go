@@ -22,6 +22,9 @@ func NewVarRef(name string) *VarRef {
 }
 
 func (vr *VarRef) String() string {
+	if !vr.This && !vr.Super && vr.VariableDecl == nil {
+		return vr.VariableName + " /* unresolved */"
+	}
 	return vr.VariableName
 }
 

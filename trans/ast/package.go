@@ -49,6 +49,10 @@ func (pkg *Package) AddClass(class *Class) {
 	pkg.Classes[class.Name] = class
 }
 
+func (pkg *Package) HasClass(className string) *Class {
+	return pkg.Classes[className]
+}
+
 func (pkg *Package) String() string {
 	return "package " + pkg.Basename()
 }

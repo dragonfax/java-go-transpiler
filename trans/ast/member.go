@@ -135,6 +135,10 @@ func (m *Member) MethodString() string {
 		returnType = m.ReturnType.String()
 	}
 
+	if m.ClassScope == nil {
+		panic("no class scope for method")
+	}
+
 	return fmt.Sprintf("func (this *%s) %s(%s) %s%s{\n%s\n}\n\n", m.ClassScope.Name, m.Name, arguments, returnType, throws, body)
 }
 

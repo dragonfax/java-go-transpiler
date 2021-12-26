@@ -70,9 +70,9 @@ func (cv *ResolvePass) VisitVarRef(varRef *ast.VarRef) int {
 
 	// TODO check through the list of imported clases.
 
-	fmt.Println("didn't find source of var ref.")
-	ast.DebugPrint(varRef.GetParent())
-	os.Exit(1)
+	//ast.DebugPrint(varRef.GetParent())
+	//fmt.Println("didn't find source of var ref.")
+	////os.Exit(1)
 
 	return 0 // these have no chuildren
 }
