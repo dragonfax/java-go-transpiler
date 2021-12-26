@@ -32,25 +32,32 @@ func (gv *TreeVisitor) AggregateResult(aggregate, nextResult node.Node) node.Nod
 
 func (gv *TreeVisitor) VisitCompilationUnit(ctx *parser.CompilationUnitContext) node.Node {
 
-	node := gv.VisitChildren(ctx)
+	packageName := ctx.PackageDeclaration().QualifiedName().GetText()
+
+	imports := make([]*ast.Import, 0)
+	for _, importCtx := range ctx.AllImportDeclaration() {
+		importedPackageName := importCtx.QualifiedName().GetText()
+		imports = append(imports, ast.NewImport(importedPackageName))
+	}
+
+	if len(ctx.AllTypeDeclaration()) == 0 {
+		return nil
+	}
+
+	if len(ctx.AllTypeDeclaration()) > 1 {
+		panic(fmt.Sprintf("wrong number of types in a file %d", 0))
+	}
+
+	node := gv.VisitTypeDeclaration(ctx.TypeDeclaration(0))
 	if node == nil {
 		return nil
 	}
 
-	packageName := ctx.PackageDeclaration().QualifiedName().GetText()
+	class := node.(*ast.Class)
+	class.PackageName = packageName
+	class.Imports = imports
 
-	class, ok := node.(*ast.Class)
-	if ok {
-		class.PackageName = packageName
-
-		for _, importCtx := range ctx.AllImportDeclaration() {
-			importedPackageName := importCtx.QualifiedName().GetText()
-			class.Imports = append(class.Imports, ast.NewImport(importedPackageName))
-		}
-		return class
-	}
-
-	panic("got something unknown from children")
+	return class
 }
 
 func (gv *TreeVisitor) VisitClassDeclaration(ctx *parser.ClassDeclarationContext) node.Node {
@@ -84,7 +91,6 @@ func (gv *TreeVisitor) VisitClassBody(ctx *parser.ClassBodyContext) node.Node {
 			continue
 		}
 		if subClass, ok := member.(*ast.Class); ok {
-			// We don't do nested
 			class.OtherMembers = append(class.OtherMembers, subClass)
 		} else if f, ok := member.(*ast.Field); ok {
 			class.Fields = append(class.Fields, f)

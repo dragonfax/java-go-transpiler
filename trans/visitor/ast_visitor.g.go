@@ -29,7 +29,6 @@ type GenASTVisitor[T comparable] interface {
 	VisitMember(tree *ast.Member) T
 	VisitMethodCall(tree *ast.MethodCall) T
 	VisitMethodReference(tree *ast.MethodReference) T
-	VisitNestedClass(tree *ast.NestedClass) T
 	VisitPackage(tree *ast.Package) T
 	VisitReturn(tree *ast.Return) T
 	VisitThrow(tree *ast.Throw) T

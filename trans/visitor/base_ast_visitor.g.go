@@ -83,9 +83,6 @@ func (av *BaseASTVisitor[T]) VisitNode(tree node.Node) T {
 	} else if n, ok := tree.(*ast.MethodReference); ok {
 		return av.root.VisitMethodReference(n)
 
-	} else if n, ok := tree.(*ast.NestedClass); ok {
-		return av.root.VisitNestedClass(n)
-
 	} else if n, ok := tree.(*ast.Package); ok {
 		return av.root.VisitPackage(n)
 
@@ -234,10 +231,6 @@ func (av *BaseASTVisitor[T]) VisitMethodCall(tree *ast.MethodCall) T {
 }
 
 func (av *BaseASTVisitor[T]) VisitMethodReference(tree *ast.MethodReference) T {
-	return av.root.VisitChildren(tree)
-}
-
-func (av *BaseASTVisitor[T]) VisitNestedClass(tree *ast.NestedClass) T {
 	return av.root.VisitChildren(tree)
 }
 

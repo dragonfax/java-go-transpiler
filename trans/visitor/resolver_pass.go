@@ -49,7 +49,7 @@ func (cv *ResolvePass) VisitVarRef(varRef *ast.VarRef) int {
 
 	localVar, ok := varRef.MemberScope.LocalVars[name]
 	if ok {
-		fmt.Println("found var ref in member")
+		// fmt.Println("found var ref in member")
 		varRef.VariableDecl = localVar
 		return 0
 	}
@@ -57,13 +57,13 @@ func (cv *ResolvePass) VisitVarRef(varRef *ast.VarRef) int {
 	// check in the class fields
 	class := varRef.MemberScope.ClassScope
 	if class == nil {
-		fmt.Println("didn't find class for var ref.")
+		// fmt.Println("didn't find class for var ref.")
 		os.Exit(1)
 	}
 
 	field, ok := class.FieldsByName[name]
 	if ok {
-		fmt.Println("found var ref in class")
+		// fmt.Println("found var ref in class")
 		varRef.VariableDecl = field
 		return 0
 	}
@@ -73,7 +73,7 @@ func (cv *ResolvePass) VisitVarRef(varRef *ast.VarRef) int {
 	if baseClass != nil {
 		field, ok := baseClass.FieldsByName[name]
 		if ok {
-			fmt.Println("found var ref in base class")
+			// fmt.Println("found var ref in base class")
 			varRef.VariableDecl = field
 			return 0
 		}
@@ -82,7 +82,7 @@ func (cv *ResolvePass) VisitVarRef(varRef *ast.VarRef) int {
 
 	refClass := class.ResolveClassName(name)
 	if refClass != nil {
-		fmt.Println("found var ref as a class")
+		// fmt.Println("found var ref as a class")
 		varRef.VariableDecl = refClass
 	}
 
