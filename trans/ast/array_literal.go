@@ -11,7 +11,6 @@ import (
 type ArrayLiteral struct {
 	*node.Base
 
-	TypePath string
 	Elements []node.Node
 }
 
@@ -24,7 +23,7 @@ func (al *ArrayLiteral) String() string {
 	for _, node := range al.Elements {
 		l = append(l, node.String())
 	}
-	return fmt.Sprintf("[]%s{%s}", al.TypePath, strings.Join(l, ","))
+	return fmt.Sprintf("[]{%s}", strings.Join(l, ","))
 }
 
 func NewArrayLiteral(lit *parser.ArrayInitializerContext) *ArrayLiteral {
