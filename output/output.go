@@ -99,7 +99,8 @@ func Translate(sourceDir, targetDir, targetPackage, targetStubDir string) error 
 	visitor.ParentPass(h)
 	visitor.NewScopePass(h).VisitNode(h)
 	visitor.NewPopulatePass(h).VisitNode(h)
-	visitor.NewResolvePass(h).VisitNode(h)
+	visitor.NewClassResolver(h).VisitNode(h)
+	visitor.NewVarResolver(h).VisitNode(h)
 	visitor.BaseClassPass(h)
 	// "check":    visitor.NewCheckPass,
 
