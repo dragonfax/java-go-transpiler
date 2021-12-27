@@ -20,12 +20,11 @@ type EnhancedFor struct {
 	*node.Base
 
 	Variable *LocalVarDecl
-	Instance node.Node
 	Body     node.Node
 }
 
 func (ef *EnhancedFor) Children() []node.Node {
-	return []node.Node{ef.Variable, ef.Instance, ef.Body}
+	return []node.Node{ef.Variable, ef.Body}
 }
 
 func NewEnhancedFor(statementCtx *parser.StatementContext) *EnhancedFor {
@@ -34,20 +33,19 @@ func NewEnhancedFor(statementCtx *parser.StatementContext) *EnhancedFor {
 	enhancedCtx := forControlCtx.EnhancedForControl()
 
 	instance := ExpressionProcessor(enhancedCtx.Expression())
-	variable := NewLocalVarDecl(NewTypeNodeFromContext(enhancedCtx.TypeType()), enhancedCtx.VariableDeclaratorId().GetText(), nil)
+	variable := NewLocalVarDecl(NewTypeNodeFromContext(enhancedCtx.TypeType()), enhancedCtx.VariableDeclaratorId().GetText(), instance)
 
 	body := StatementProcessor(statementCtx.Statement(0))
 	return &EnhancedFor{
 		Base: node.New(),
 
 		Variable: variable,
-		Instance: instance,
 		Body:     body,
 	}
 }
 
 func (ef *EnhancedFor) String() string {
-	return fmt.Sprintf("for %s := range %s %s", ef.Variable.Name, ef.Instance, ef.Body)
+	return fmt.Sprintf("for %s := range %s %s", ef.Variable.Name, ef.Variable.Expression, ef.Body)
 }
 
 type ClassicFor struct {
