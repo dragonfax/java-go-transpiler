@@ -7,6 +7,16 @@ import (
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
+var PrimitiveClasses = map[string]*Class{
+	"float":   NewPrimitiveClass("float"),
+	"double":  NewPrimitiveClass("double"),
+	"boolean": NewPrimitiveClass("boolean"),
+	"long":    NewPrimitiveClass("long"),
+	"String":  NewPrimitiveClass("String"),
+	"void":    NewPrimitiveClass("void"),
+	"int":     NewPrimitiveClass("int"),
+}
+
 type Class struct {
 	*node.Base
 
@@ -165,6 +175,12 @@ func NewClass() *Class {
 	return c
 }
 
+func NewPrimitiveClass(name string) *Class {
+	c := NewClass()
+	c.Name = name
+	return c
+}
+
 func (c *Class) AddField(field *Field) {
 	c.FieldsByName[field.Name] = field
 }
@@ -182,6 +198,11 @@ func (thisClass *Class) ResolveClassName(className string) *Class {
 	// resolve a classname to a another class from the scope of this class.
 	// class could come from the same package as this class, or an imported class, or an imported package
 	// TODO or a primitive boxing class
+
+	// primitives
+	if pClass, ok := PrimitiveClasses[className]; ok {
+		return pClass
+	}
 
 	// primitive boxes (via runtime package)
 	if _, ok := boxingClassesSet[className]; ok {
