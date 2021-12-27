@@ -26,7 +26,7 @@ func (bn *Block) String() string {
 	if bn == nil {
 		panic("nil block")
 	}
-	return fmt.Sprintf("{\n%s}\n", expressionListToString(bn.Body))
+	return expressionListToString(bn.Body)
 }
 
 func NewBlock(block *parser.BlockContext) *Block {
