@@ -122,9 +122,6 @@ func (av *BaseASTVisitor[T]) VisitNode(tree node.Node) T {
 	} else if n, ok := tree.(*ast.TypeParameter); ok {
 		return av.root.VisitTypeParameter(n)
 
-	} else if n, ok := tree.(*ast.Unimplemented); ok {
-		return av.root.VisitUnimplemented(n)
-
 	} else if n, ok := tree.(*ast.VarRef); ok {
 		return av.root.VisitVarRef(n)
 
@@ -274,10 +271,6 @@ func (av *BaseASTVisitor[T]) VisitTypeParameterList(tree *ast.TypeParameterList)
 }
 
 func (av *BaseASTVisitor[T]) VisitTypeParameter(tree *ast.TypeParameter) T {
-	return av.root.VisitChildren(tree)
-}
-
-func (av *BaseASTVisitor[T]) VisitUnimplemented(tree *ast.Unimplemented) T {
 	return av.root.VisitChildren(tree)
 }
 
