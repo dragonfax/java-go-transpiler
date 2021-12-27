@@ -7,6 +7,10 @@ import (
 	"github.com/dragonfax/java_converter/trans/ast"
 )
 
+// TODO add the boxing classes, to a global package so they can be found.
+//      give a package name on disk so they can be auto-generated with the needed methods and fields.
+var boxingClasses = []string{"Boolean", "Byte", "Character", "Float", "Integer", "Long", "Short", "Double"}
+
 type ResolvePass struct {
 	*BaseASTVisitor[int] // throwaway return value
 }
@@ -14,6 +18,7 @@ type ResolvePass struct {
 func NewResolvePass(h *ast.Hierarchy) ASTVisitor[int] {
 	this := &ResolvePass{}
 	this.BaseASTVisitor = NewASTVisitor[int](h, this)
+
 	return this
 }
 
