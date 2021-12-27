@@ -23,18 +23,18 @@ type Field struct {
 
 	Name       string
 	Expression node.Node // for now
-	Type       *Type
+	TypePath   *TypePath
 
 	Public    bool
 	Transient bool
 	Static    bool
 }
 
-func NewField(typ *Type, name string, expression node.Node) *Field {
+func NewField(typ *TypePath, name string, expression node.Node) *Field {
 	return &Field{
 		Base:           node.New(),
 		BaseClassScope: NewClassScope(),
-		Type:           typ,
+		TypePath:       typ,
 		Name:           name,
 		Expression:     expression,
 	}
@@ -42,13 +42,13 @@ func NewField(typ *Type, name string, expression node.Node) *Field {
 
 func (f *Field) Children() []node.Node {
 	if f.Expression != nil {
-		return []node.Node{f.Type, f.Expression}
+		return []node.Node{f.TypePath, f.Expression}
 	}
-	return []node.Node{f.Type}
+	return []node.Node{f.TypePath}
 }
 
 func (f *Field) Declaration() string {
-	return fmt.Sprintf("%s %s", f.Name, f.Type)
+	return fmt.Sprintf("%s %s", f.Name, f.TypePath)
 }
 
 func (f *Field) HasInitializer() bool {

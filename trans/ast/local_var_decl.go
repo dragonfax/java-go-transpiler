@@ -17,22 +17,22 @@ type LocalVarDecl struct {
 
 	Name       string
 	Expression node.Node
-	Type       *Type
+	TypePath   *TypePath
 	Ellipses   bool
 	IsArgument bool
 }
 
-func NewLocalVarDecl(typ *Type, name string, expression node.Node) *LocalVarDecl {
+func NewLocalVarDecl(typ *TypePath, name string, expression node.Node) *LocalVarDecl {
 	return &LocalVarDecl{
 		Base:            node.New(),
 		BaseMemberScope: NewMemberScope(),
-		Type:            typ,
+		TypePath:        typ,
 		Name:            name,
 		Expression:      expression,
 	}
 }
 
-func NewArgument(typ *Type, name string, ellipses bool) *LocalVarDecl {
+func NewArgument(typ *TypePath, name string, ellipses bool) *LocalVarDecl {
 	if typ == nil {
 		panic(" no variable type")
 	}
@@ -42,7 +42,7 @@ func NewArgument(typ *Type, name string, ellipses bool) *LocalVarDecl {
 	return &LocalVarDecl{
 		Base:            node.New(),
 		BaseMemberScope: NewMemberScope(),
-		Type:            typ,
+		TypePath:        typ,
 		Name:            name,
 		Ellipses:        ellipses,
 		IsArgument:      true,
@@ -51,8 +51,8 @@ func NewArgument(typ *Type, name string, ellipses bool) *LocalVarDecl {
 
 func (f *LocalVarDecl) Children() []node.Node {
 	list := []node.Node{}
-	if f.Type != nil {
-		list = append(list, f.Type)
+	if f.TypePath != nil {
+		list = append(list, f.TypePath)
 	}
 	if f.Expression != nil {
 		list = append(list, f.Expression)
@@ -63,7 +63,7 @@ func (f *LocalVarDecl) Children() []node.Node {
 func (f *LocalVarDecl) String() string {
 	if f.Ellipses {
 		// only formal parameters have these
-		return fmt.Sprintf("%s %s...", f.Name, f.Type)
+		return fmt.Sprintf("%s %s...", f.Name, f.TypePath)
 	}
 
 	if f.Expression != nil {
@@ -77,7 +77,7 @@ func (f *LocalVarDecl) String() string {
 	}
 
 	// might be a formal parameter, or a local var declaration
-	return fmt.Sprintf("%s%s %s", varTerm, f.Name, f.Type)
+	return fmt.Sprintf("%s%s %s", varTerm, f.Name, f.TypePath)
 }
 
 func NewLocalVarDeclNodeList(decl *parser.LocalVariableDeclarationContext) []*LocalVarDecl {

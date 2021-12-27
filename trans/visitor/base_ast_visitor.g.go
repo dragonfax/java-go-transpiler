@@ -29,9 +29,6 @@ func (av *BaseASTVisitor[T]) VisitNode(tree node.Node) T {
 	} else if n, ok := tree.(*ast.ClassReference); ok {
 		return av.root.VisitClassReference(n)
 
-	} else if n, ok := tree.(*ast.ConstructorCall); ok {
-		return av.root.VisitConstructorCall(n)
-
 	} else if n, ok := tree.(*ast.EnumConstant); ok {
 		return av.root.VisitEnumConstant(n)
 
@@ -119,8 +116,8 @@ func (av *BaseASTVisitor[T]) VisitNode(tree node.Node) T {
 	} else if n, ok := tree.(*ast.CatchClause); ok {
 		return av.root.VisitCatchClause(n)
 
-	} else if n, ok := tree.(*ast.Type); ok {
-		return av.root.VisitType(n)
+	} else if n, ok := tree.(*ast.TypePath); ok {
+		return av.root.VisitTypePath(n)
 
 	} else if n, ok := tree.(*ast.TypeElement); ok {
 		return av.root.VisitTypeElement(n)
@@ -159,10 +156,6 @@ func (av *BaseASTVisitor[T]) VisitClass(tree *ast.Class) T {
 }
 
 func (av *BaseASTVisitor[T]) VisitClassReference(tree *ast.ClassReference) T {
-	return av.root.VisitChildren(tree)
-}
-
-func (av *BaseASTVisitor[T]) VisitConstructorCall(tree *ast.ConstructorCall) T {
 	return av.root.VisitChildren(tree)
 }
 
@@ -282,7 +275,7 @@ func (av *BaseASTVisitor[T]) VisitCatchClause(tree *ast.CatchClause) T {
 	return av.root.VisitChildren(tree)
 }
 
-func (av *BaseASTVisitor[T]) VisitType(tree *ast.Type) T {
+func (av *BaseASTVisitor[T]) VisitTypePath(tree *ast.TypePath) T {
 	return av.root.VisitChildren(tree)
 }
 

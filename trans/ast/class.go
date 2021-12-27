@@ -14,7 +14,7 @@ type Class struct {
 	Imports       []*Import
 	BaseClassName string
 	BaseClass     *Class
-	Interfaces    []*Type
+	Interfaces    []*TypePath
 
 	/* could be a member, but could also be an interface, a nested class, or a few other things */
 	Members      []*Member
@@ -146,7 +146,7 @@ func NewClass() *Class {
 		Base:         node.New(),
 		Members:      make([]*Member, 0),
 		OtherMembers: make([]node.Node, 0),
-		Interfaces:   make([]*Type, 0),
+		Interfaces:   make([]*TypePath, 0),
 		Fields:       make([]*Field, 0),
 		Imports:      make([]*Import, 0),
 		Constants:    make([]*EnumConstant, 0),

@@ -11,7 +11,6 @@ type GenASTVisitor[T comparable] interface {
 	VisitChain(tree *ast.Chain) T
 	VisitClass(tree *ast.Class) T
 	VisitClassReference(tree *ast.ClassReference) T
-	VisitConstructorCall(tree *ast.ConstructorCall) T
 	VisitEnumConstant(tree *ast.EnumConstant) T
 	VisitEnumRef(tree *ast.EnumRef) T
 	VisitField(tree *ast.Field) T
@@ -41,7 +40,7 @@ type GenASTVisitor[T comparable] interface {
 	VisitSynchronizedBlock(tree *ast.SynchronizedBlock) T
 	VisitTryCatch(tree *ast.TryCatch) T
 	VisitCatchClause(tree *ast.CatchClause) T
-	VisitType(tree *ast.Type) T
+	VisitTypePath(tree *ast.TypePath) T
 	VisitTypeElement(tree *ast.TypeElement) T
 	VisitTypeParameterList(tree *ast.TypeParameterList) T
 	VisitTypeParameter(tree *ast.TypeParameter) T

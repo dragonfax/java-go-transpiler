@@ -17,27 +17,29 @@ var primitiveTranslation = map[string]string{
 	"void":    "",
 }
 
-type Type struct {
+type TypePath struct {
 	*node.Base
 
 	/* may just be the path to the type */
 	Elements []*TypeElement
+
+	Class *Class // shortcut, for resolution later
 }
 
-func NewType(elements []*TypeElement) *Type {
-	return &Type{Base: node.New(), Elements: elements}
+func NewType(elements []*TypeElement) *TypePath {
+	return &TypePath{Base: node.New(), Elements: elements}
 }
 
-func NewTypeOrVoid(typ *parser.TypeTypeOrVoidContext) *Type {
+func NewTypeOrVoid(typ *parser.TypeTypeOrVoidContext) *TypePath {
 	typCtx := typ
 	if typCtx.VOID() != nil {
-		return NewType([]*TypeElement{{Base: node.New(), Class: "void"}})
+		return NewType([]*TypeElement{{Base: node.New(), ClassName: "void"}})
 	} else {
 		return NewTypeNodeFromContext(typCtx.TypeType())
 	}
 }
 
-func NewTypeNodeFromContext(typ *parser.TypeTypeContext) *Type {
+func NewTypeNodeFromContext(typ *parser.TypeTypeContext) *TypePath {
 	if typ == nil {
 		return nil
 	}
@@ -46,8 +48,8 @@ func NewTypeNodeFromContext(typ *parser.TypeTypeContext) *Type {
 		// simple primitive type, easy to parse
 		return NewType([]*TypeElement{
 			{
-				Base:  node.New(),
-				Class: ctx.PrimitiveType().GetText(),
+				Base:      node.New(),
+				ClassName: ctx.PrimitiveType().GetText(),
 			},
 		})
 	}
@@ -57,14 +59,14 @@ func NewTypeNodeFromContext(typ *parser.TypeTypeContext) *Type {
 	// multile components to one type. Say Car.WheelEnum
 	elements := make([]*TypeElement, 0)
 	for i, typID := range classCtx.AllIDENTIFIER() {
-		class := typID.GetText()
+		className := typID.GetText()
 
 		typeComp := classCtx.TypeArguments(i)
 		if typeComp == nil {
 			// no typ arguments for this element of the type
 			elements = append(elements, &TypeElement{
-				Base:  node.New(),
-				Class: class,
+				Base:      node.New(),
+				ClassName: className,
 			})
 			continue
 		}
@@ -72,7 +74,7 @@ func NewTypeNodeFromContext(typ *parser.TypeTypeContext) *Type {
 		typeCompCtx := typeComp
 
 		// (typeArguments) multiple type args between <> seperated by commas
-		thisTypeArguments := make([]*Type, 0)
+		thisTypeArguments := make([]*TypePath, 0)
 		for _, typCompArg := range typeCompCtx.AllTypeArgument() {
 
 			childType := NewTypeNodeFromContext(typCompArg.TypeType())
@@ -81,7 +83,7 @@ func NewTypeNodeFromContext(typ *parser.TypeTypeContext) *Type {
 
 		node := &TypeElement{
 			Base:          node.New(),
-			Class:         class,
+			ClassName:     className,
 			TypeArguments: thisTypeArguments,
 		}
 		elements = append(elements, node)
@@ -90,7 +92,7 @@ func NewTypeNodeFromContext(typ *parser.TypeTypeContext) *Type {
 	return NewType(elements)
 }
 
-func (tn Type) String() string {
+func (tn TypePath) String() string {
 	list := make([]string, 0)
 	for _, ten := range tn.Elements {
 		list = append(list, ten.String())
@@ -98,7 +100,7 @@ func (tn Type) String() string {
 	return strings.Join(list, ".")
 }
 
-func (tn *Type) Children() []node.Node {
+func (tn *TypePath) Children() []node.Node {
 	if tn == nil {
 		return nil
 	}
@@ -108,12 +110,12 @@ func (tn *Type) Children() []node.Node {
 // used when defining the type of variable/return value/parameter/etc
 type TypeElement struct {
 	*node.Base
-	Class         string
-	TypeArguments []*Type
+	ClassName     string
+	TypeArguments []*TypePath
 }
 
 func (te *TypeElement) Name() string {
-	return te.Class
+	return te.ClassName
 }
 
 func (te *TypeElement) Children() []node.Node {
@@ -121,7 +123,7 @@ func (te *TypeElement) Children() []node.Node {
 }
 
 func (te *TypeElement) IsPrimitive() bool {
-	switch te.Class {
+	switch te.ClassName {
 	case "bypte", "float", "short", "int", "long", "double", "boolean", "char", "String", "void":
 		return true
 	default:
@@ -137,9 +139,9 @@ func (tn *TypeElement) String() string {
 		star = ""
 	}
 
-	class := tn.Class
-	if tClass, ok := primitiveTranslation[class]; ok {
-		class = tClass
+	className := tn.ClassName
+	if tClassName, ok := primitiveTranslation[className]; ok {
+		className = tClassName
 	}
 
 	if len(tn.TypeArguments) > 0 {
@@ -149,8 +151,8 @@ func (tn *TypeElement) String() string {
 			list = append(list, s.String())
 		}
 
-		return fmt.Sprintf("%s%s[%s]", star, class, strings.Join(list, ","))
+		return fmt.Sprintf("%s%s[%s]", star, className, strings.Join(list, ","))
 	}
 
-	return star + class
+	return star + className
 }

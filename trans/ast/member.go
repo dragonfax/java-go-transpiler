@@ -19,7 +19,7 @@ type Member struct {
 	Name           string
 	TypeParameters *TypeParameterList // implies generic method, nullable
 	Arguments      []*LocalVarDecl    // nullable
-	ReturnType     *Type              // nullable
+	ReturnType     *TypePath          // nullable
 	Body           node.Node          // nullable
 	Throws         string
 
@@ -58,7 +58,7 @@ func NewConstructor(ctx *parser.ConstructorDeclarationContext) *Member {
 	return c
 }
 
-func NewMethod(name string, arguments []*LocalVarDecl, returnType *Type, body node.Node) *Member {
+func NewMethod(name string, arguments []*LocalVarDecl, returnType *TypePath, body node.Node) *Member {
 	return &Member{
 		Base:           node.New(),
 		BaseClassScope: NewClassScope(),

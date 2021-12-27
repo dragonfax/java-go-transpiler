@@ -81,7 +81,7 @@ func NewUnaryOperator(prefix bool, operator string, left node.Node) node.Node {
 	// a single dash is a negative. A negative number sometimes parses this way.
 	if operator == "-" {
 		if literal, ok := left.(*Literal); ok {
-			switch literal.Type {
+			switch literal.LiteralType {
 			case Integer:
 				return NewLiteral(Integer, "-"+literal.Value)
 			case Float:

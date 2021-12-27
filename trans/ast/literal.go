@@ -21,8 +21,8 @@ const (
 type Literal struct {
 	*node.Base
 
-	Type  LiteralType
-	Value string
+	LiteralType LiteralType
+	Value       string
 }
 
 func (ln *Literal) Children() []node.Node {
@@ -31,9 +31,9 @@ func (ln *Literal) Children() []node.Node {
 
 func NewLiteral(typ LiteralType, value string) *Literal {
 	return &Literal{
-		Base:  node.New(),
-		Type:  typ,
-		Value: value,
+		Base:        node.New(),
+		LiteralType: typ,
+		Value:       value,
 	}
 }
 
@@ -64,9 +64,9 @@ func NewLiteralFromContext(literal *parser.LiteralContext) *Literal {
 	}
 
 	return &Literal{
-		Base:  node.New(),
-		Type:  typ,
-		Value: literal.GetText(),
+		Base:        node.New(),
+		LiteralType: typ,
+		Value:       literal.GetText(),
 	}
 }
 
@@ -75,10 +75,10 @@ func (ln *Literal) Name() string {
 }
 
 func (ln *Literal) String() string {
-	if ln.Type == Float {
+	if ln.LiteralType == Float {
 		return strings.TrimSuffix(ln.Value, "f")
 	}
-	if ln.Type == Null {
+	if ln.LiteralType == Null {
 		return "nil"
 	}
 	return ln.Value
