@@ -16,7 +16,7 @@ import (
  */
 type MethodCall struct {
 	*node.Base
-	*BaseMemberScope
+	*BaseMethodScope
 
 	MethodName    string // or class name for constructors
 	TypeArguments []*TypePath
@@ -72,7 +72,7 @@ func NewMethodCall(methodCall *parser.MethodCallContext) *MethodCall {
 
 	this := &MethodCall{
 		Base:            node.New(),
-		BaseMemberScope: NewMemberScope(),
+		BaseMethodScope: NewMethodScope(),
 		MethodName:      methodName,
 		Arguments:       arguments,
 	}
@@ -128,7 +128,7 @@ func NewConstructorCall(creator *parser.CreatorContext) *MethodCall {
 
 	return &MethodCall{
 		Base:            node.New(),
-		BaseMemberScope: NewMemberScope(),
+		BaseMethodScope: NewMethodScope(),
 		MethodName:      className,
 		TypeArguments:   typeArguments,
 		Arguments:       arguments,

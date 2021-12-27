@@ -7,7 +7,7 @@ import (
 
 /* FieldList is a temporary node.
  * To hold a list of fields with the same type that were defined
- * in the same class member statement.
+ * in the same class method statement.
  *
  * As soon as th class gets the node, it breaks it into its individual fields,
  * and adds them all to itself.
@@ -20,7 +20,7 @@ type FieldList struct {
 }
 
 func NewFieldList(ctx *parser.FieldDeclarationContext) *FieldList {
-	members := make([]*Field, 0)
+	methods := make([]*Field, 0)
 
 	typ := NewTypeNodeFromContext(ctx.TypeType())
 
@@ -39,10 +39,10 @@ func NewFieldList(ctx *parser.FieldDeclarationContext) *FieldList {
 			}
 		}
 
-		members = append(members, NewField(typ, name, init))
+		methods = append(methods, NewField(typ, name, init))
 	}
 
-	return &FieldList{Base: node.New(), Fields: members}
+	return &FieldList{Base: node.New(), Fields: methods}
 }
 
 func (fl *FieldList) Children() []node.Node {

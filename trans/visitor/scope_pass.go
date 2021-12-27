@@ -11,7 +11,7 @@ type ScopePass struct {
 	// Context
 	CurrentPackage *ast.Package
 	CurrentClass   *ast.Class
-	CurrentMember  *ast.Member
+	CurrentMethod  *ast.Method
 }
 
 func NewScopePass(h *ast.Hierarchy) ASTVisitor[int] {
@@ -23,8 +23,8 @@ func NewScopePass(h *ast.Hierarchy) ASTVisitor[int] {
 func (av *ScopePass) VisitChildren(tree node.Node) int {
 
 	/* set the method and class scope */
-	if scope, ok := tree.(ast.MemberScope); av.CurrentMember != nil && ok {
-		scope.SetMemberScope(av.CurrentMember)
+	if scope, ok := tree.(ast.MethodScope); av.CurrentMethod != nil && ok {
+		scope.SetMethodScope(av.CurrentMethod)
 	}
 
 	if scope, ok := tree.(ast.ClassScope); av.CurrentClass != nil && ok {
@@ -73,12 +73,12 @@ func (av *ScopePass) VisitImport(imp *ast.Import) int {
 	return av.VisitChildren(imp)
 }
 
-func (av *ScopePass) VisitMember(member *ast.Member) int {
+func (av *ScopePass) VisitMethod(method *ast.Method) int {
 
-	av.CurrentMember = member
-	member.ClassScope = av.CurrentClass
+	av.CurrentMethod = method
+	method.ClassScope = av.CurrentClass
 
-	return av.VisitChildren(member)
+	return av.VisitChildren(method)
 
 }
 
@@ -89,10 +89,10 @@ func (av *ScopePass) VisitField(field *ast.Field) int {
 }
 
 func (cv *ScopePass) VisitLocalVarDecl(localVarDecl *ast.LocalVarDecl) int {
-	localVarDecl.MemberScope = cv.CurrentMember
+	localVarDecl.MethodScope = cv.CurrentMethod
 
-	if localVarDecl.MemberScope == nil {
-		panic("no member found around local var decl")
+	if localVarDecl.MethodScope == nil {
+		panic("no method found around local var decl")
 	}
 
 	return cv.VisitChildren(localVarDecl)

@@ -25,7 +25,7 @@ type GenASTVisitor[T comparable] interface {
 	VisitLambda(tree *ast.Lambda) T
 	VisitLiteral(tree *ast.Literal) T
 	VisitLocalVarDecl(tree *ast.LocalVarDecl) T
-	VisitMember(tree *ast.Member) T
+	VisitMethod(tree *ast.Method) T
 	VisitMethodCall(tree *ast.MethodCall) T
 	VisitMethodReference(tree *ast.MethodReference) T
 	VisitPackage(tree *ast.Package) T

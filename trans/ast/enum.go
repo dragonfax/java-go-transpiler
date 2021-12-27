@@ -30,16 +30,16 @@ const (
 	{{ $element.Name }} {{ $name }} = iota{{end}}
 
 )
-{{if (or .Members .Fields)}}// TODO not including enum body
+{{if (or .Methods .Fields)}}// TODO not including enum body
 {{end}}
 `
 
 var enumTemplateCompiled = template.Must(template.New("enum").Parse(enumTemplate))
 
-func NewEnum(ctx *parser.EnumDeclarationContext, fields []*Field, members []*Member, otherMembers []node.Node) *Class {
+func NewEnum(ctx *parser.EnumDeclarationContext, fields []*Field, methods []*Method, otherMembers []node.Node) *Class {
 	this := NewClass()
 	this.Name = ctx.IDENTIFIER().GetText()
-	this.Members = members
+	this.Methods = methods
 	this.Fields = fields
 	this.Enum = true
 	this.OtherMembers = otherMembers

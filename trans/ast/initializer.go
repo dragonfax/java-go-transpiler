@@ -8,7 +8,7 @@ import (
 )
 
 /* static and non-static initializers.
- * act as members of a class.
+ * act as methods of a class.
  */
 type Initializer struct {
 	*node.Base

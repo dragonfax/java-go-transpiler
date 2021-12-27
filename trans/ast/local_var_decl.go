@@ -13,7 +13,7 @@ import (
  */
 type LocalVarDecl struct {
 	*node.Base
-	*BaseMemberScope
+	*BaseMethodScope
 
 	Name       string
 	Expression node.Node
@@ -25,7 +25,7 @@ type LocalVarDecl struct {
 func NewLocalVarDecl(typ *TypePath, name string, expression node.Node) *LocalVarDecl {
 	return &LocalVarDecl{
 		Base:            node.New(),
-		BaseMemberScope: NewMemberScope(),
+		BaseMethodScope: NewMethodScope(),
 		TypePath:        typ,
 		Name:            name,
 		Expression:      expression,
@@ -41,7 +41,7 @@ func NewArgument(typ *TypePath, name string, ellipses bool) *LocalVarDecl {
 	}
 	return &LocalVarDecl{
 		Base:            node.New(),
-		BaseMemberScope: NewMemberScope(),
+		BaseMethodScope: NewMethodScope(),
 		TypePath:        typ,
 		Name:            name,
 		Ellipses:        ellipses,

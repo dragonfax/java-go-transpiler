@@ -71,8 +71,8 @@ func (av *BaseASTVisitor[T]) VisitNode(tree node.Node) T {
 	} else if n, ok := tree.(*ast.LocalVarDecl); ok {
 		return av.root.VisitLocalVarDecl(n)
 
-	} else if n, ok := tree.(*ast.Member); ok {
-		return av.root.VisitMember(n)
+	} else if n, ok := tree.(*ast.Method); ok {
+		return av.root.VisitMethod(n)
 
 	} else if n, ok := tree.(*ast.MethodCall); ok {
 		return av.root.VisitMethodCall(n)
@@ -215,7 +215,7 @@ func (av *BaseASTVisitor[T]) VisitLocalVarDecl(tree *ast.LocalVarDecl) T {
 	return av.root.VisitChildren(tree)
 }
 
-func (av *BaseASTVisitor[T]) VisitMember(tree *ast.Member) T {
+func (av *BaseASTVisitor[T]) VisitMethod(tree *ast.Method) T {
 	return av.root.VisitChildren(tree)
 }
 

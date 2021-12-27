@@ -18,13 +18,13 @@ func NewPopulatePass(h *ast.Hierarchy) ASTVisitor[int] {
 
 func (cv *PopulatePass) VisitLocalVarDecl(localVarDecl *ast.LocalVarDecl) int {
 
-	if localVarDecl.MemberScope == nil {
+	if localVarDecl.MethodScope == nil {
 		ast.DebugPrint(localVarDecl)
-		panic("local var never got a member")
+		panic("local var never got a method")
 	}
 
 	// this ends up covering both local var declarations and formal parameters in methods/constructors
-	localVarDecl.MemberScope.AddLocalVar(localVarDecl)
+	localVarDecl.MethodScope.AddLocalVar(localVarDecl)
 
 	return 0 // no children that need processesing.
 }

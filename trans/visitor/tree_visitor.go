@@ -83,23 +83,23 @@ func (gv *TreeVisitor) VisitClassBody(ctx *parser.ClassBodyContext) node.Node {
 	class := ast.NewClass()
 
 	for _, decl := range ctx.AllClassBodyDeclaration() {
-		member := gv.VisitClassBodyDeclaration(decl)
-		if member == nil {
+		method := gv.VisitClassBodyDeclaration(decl)
+		if method == nil {
 			if decl.GetText() != ";" {
-				fmt.Printf("WARNING: skipping class member: %s\n", decl.GetText())
+				fmt.Printf("WARNING: skipping class method: %s\n", decl.GetText())
 			}
 			continue
 		}
-		if subClass, ok := member.(*ast.Class); ok {
+		if subClass, ok := method.(*ast.Class); ok {
 			class.OtherMembers = append(class.OtherMembers, subClass)
-		} else if f, ok := member.(*ast.Field); ok {
+		} else if f, ok := method.(*ast.Field); ok {
 			class.Fields = append(class.Fields, f)
-		} else if fl, ok := member.(*ast.FieldList); ok {
+		} else if fl, ok := method.(*ast.FieldList); ok {
 			class.Fields = append(class.Fields, fl.Fields...)
-		} else if m, ok := member.(*ast.Member); ok {
-			class.Members = append(class.Members, m)
+		} else if m, ok := method.(*ast.Method); ok {
+			class.Methods = append(class.Methods, m)
 		} else {
-			class.OtherMembers = append(class.OtherMembers, member)
+			class.OtherMembers = append(class.OtherMembers, method)
 		}
 	}
 
@@ -111,14 +111,14 @@ func (gv *TreeVisitor) VisitClassBodyDeclaration(ctx *parser.ClassBodyDeclaratio
 	// static and non-static initializers
 	// wont' be processed by any of my other visit rules
 	if ctx.Block() != nil {
-		// acts as a member
+		// acts as a method
 		return ast.NewInitializerBlock(ctx)
 	}
 
 	/* collect children and notify them of their modifiers */
 
-	member := gv.VisitChildren(ctx)
-	if member == nil {
+	method := gv.VisitChildren(ctx)
+	if method == nil {
 		return nil
 	}
 
@@ -126,35 +126,35 @@ func (gv *TreeVisitor) VisitClassBodyDeclaration(ctx *parser.ClassBodyDeclaratio
 		modifierText := modifier.GetText()
 		switch modifierText {
 		case "public", "protected":
-			if set, ok := member.(interface{ SetPublic(bool) }); ok {
+			if set, ok := method.(interface{ SetPublic(bool) }); ok {
 				set.SetPublic(true)
 			}
 		case "transient":
-			if set, ok := member.(interface{ SetTransient(bool) }); ok {
+			if set, ok := method.(interface{ SetTransient(bool) }); ok {
 				set.SetTransient(true)
 			}
 		case "static":
-			if set, ok := member.(interface{ SetStatic(bool) }); ok {
+			if set, ok := method.(interface{ SetStatic(bool) }); ok {
 				set.SetStatic(true)
 			}
 		case "abstract":
-			if set, ok := member.(interface{ SetAbstract(bool) }); ok {
+			if set, ok := method.(interface{ SetAbstract(bool) }); ok {
 				set.SetAbstract(true)
 			}
 		case "synchronized":
-			if set, ok := member.(interface{ SetSynchronized(bool) }); ok {
+			if set, ok := method.(interface{ SetSynchronized(bool) }); ok {
 				set.SetSynchronized((true))
 			}
 		}
 	}
 
-	return member
+	return method
 }
 
 func (gv *TreeVisitor) VisitGenericMethodDeclaration(ctx *parser.GenericMethodDeclarationContext) node.Node {
 
 	method := gv.VisitMethodDeclaration(ctx.MethodDeclaration())
-	method.(*ast.Member).TypeParameters = ast.NewTypeParameterList(ctx.TypeParameters())
+	method.(*ast.Method).TypeParameters = ast.NewTypeParameterList(ctx.TypeParameters())
 
 	return method
 }
@@ -186,34 +186,34 @@ func (v *TreeVisitor) VisitConstructorDeclaration(ctx *parser.ConstructorDeclara
 }
 
 func (gv *TreeVisitor) VisitEnumDeclaration(ctx *parser.EnumDeclarationContext) node.Node {
-	members := make([]*ast.Member, 0)
+	methods := make([]*ast.Method, 0)
 	fields := make([]*ast.Field, 0)
 	otherMembers := make([]node.Node, 0)
 	if ctx.EnumBodyDeclarations() != nil {
 		for _, decl := range ctx.EnumBodyDeclarations().AllClassBodyDeclaration() {
-			member := gv.VisitClassBodyDeclaration(decl)
-			if member == nil {
+			method := gv.VisitClassBodyDeclaration(decl)
+			if method == nil {
 				if decl.GetText() != ";" {
-					fmt.Printf("WARNING: skipping class member: %s\n", decl.GetText())
+					fmt.Printf("WARNING: skipping class method: %s\n", decl.GetText())
 				}
 				continue
 			}
-			if subClass, ok := member.(*ast.Class); ok {
+			if subClass, ok := method.(*ast.Class); ok {
 				// We don't do subclasses
 				otherMembers = append(otherMembers, subClass)
-			} else if f, ok := member.(*ast.Field); ok {
+			} else if f, ok := method.(*ast.Field); ok {
 				fields = append(fields, f)
-			} else if fl, ok := member.(*ast.FieldList); ok {
+			} else if fl, ok := method.(*ast.FieldList); ok {
 				fields = append(fields, fl.Fields...)
-			} else if m, ok := member.(*ast.Member); ok {
-				members = append(members, m)
+			} else if m, ok := method.(*ast.Method); ok {
+				methods = append(methods, m)
 			} else {
-				otherMembers = append(otherMembers, member)
+				otherMembers = append(otherMembers, method)
 			}
 		}
 	}
 
-	return ast.NewEnum(ctx, fields, members, otherMembers)
+	return ast.NewEnum(ctx, fields, methods, otherMembers)
 }
 
 func (gv *TreeVisitor) VisitInterfaceDeclaration(ctx *parser.InterfaceDeclarationContext) node.Node {

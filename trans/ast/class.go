@@ -16,8 +16,8 @@ type Class struct {
 	BaseClass     *Class
 	Interfaces    []*TypePath
 
-	/* could be a member, but could also be an interface, a nested class, or a few other things */
-	Members      []*Member
+	/* could be a method, but could also be an interface, a nested class, or a few other things */
+	Methods      []*Method
 	OtherMembers []node.Node
 
 	Fields       []*Field
@@ -46,7 +46,7 @@ func (c *Class) Children() []node.Node {
 			panic("nil in list")
 		}
 	}
-	list = append(list, node.ListOfNodesToNodeList(c.Members)...)
+	list = append(list, node.ListOfNodesToNodeList(c.Methods)...)
 	for _, n := range list {
 		if n == nil {
 			panic("nil in list")
@@ -95,11 +95,11 @@ type {{ .Name }} struct {
 }
 
 {{range .OtherMembers}}
-// TODO other member in class
+// TODO other method in class
 {{printf "%T" . }}
 {{end}}
 
-{{range .Members}}{{ . }}
+{{range .Methods}}{{ . }}
 {{end}}
 `
 
@@ -107,7 +107,7 @@ var classTpl = template.Must(template.New("name").Parse(classTemplate))
 
 var interfaceTemplate = `
 type {{ .Name }} interface {
-{{range .Members}}
+{{range .Methods}}
 	{{.Name}}({{.ArgumentsString}}) .ReturnType
 {{end}}
 }
@@ -144,7 +144,7 @@ func (c *Class) AsFile() string {
 func NewClass() *Class {
 	c := &Class{
 		Base:         node.New(),
-		Members:      make([]*Member, 0),
+		Methods:      make([]*Method, 0),
 		OtherMembers: make([]node.Node, 0),
 		Interfaces:   make([]*TypePath, 0),
 		Fields:       make([]*Field, 0),

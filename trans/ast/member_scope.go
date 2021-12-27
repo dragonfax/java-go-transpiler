@@ -4,23 +4,23 @@ package ast
  * a method or constructor
  */
 
-type MemberScope interface {
-	SetMemberScope(*Member)
-	GetMemberScope() *Member
+type MethodScope interface {
+	SetMethodScope(*Method)
+	GetMethodScope() *Method
 }
 
-type BaseMemberScope struct {
-	MemberScope *Member
+type BaseMethodScope struct {
+	MethodScope *Method
 }
 
-func NewMemberScope() *BaseMemberScope {
-	return &BaseMemberScope{}
+func NewMethodScope() *BaseMethodScope {
+	return &BaseMethodScope{}
 }
 
-func (s *BaseMemberScope) SetMemberScope(scope *Member) {
-	s.MemberScope = scope
+func (s *BaseMethodScope) SetMethodScope(scope *Method) {
+	s.MethodScope = scope
 }
 
-func (s *BaseMemberScope) GetMemberScope() *Member {
-	return s.MemberScope
+func (s *BaseMethodScope) GetMethodScope() *Method {
+	return s.MethodScope
 }

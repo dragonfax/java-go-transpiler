@@ -10,9 +10,9 @@ import (
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
-/* Member, a method or a constructor.
+/* Method, a method or a constructor.
  */
-type Member struct {
+type Method struct {
 	*node.Base
 	*BaseClassScope
 
@@ -33,9 +33,9 @@ type Member struct {
 	LocalVars map[string]*LocalVarDecl
 }
 
-func NewConstructor(ctx *parser.ConstructorDeclarationContext) *Member {
+func NewConstructor(ctx *parser.ConstructorDeclarationContext) *Method {
 
-	c := &Member{
+	c := &Method{
 		Base:           node.New(),
 		BaseClassScope: NewClassScope(),
 		Name:           ctx.IDENTIFIER().GetText(),
@@ -58,8 +58,8 @@ func NewConstructor(ctx *parser.ConstructorDeclarationContext) *Member {
 	return c
 }
 
-func NewMethod(name string, arguments []*LocalVarDecl, returnType *TypePath, body node.Node) *Member {
-	return &Member{
+func NewMethod(name string, arguments []*LocalVarDecl, returnType *TypePath, body node.Node) *Method {
+	return &Method{
 		Base:           node.New(),
 		BaseClassScope: NewClassScope(),
 
@@ -71,7 +71,7 @@ func NewMethod(name string, arguments []*LocalVarDecl, returnType *TypePath, bod
 	}
 }
 
-func (m *Member) Children() []node.Node {
+func (m *Method) Children() []node.Node {
 	list := make([]node.Node, 0)
 
 	list = append(list, node.ListOfNodesToNodeList(m.Arguments)...)
@@ -88,32 +88,32 @@ func (m *Member) Children() []node.Node {
 	return list
 }
 
-func (m *Member) SetPublic(public bool) {
+func (m *Method) SetPublic(public bool) {
 	m.Public = public
 }
 
-func (m *Member) SetAbstract(abstract bool) {
+func (m *Method) SetAbstract(abstract bool) {
 	m.Abstract = abstract
 }
 
-func (m *Member) SetStatic(static bool) {
+func (m *Method) SetStatic(static bool) {
 	m.Static = static
 }
 
-func (m *Member) SetSynchronized(sync bool) {
+func (m *Method) SetSynchronized(sync bool) {
 	m.Synchronized = sync
 }
 
-func (m *Member) String() string {
+func (m *Method) String() string {
 	if m == nil {
-		panic("nil member")
+		panic("nil method")
 	}
 	if m.Constructor {
 		return m.ConstructorString()
 	}
 	return m.MethodString()
 }
-func (m *Member) MethodString() string {
+func (m *Method) MethodString() string {
 	if m == nil {
 		panic("nil method")
 	}
@@ -145,11 +145,11 @@ func (m *Member) MethodString() string {
 	return fmt.Sprintf("func (this *%s) %s(%s) %s%s{\n%s\n}\n\n", m.ClassScope.Name, m.Name, arguments, returnType, throws, body)
 }
 
-func (im *Member) ArgumentsString() string {
+func (im *Method) ArgumentsString() string {
 	return ArgumentListToString(node.ListOfNodesToNodeList(im.Arguments))
 }
 
-func ArgumentCount(method *Member) string {
+func ArgumentCount(method *Method) string {
 	if len(method.Arguments) == 0 {
 		return ""
 	}
@@ -188,15 +188,15 @@ var constructorTemplateCompiled = template.Must(template.New("constructor").Func
 	"ArgumentCount": ArgumentCount,
 }).Parse(constructorTemplate))
 
-func (c *Member) ConstructorString() string {
+func (c *Method) ConstructorString() string {
 	writer := strings.Builder{}
 	constructorTemplateCompiled.Execute(&writer, c)
 	return writer.String()
 }
 
-func (m *Member) AddLocalVar(localVarDecl *LocalVarDecl) {
+func (m *Method) AddLocalVar(localVarDecl *LocalVarDecl) {
 	if m == nil {
-		panic("nil member")
+		panic("nil method")
 	}
 	m.LocalVars[localVarDecl.Name] = localVarDecl
 }

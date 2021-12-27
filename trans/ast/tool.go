@@ -42,9 +42,9 @@ func DebugPrint(n node.Node) {
 	if cs, ok := n.(ClassScope); ok && cs.GetClassScope() != nil {
 		fmt.Printf("from class %s\n", cs.GetClassScope().Name)
 	}
-	if ms, ok := n.(MemberScope); ok && ms.GetMemberScope() != nil {
-		memberScope := ms.GetMemberScope()
-		fmt.Printf("from class %s and method %s\n", memberScope.GetClassScope().Name, memberScope.Name)
+	if ms, ok := n.(MethodScope); ok && ms.GetMethodScope() != nil {
+		methodScope := ms.GetMethodScope()
+		fmt.Printf("from class %s and method %s\n", methodScope.GetClassScope().Name, methodScope.Name)
 	}
 }
 

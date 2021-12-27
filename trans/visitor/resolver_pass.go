@@ -46,21 +46,21 @@ func (cv *ResolvePass) VisitVarRef(varRef *ast.VarRef) int {
 	name := varRef.VariableName
 
 	// check in the method arguments and other method variables
-	if varRef.MemberScope == nil {
+	if varRef.MethodScope == nil {
 		ast.DebugPrint(varRef.GetParent())
-		fmt.Println("no member scope for var ref")
+		fmt.Println("no method scope for var ref")
 		os.Exit(1)
 	}
 
-	localVar, ok := varRef.MemberScope.LocalVars[name]
+	localVar, ok := varRef.MethodScope.LocalVars[name]
 	if ok {
-		// fmt.Println("found var ref in member")
+		// fmt.Println("found var ref in method")
 		varRef.VariableDecl = localVar
 		return 0
 	}
 
 	// check in the class fields
-	class := varRef.MemberScope.ClassScope
+	class := varRef.MethodScope.ClassScope
 	if class == nil {
 		// fmt.Println("didn't find class for var ref.")
 		os.Exit(1)
