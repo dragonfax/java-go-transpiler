@@ -11,13 +11,15 @@ import (
 type ConstructorCall struct {
 	*node.Base
 
-	Class         string
+	ClassName     string
 	TypeArguments []*Type
 	Arguments     []node.Node
+
+	Class *Class // for resolution
 }
 
 func (cc *ConstructorCall) Name() string {
-	return "ConstructorCall = " + cc.Class
+	return "ConstructorCall = " + cc.ClassName
 }
 
 func (cc *ConstructorCall) Children() []node.Node {
@@ -31,11 +33,11 @@ func NewConstructorCall(creator *parser.CreatorContext) *ConstructorCall {
 	creatorCtx := creator
 
 	creatorNameCtx := creatorCtx.CreatedName()
-	class := ""
+	className := ""
 	if creatorNameCtx.IDENTIFIER(0) != nil {
-		class = creatorNameCtx.IDENTIFIER(0).GetText()
+		className = creatorNameCtx.IDENTIFIER(0).GetText()
 	} else if creatorNameCtx.PrimitiveType() != nil {
-		class = creatorNameCtx.PrimitiveType().GetText()
+		className = creatorNameCtx.PrimitiveType().GetText()
 	} else {
 		panic("constructor call with no class name")
 	}
@@ -66,7 +68,7 @@ func NewConstructorCall(creator *parser.CreatorContext) *ConstructorCall {
 
 	return &ConstructorCall{
 		Base:          node.New(),
-		Class:         class,
+		ClassName:     className,
 		TypeArguments: typeArguments,
 		Arguments:     arguments,
 	}
@@ -74,7 +76,7 @@ func NewConstructorCall(creator *parser.CreatorContext) *ConstructorCall {
 
 func (cc *ConstructorCall) String() string {
 	if len(cc.TypeArguments) == 0 {
-		return fmt.Sprintf("New%s(%s)", cc.Class, ArgumentListToString(cc.Arguments))
+		return fmt.Sprintf("New%s(%s)", cc.ClassName, ArgumentListToString(cc.Arguments))
 	}
 
 	list := make([]string, 0)
@@ -88,5 +90,5 @@ func (cc *ConstructorCall) String() string {
 		argumentCount = fmt.Sprintf("%d", len(cc.Arguments))
 	}
 
-	return fmt.Sprintf("New%s%s[%s](%s)", cc.Class, argumentCount, strings.Join(list, ","), ArgumentListToString(cc.Arguments))
+	return fmt.Sprintf("New%s%s[%s](%s)", cc.ClassName, argumentCount, strings.Join(list, ","), ArgumentListToString(cc.Arguments))
 }
