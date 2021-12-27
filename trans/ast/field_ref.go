@@ -15,7 +15,7 @@ type FieldRef struct {
 	FieldName string
 }
 
-func (fr *FieldRef) Name() string {
+func (fr *FieldRef) NodeName() string {
 	return fmt.Sprintf("FieldRef = %s", fr.FieldName)
 }
 

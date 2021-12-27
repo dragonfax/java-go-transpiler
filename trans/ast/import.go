@@ -22,7 +22,7 @@ func NewImport(s string) *Import {
 	return &Import{Base: node.New(), BaseClassScope: NewClassScope(), ImportString: s}
 }
 
-func (i *Import) Name() string {
+func (i *Import) NodeName() string {
 	return i.ImportString
 }
 

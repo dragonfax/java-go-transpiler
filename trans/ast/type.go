@@ -33,7 +33,7 @@ func NewType(elements []*TypeElement) *TypePath {
 func NewTypeOrVoid(typ *parser.TypeTypeOrVoidContext) *TypePath {
 	typCtx := typ
 	if typCtx.VOID() != nil {
-		return NewType([]*TypeElement{{Base: node.New(), ClassName: "void"}})
+		return NewType([]*TypeElement{NewTypeElement("void", nil)})
 	} else {
 		return NewTypeNodeFromContext(typCtx.TypeType())
 	}
@@ -47,11 +47,7 @@ func NewTypeNodeFromContext(typ *parser.TypeTypeContext) *TypePath {
 	if ctx.PrimitiveType() != nil {
 		// simple primitive type, easy to parse
 		return NewType([]*TypeElement{
-			{
-				Base:      node.New(),
-				ClassName: ctx.PrimitiveType().GetText(),
-			},
-		})
+			NewTypeElement(ctx.PrimitiveType().GetText(), nil)})
 	}
 
 	classCtx := ctx.ClassOrInterfaceType()
@@ -64,10 +60,7 @@ func NewTypeNodeFromContext(typ *parser.TypeTypeContext) *TypePath {
 		typeComp := classCtx.TypeArguments(i)
 		if typeComp == nil {
 			// no typ arguments for this element of the type
-			elements = append(elements, &TypeElement{
-				Base:      node.New(),
-				ClassName: className,
-			})
+			elements = append(elements, NewTypeElement(className, nil))
 			continue
 		}
 
@@ -81,11 +74,7 @@ func NewTypeNodeFromContext(typ *parser.TypeTypeContext) *TypePath {
 			thisTypeArguments = append(thisTypeArguments, childType)
 		}
 
-		node := &TypeElement{
-			Base:          node.New(),
-			ClassName:     className,
-			TypeArguments: thisTypeArguments,
-		}
+		node := NewTypeElement(className, thisTypeArguments)
 		elements = append(elements, node)
 	}
 
@@ -110,12 +99,29 @@ func (tn *TypePath) Children() []node.Node {
 // used when defining the type of variable/return value/parameter/etc
 type TypeElement struct {
 	*node.Base
+	*BaseClassScope
+
 	ClassName     string
 	TypeArguments []*TypePath
+
+	Class *Class
 }
 
-func (te *TypeElement) Name() string {
-	return te.ClassName
+func NewTypeElement(className string, typeArguments []*TypePath) *TypeElement {
+	node := &TypeElement{
+		Base:           node.New(),
+		BaseClassScope: NewClassScope(),
+		ClassName:      className,
+		TypeArguments:  typeArguments,
+	}
+	return node
+}
+
+func (te *TypeElement) NodeName() string {
+	if te.Class == nil {
+		return te.ClassName + " /* unresolved */"
+	}
+	return te.Class.Name
 }
 
 func (te *TypeElement) Children() []node.Node {

@@ -70,7 +70,7 @@ func NewLiteralFromContext(literal *parser.LiteralContext) *Literal {
 	}
 }
 
-func (ln *Literal) Name() string {
+func (ln *Literal) NodeName() string {
 	return ln.String()
 }
 

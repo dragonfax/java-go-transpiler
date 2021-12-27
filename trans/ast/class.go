@@ -31,6 +31,16 @@ type Class struct {
 	FieldsByName map[string]*Field
 }
 
+func (c *Class) NodeName() string {
+	if c.BaseClassName != "" {
+		if c.BaseClass == nil {
+			return fmt.Sprintf("%s (%s /* unresolved */)", c.Name, c.BaseClassName)
+		}
+		return fmt.Sprintf("%s (%s)", c.Name, c.BaseClass.Name)
+	}
+	return c.Name
+}
+
 func (c *Class) Children() []node.Node {
 	list := make([]node.Node, 0)
 
@@ -159,10 +169,32 @@ func (c *Class) AddField(field *Field) {
 	c.FieldsByName[field.Name] = field
 }
 
-func (thisClass *Class) ResolveClassName(className string) *Class {
-	// resolve a classname to a class from the scope of this class.
-	// class could come from the same package as this class, or an imported class, or an imported package
+func (c *Class) NestedClassByName(className string) *Class {
+	for _, nc := range c.NestedClasses {
+		if nc.Name == className {
+			return nc
+		}
+	}
+	return nil
+}
 
+func (thisClass *Class) ResolveClassName(className string) *Class {
+	// resolve a classname to a another class from the scope of this class.
+	// class could come from the same package as this class, or an imported class, or an imported package
+	// TODO or a primitive boxing class
+
+	// primitive boxes (via runtime package)
+	if _, ok := boxingClassesSet[className]; ok {
+		return thisClass.PackageScope.GetParent().(*Hierarchy).GetPackage("runtime").GetClass(className)
+	}
+
+	// nested classes
+	nc := thisClass.NestedClassByName(className)
+	if nc != nil {
+		return nc
+	}
+
+	// classes imported directly
 	for _, imp := range thisClass.Imports {
 		if imp.ImportClass != nil && imp.ImportClass.Name == className {
 			// the referenced class is from this import.
@@ -170,13 +202,14 @@ func (thisClass *Class) ResolveClassName(className string) *Class {
 		}
 	}
 
+	// classes in the same package as this one
 	resolvedClass := thisClass.PackageScope.HasClass(className)
 	if resolvedClass != nil {
 		// the references class is from the same package
 		return resolvedClass
 	}
 
-	// go through all start imported packages
+	// classes imported indirectly via '*' package imports
 	for _, imp := range thisClass.Imports {
 		if imp.Star {
 			resolvedClass := imp.ImportPackage.HasClass(className)

@@ -21,7 +21,7 @@ func NewVarRef(name string) *VarRef {
 	return &VarRef{Base: node.New(), BaseMethodScope: NewMethodScope(), VariableName: name}
 }
 
-func (vr *VarRef) Name() string {
+func (vr *VarRef) NodeName() string {
 	return vr.String()
 }
 

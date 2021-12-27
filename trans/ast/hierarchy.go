@@ -10,11 +10,34 @@ type Hierarchy struct {
 	RootPackage string
 }
 
+var boxingClassesList = []string{"Boolean", "Byte", "Character", "Float", "Integer", "Long", "Short", "Double"}
+var boxingClassesSet = ListToSet(boxingClassesList)
+
+func ListToSet[E comparable](list []E) map[E]struct{} {
+	set := make(map[E]struct{})
+	for _, e := range list {
+		set[e] = struct{}{}
+	}
+	return set
+}
+
 func NewHierarchy() *Hierarchy {
-	return &Hierarchy{
+	this := &Hierarchy{
 		Base:     node.New(),
 		Packages: make(map[string]*Package),
 	}
+
+	// Adding boxing classes to runtime package
+	runtimePkg := this.GetPackage("runtime")
+	for _, box := range boxingClassesList {
+		boxClass := NewClass()
+		boxClass.Name = box
+		boxClass.PackageName = "runtime"
+		boxClass.PackageScope = runtimePkg
+		runtimePkg.AddClass(boxClass)
+	}
+
+	return this
 }
 
 func (h *Hierarchy) String() string {

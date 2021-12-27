@@ -8,8 +8,11 @@ import "github.com/dragonfax/java_converter/trans/node"
  */
 type ClassRef struct {
 	*node.Base
+	*BaseClassScope
 
 	ClassName string
+
+	Class *Class
 }
 
 func (cr *ClassRef) Children() []node.Node {
@@ -20,13 +23,21 @@ func NewClassRef(className string) *ClassRef {
 	if className == "" {
 		panic("no class name")
 	}
-	return &ClassRef{Base: node.New(), ClassName: className}
+	return &ClassRef{
+		Base:           node.New(),
+		BaseClassScope: NewClassScope(),
+		ClassName:      className,
+	}
 }
 
 func (cr *ClassRef) String() string {
-	return cr.ClassName + ".class"
+	if cr.Class == nil {
+		return cr.ClassName + ".class /* unresolved */"
+
+	}
+	return cr.Class.Name + ".class"
 }
 
-func (cr *ClassRef) Name() string {
+func (cr *ClassRef) NodeName() string {
 	return cr.String()
 }

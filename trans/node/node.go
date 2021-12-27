@@ -94,8 +94,8 @@ func JSONMarshalNode(node Node) string {
 }
 
 func Name(node Node) string {
-	if nameNode, ok := node.(interface{ Name() string }); ok {
-		return nameNode.Name()
+	if nameNode, ok := node.(interface{ NodeName() string }); ok {
+		return nameNode.NodeName()
 	}
 
 	obj := reflector.New(node)

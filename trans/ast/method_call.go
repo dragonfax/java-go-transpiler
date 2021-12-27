@@ -28,7 +28,7 @@ type MethodCall struct {
 	Class *Class // class with method, or to be constructed, after resolution
 }
 
-func (mc *MethodCall) Name() string {
+func (mc *MethodCall) NodeName() string {
 	t := "MethodCall"
 	if mc.Constructor {
 		t = "ConstructorCall"
