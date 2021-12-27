@@ -70,13 +70,30 @@ func (uo *UnaryOperator) Children() []node.Node {
 	return []node.Node{uo.Left}
 }
 
-func NewUnaryOperator(prefix bool, operator string, left node.Node) *UnaryOperator {
+func NewUnaryOperator(prefix bool, operator string, left node.Node) node.Node {
 	if operator == "" {
 		panic("no operator")
 	}
 	if tool.IsNilInterface(left) {
 		panic("no expression")
 	}
+
+	// a single dash is a negative. A negative number sometimes parses this way.
+	if operator == "-" {
+		if literal, ok := left.(*Literal); ok {
+			switch literal.Type {
+			case Integer:
+				return NewLiteral(Integer, "-"+literal.Value)
+			case Float:
+				return NewLiteral(Float, "-"+literal.Value)
+			default:
+				panic("use of a negative against non-numberic literal")
+			}
+		}
+		// else we can make a multiplication against -1
+		return NewBinaryOperator("*", NewLiteral(Integer, "-1"), left)
+	}
+
 	this := &UnaryOperator{Left: left, Prefix: prefix}
 	this.Base = node.New()
 	this.Operator = operator

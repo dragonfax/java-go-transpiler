@@ -29,7 +29,15 @@ func (ln *Literal) Children() []node.Node {
 	return nil
 }
 
-func NewLiteral(literal *parser.LiteralContext) *Literal {
+func NewLiteral(typ LiteralType, value string) *Literal {
+	return &Literal{
+		Base:  node.New(),
+		Type:  typ,
+		Value: value,
+	}
+}
+
+func NewLiteralFromContext(literal *parser.LiteralContext) *Literal {
 	if literal == nil {
 		panic("no literal value")
 	}

@@ -162,7 +162,7 @@ func expressionFromPrimary(primary *parser.PrimaryContext) node.Node {
 
 	if primaryCtx.Literal() != nil {
 		literal := primaryCtx.Literal()
-		return NewLiteral(literal)
+		return NewLiteralFromContext(literal)
 	}
 
 	if primaryCtx.CLASS() != nil {
