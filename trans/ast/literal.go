@@ -7,15 +7,15 @@ import (
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
-type LiteralType int
+type LiteralType string
 
 const (
-	Integer LiteralType = iota
-	Float
-	Char
-	String
-	Bool
-	Null
+	Integer LiteralType = "int"
+	Float   LiteralType = "float"
+	Char    LiteralType = "rune"
+	String  LiteralType = "string"
+	Bool    LiteralType = "bool"
+	Null    LiteralType = "nil"
 )
 
 type Literal struct {
@@ -60,6 +60,10 @@ func NewLiteral(literal *parser.LiteralContext) *Literal {
 		Type:  typ,
 		Value: literal.GetText(),
 	}
+}
+
+func (ln *Literal) Name() string {
+	return ln.String()
 }
 
 func (ln *Literal) String() string {

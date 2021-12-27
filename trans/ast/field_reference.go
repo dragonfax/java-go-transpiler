@@ -12,15 +12,15 @@ import (
 type FieldReference struct {
 	*node.Base
 
-	FieldName          string
-	InstanceExpression node.Node
+	FieldName string
+}
+
+func (fr *FieldReference) Name() string {
+	return fmt.Sprintf("FieldRef = %s", fr.FieldName)
 }
 
 func (ia *FieldReference) Children() []node.Node {
-	if ia.InstanceExpression == nil {
-		return nil
-	}
-	return []node.Node{ia.InstanceExpression}
+	return nil
 }
 
 func NewFieldReference(fieldName string) *FieldReference {
@@ -32,8 +32,5 @@ func NewFieldReference(fieldName string) *FieldReference {
 }
 
 func (ia *FieldReference) String() string {
-	if ia.InstanceExpression != nil {
-		return fmt.Sprintf("%s.%s", ia.InstanceExpression, ia.FieldName)
-	}
 	return fmt.Sprintf("%s", ia.FieldName)
 }

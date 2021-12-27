@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"reflect"
+	"strings"
 
 	"github.com/dragonfax/java_converter/tool"
 	"github.com/tkrajina/go-reflector/reflector"
@@ -106,5 +107,7 @@ func Name(node Node) string {
 		}
 	}
 
-	return fmt.Sprintf("%T", node)
+	t := fmt.Sprintf("%T", node)
+
+	return strings.TrimPrefix(t, "*ast.")
 }

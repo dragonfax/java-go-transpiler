@@ -16,6 +16,10 @@ type ConstructorCall struct {
 	Arguments     []node.Node
 }
 
+func (cc *ConstructorCall) Name() string {
+	return "ConstructorCall = " + cc.Class
+}
+
 func (cc *ConstructorCall) Children() []node.Node {
 	return node.AppendNodeLists(cc.TypeArguments, cc.Arguments...)
 }

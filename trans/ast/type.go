@@ -20,6 +20,7 @@ var primitiveTranslation = map[string]string{
 type Type struct {
 	*node.Base
 
+	/* may just be the path to the type */
 	Elements []*TypeElement
 }
 

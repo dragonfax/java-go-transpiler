@@ -53,9 +53,9 @@ func (ef *EnhancedFor) String() string {
 type ClassicFor struct {
 	*node.Base
 
-	Condition     node.Node
-	Init          []node.Node
-	Increment     []node.Node
+	Condition     node.Node   // should only be an expression with a bool type
+	Init          []node.Node // should only be localvardecl
+	Increment     []node.Node // should only be expression, no localvar dec
 	Body          node.Node
 	ConditionLast bool // Do...While
 }

@@ -24,7 +24,7 @@ type MethodCall struct {
 }
 
 func (mc *MethodCall) Name() string {
-	return mc.MethodName
+	return "MethodCall = " + mc.MethodName
 }
 
 func (mc *MethodCall) Children() []node.Node {
