@@ -9,7 +9,7 @@ import (
 
 type Lambda struct {
 	*node.Base
-	Arguments []node.Node
+	Arguments []*LocalVarDecl
 	Body      node.Node
 }
 
@@ -34,12 +34,12 @@ func NewLambda(lambda *parser.LambdaExpressionContext) *Lambda {
 		panic("no body for lambda")
 	}
 
-	arguments := make([]node.Node, 0)
+	arguments := make([]*LocalVarDecl, 0)
 	parametersCtx := lambdaCtx.LambdaParameters()
 	if len(parametersCtx.AllIDENTIFIER()) > 0 {
-		// java lambda can have just parameter names, without types. thats valid
+		// java lambda can have just parameter names, without types.
 		for _, id := range parametersCtx.AllIDENTIFIER() {
-			arguments = append(arguments, NewIdentifier(id.GetText()))
+			arguments = append(arguments, NewLocalVarDecl(nil, id.GetText(), nil))
 		}
 	} else {
 		// must have formal parameters list
@@ -52,7 +52,7 @@ func NewLambda(lambda *parser.LambdaExpressionContext) *Lambda {
 func (ln *Lambda) String() string {
 	arguments := ""
 	if ln.Arguments != nil {
-		arguments = ArgumentListToString(ln.Arguments)
+		arguments = ArgumentListToString(node.ListOfNodesToNodeList(ln.Arguments))
 	}
 	return fmt.Sprintf("func (%s) {%s}", arguments, ln.Body)
 }

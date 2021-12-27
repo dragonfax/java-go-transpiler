@@ -172,13 +172,13 @@ func expressionFromPrimary(primary *parser.PrimaryContext) node.Node {
 	panic("unknown primary type: " + primary.GetText() + "\n\n" + primary.ToStringTree(parser.RuleNames, nil))
 }
 
-func FormalParameterListProcessor(formal *parser.FormalParameterListContext) []node.Node {
+func FormalParameterListProcessor(formal *parser.FormalParameterListContext) []*LocalVarDecl {
 	if tool.IsNilInterface(formal) {
 		return nil
 	}
 	ctx := formal
 
-	parameters := make([]node.Node, 0)
+	parameters := make([]*LocalVarDecl, 0)
 	for _, formalParam := range ctx.AllFormalParameter() {
 		formalParamCtx := formalParam
 		t := NewTypeNodeFromContext(formalParamCtx.TypeType())

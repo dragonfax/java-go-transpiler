@@ -18,8 +18,8 @@ type Member struct {
 
 	Name           string
 	TypeParameters *TypeParameterList // implies generic method, nullable
-	Arguments      []node.Node        // nullable
-	ReturnType     node.Node          // nullable
+	Arguments      []*LocalVarDecl    // nullable
+	ReturnType     *Type              // nullable
 	Body           node.Node          // nullable
 	Throws         string
 
@@ -58,7 +58,7 @@ func NewConstructor(ctx *parser.ConstructorDeclarationContext) *Member {
 	return c
 }
 
-func NewMethod(name string, arguments []node.Node, returnType node.Node, body node.Node) *Member {
+func NewMethod(name string, arguments []*LocalVarDecl, returnType *Type, body node.Node) *Member {
 	return &Member{
 		Base:           node.New(),
 		BaseClassScope: NewClassScope(),
@@ -74,7 +74,7 @@ func NewMethod(name string, arguments []node.Node, returnType node.Node, body no
 func (m *Member) Children() []node.Node {
 	list := make([]node.Node, 0)
 
-	list = append(list, m.Arguments...)
+	list = append(list, node.ListOfNodesToNodeList(m.Arguments)...)
 	if m.TypeParameters != nil {
 		list = append(list, m.TypeParameters)
 	}
@@ -125,7 +125,7 @@ func (m *Member) MethodString() string {
 
 	arguments := ""
 	if len(m.Arguments) > 0 {
-		arguments = ArgumentListToString(m.Arguments)
+		arguments = ArgumentListToString(node.ListOfNodesToNodeList(m.Arguments))
 	}
 
 	throws := ""
@@ -146,7 +146,7 @@ func (m *Member) MethodString() string {
 }
 
 func (im *Member) ArgumentsString() string {
-	return ArgumentListToString(im.Arguments)
+	return ArgumentListToString(node.ListOfNodesToNodeList(im.Arguments))
 }
 
 func ArgumentCount(method *Member) string {
