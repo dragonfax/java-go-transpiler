@@ -6,27 +6,27 @@ import "github.com/dragonfax/java_converter/trans/node"
  * in order to use the class as an instance value itself
  * for reflection or other nonsense.
  */
-type ClassReference struct {
+type ClassRef struct {
 	*node.Base
 
 	ClassName string
 }
 
-func (cr *ClassReference) Children() []node.Node {
+func (cr *ClassRef) Children() []node.Node {
 	return nil
 }
 
-func NewClassReference(className string) *ClassReference {
+func NewClassRef(className string) *ClassRef {
 	if className == "" {
 		panic("no class name")
 	}
-	return &ClassReference{Base: node.New(), ClassName: className}
+	return &ClassRef{Base: node.New(), ClassName: className}
 }
 
-func (cr *ClassReference) String() string {
+func (cr *ClassRef) String() string {
 	return cr.ClassName + ".class"
 }
 
-func (cr *ClassReference) Name() string {
+func (cr *ClassRef) Name() string {
 	return cr.String()
 }

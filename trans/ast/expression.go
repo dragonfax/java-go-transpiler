@@ -24,7 +24,7 @@ func ExpressionProcessor(expressionI *parser.ExpressionContext) node.Node {
 
 	if expression.COLONCOLON() != nil {
 		// method reference
-		return NewMethodReference(expression)
+		return NewMethodRef(expression)
 	}
 
 	if expression.NEW() != nil {
@@ -56,7 +56,7 @@ func ExpressionProcessor(expressionI *parser.ExpressionContext) node.Node {
 				panic("qualified 'this'. For referencing outer class from inner class")
 			}
 			if expression.IDENTIFIER() != nil {
-				return NewChain(firstExpression, NewFieldReference(expression.IDENTIFIER().GetText()))
+				return NewChain(firstExpression, NewFieldRef(expression.IDENTIFIER().GetText()))
 			}
 			if expression.MethodCall() != nil {
 				return NewChain(firstExpression, NewMethodCall(expression.MethodCall()))
@@ -166,7 +166,7 @@ func expressionFromPrimary(primary *parser.PrimaryContext) node.Node {
 	}
 
 	if primaryCtx.CLASS() != nil {
-		return NewClassReference(primaryCtx.TypeTypeOrVoid().GetText())
+		return NewClassRef(primaryCtx.TypeTypeOrVoid().GetText())
 	}
 
 	panic("unknown primary type: " + primary.GetText() + "\n\n" + primary.ToStringTree(parser.RuleNames, nil))

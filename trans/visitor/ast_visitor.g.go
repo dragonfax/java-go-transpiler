@@ -10,12 +10,12 @@ type GenASTVisitor[T comparable] interface {
 	VisitBlock(tree *ast.Block) T
 	VisitChain(tree *ast.Chain) T
 	VisitClass(tree *ast.Class) T
-	VisitClassReference(tree *ast.ClassReference) T
+	VisitClassRef(tree *ast.ClassRef) T
 	VisitEnumConstant(tree *ast.EnumConstant) T
 	VisitEnumRef(tree *ast.EnumRef) T
 	VisitField(tree *ast.Field) T
 	VisitFieldList(tree *ast.FieldList) T
-	VisitFieldReference(tree *ast.FieldReference) T
+	VisitFieldRef(tree *ast.FieldRef) T
 	VisitEnhancedFor(tree *ast.EnhancedFor) T
 	VisitClassicFor(tree *ast.ClassicFor) T
 	VisitHierarchy(tree *ast.Hierarchy) T
@@ -26,7 +26,7 @@ type GenASTVisitor[T comparable] interface {
 	VisitLocalVarDecl(tree *ast.LocalVarDecl) T
 	VisitMethod(tree *ast.Method) T
 	VisitMethodCall(tree *ast.MethodCall) T
-	VisitMethodReference(tree *ast.MethodReference) T
+	VisitMethodRef(tree *ast.MethodRef) T
 	VisitPackage(tree *ast.Package) T
 	VisitReturn(tree *ast.Return) T
 	VisitThrow(tree *ast.Throw) T

@@ -7,18 +7,18 @@ import (
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
-type MethodReference struct {
+type MethodRef struct {
 	*node.Base
 
 	Instance node.Node
 	Method   string
 }
 
-func (mr *MethodReference) Children() []node.Node {
+func (mr *MethodRef) Children() []node.Node {
 	return []node.Node{mr.Instance}
 }
 
-func NewMethodReference(expression *parser.ExpressionContext) node.Node {
+func NewMethodRef(expression *parser.ExpressionContext) node.Node {
 	ctx := expression
 
 	method := ""
@@ -46,9 +46,9 @@ func NewMethodReference(expression *parser.ExpressionContext) node.Node {
 		panic("no instance/expression for method reference")
 	}
 
-	return &MethodReference{Base: node.New(), Method: method, Instance: instance}
+	return &MethodRef{Base: node.New(), Method: method, Instance: instance}
 }
 
-func (mf *MethodReference) String() string {
+func (mf *MethodRef) String() string {
 	return fmt.Sprintf("%s.%s", mf.Instance, mf.Method)
 }

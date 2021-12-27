@@ -26,8 +26,8 @@ func (av *BaseASTVisitor[T]) VisitNode(tree node.Node) T {
 	} else if n, ok := tree.(*ast.Class); ok {
 		return av.root.VisitClass(n)
 
-	} else if n, ok := tree.(*ast.ClassReference); ok {
-		return av.root.VisitClassReference(n)
+	} else if n, ok := tree.(*ast.ClassRef); ok {
+		return av.root.VisitClassRef(n)
 
 	} else if n, ok := tree.(*ast.EnumConstant); ok {
 		return av.root.VisitEnumConstant(n)
@@ -41,8 +41,8 @@ func (av *BaseASTVisitor[T]) VisitNode(tree node.Node) T {
 	} else if n, ok := tree.(*ast.FieldList); ok {
 		return av.root.VisitFieldList(n)
 
-	} else if n, ok := tree.(*ast.FieldReference); ok {
-		return av.root.VisitFieldReference(n)
+	} else if n, ok := tree.(*ast.FieldRef); ok {
+		return av.root.VisitFieldRef(n)
 
 	} else if n, ok := tree.(*ast.EnhancedFor); ok {
 		return av.root.VisitEnhancedFor(n)
@@ -74,8 +74,8 @@ func (av *BaseASTVisitor[T]) VisitNode(tree node.Node) T {
 	} else if n, ok := tree.(*ast.MethodCall); ok {
 		return av.root.VisitMethodCall(n)
 
-	} else if n, ok := tree.(*ast.MethodReference); ok {
-		return av.root.VisitMethodReference(n)
+	} else if n, ok := tree.(*ast.MethodRef); ok {
+		return av.root.VisitMethodRef(n)
 
 	} else if n, ok := tree.(*ast.Package); ok {
 		return av.root.VisitPackage(n)
@@ -146,7 +146,7 @@ func (av *BaseASTVisitor[T]) VisitClass(tree *ast.Class) T {
 	return av.root.VisitChildren(tree)
 }
 
-func (av *BaseASTVisitor[T]) VisitClassReference(tree *ast.ClassReference) T {
+func (av *BaseASTVisitor[T]) VisitClassRef(tree *ast.ClassRef) T {
 	return av.root.VisitChildren(tree)
 }
 
@@ -166,7 +166,7 @@ func (av *BaseASTVisitor[T]) VisitFieldList(tree *ast.FieldList) T {
 	return av.root.VisitChildren(tree)
 }
 
-func (av *BaseASTVisitor[T]) VisitFieldReference(tree *ast.FieldReference) T {
+func (av *BaseASTVisitor[T]) VisitFieldRef(tree *ast.FieldRef) T {
 	return av.root.VisitChildren(tree)
 }
 
@@ -210,7 +210,7 @@ func (av *BaseASTVisitor[T]) VisitMethodCall(tree *ast.MethodCall) T {
 	return av.root.VisitChildren(tree)
 }
 
-func (av *BaseASTVisitor[T]) VisitMethodReference(tree *ast.MethodReference) T {
+func (av *BaseASTVisitor[T]) VisitMethodRef(tree *ast.MethodRef) T {
 	return av.root.VisitChildren(tree)
 }
 
