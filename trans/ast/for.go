@@ -51,16 +51,16 @@ func (ef *EnhancedFor) String() string {
 type ClassicFor struct {
 	*node.Base
 
-	Condition     node.Node   // should only be an expression with a bool type
-	Init          []node.Node // should only be localvardecl
-	Increment     []node.Node // should only be expression, no localvar dec
+	Condition     node.Node       // should only be an expression with a bool type
+	Init          []*LocalVarDecl // should only be localvardecl
+	Increment     []node.Node     // should only be expression, no localvar dec
 	Body          node.Node
 	ConditionLast bool // Do...While
 }
 
 func (cf *ClassicFor) Children() []node.Node {
 	list := []node.Node{cf.Body}
-	list = append(list, cf.Init...)
+	list = append(list, node.ListOfNodesToNodeList(cf.Init)...)
 	list = append(list, cf.Increment...)
 	if cf.Condition != nil {
 		list = append(list, cf.Condition)
@@ -97,7 +97,7 @@ func NewClassicFor(statementCtx *parser.StatementContext) *ClassicFor {
 	}
 }
 
-func classicForControlProcessor(forControlCtx *parser.ForControlContext) (init []node.Node, condition node.Node, increment []node.Node) {
+func classicForControlProcessor(forControlCtx *parser.ForControlContext) (init []*LocalVarDecl, condition node.Node, increment []node.Node) {
 	if forControlCtx.GetForUpdate() != nil {
 		increment = make([]node.Node, 0)
 		for _, exp := range forControlCtx.GetForUpdate().AllExpression() {
@@ -115,11 +115,11 @@ func classicForControlProcessor(forControlCtx *parser.ForControlContext) (init [
 
 	if forControlCtx.ForInit() != nil {
 		initCtx := forControlCtx.ForInit()
-		init = make([]node.Node, 0)
+		init = make([]*LocalVarDecl, 0)
 		if initCtx.LocalVariableDeclaration() != nil {
 			// variable declaractions
 			declCtx := initCtx.LocalVariableDeclaration()
-			init = node.ListOfNodesToNodeList(NewLocalVarDeclNodeList(declCtx))
+			init = NewLocalVarDeclNodeList(declCtx)
 			for _, n := range init {
 				if n == nil {
 					panic("nil in node list")
@@ -127,12 +127,14 @@ func classicForControlProcessor(forControlCtx *parser.ForControlContext) (init [
 			}
 		} else {
 			// expression list
+			// These should be replace-able in the original source before translation. to make them a simple local var
+			fmt.Println("warning: for loops without localvardecl, just expression")
 			for _, exp := range initCtx.ExpressionList().AllExpression() {
 				node := ExpressionProcessor(exp)
 				if node == nil {
 					panic("nil into node list")
 				}
-				init = append(init, node)
+				init = append(init, NewLocalVarDecl(nil, "TODO", node))
 			}
 		}
 	}
