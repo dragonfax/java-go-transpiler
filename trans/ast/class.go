@@ -17,8 +17,8 @@ type Class struct {
 	Interfaces    []*TypePath
 
 	/* could be a method, but could also be an interface, a nested class, or a few other things */
-	Methods      []*Method
-	OtherMembers []node.Node
+	Methods       []*Method
+	NestedClasses []*Class
 
 	Fields       []*Field
 	PackageScope *Package
@@ -94,7 +94,7 @@ type {{ .Name }} struct {
 	{{end}}
 }
 
-{{range .OtherMembers}}
+{{range .NestedClasses}}
 // TODO other method in class
 {{printf "%T" . }}
 {{end}}
@@ -143,14 +143,14 @@ func (c *Class) AsFile() string {
 
 func NewClass() *Class {
 	c := &Class{
-		Base:         node.New(),
-		Methods:      make([]*Method, 0),
-		OtherMembers: make([]node.Node, 0),
-		Interfaces:   make([]*TypePath, 0),
-		Fields:       make([]*Field, 0),
-		Imports:      make([]*Import, 0),
-		Constants:    make([]*EnumConstant, 0),
-		FieldsByName: make(map[string]*Field),
+		Base:          node.New(),
+		Methods:       make([]*Method, 0),
+		NestedClasses: make([]*Class, 0),
+		Interfaces:    make([]*TypePath, 0),
+		Fields:        make([]*Field, 0),
+		Imports:       make([]*Import, 0),
+		Constants:     make([]*EnumConstant, 0),
+		FieldsByName:  make(map[string]*Field),
 	}
 	return c
 }

@@ -83,23 +83,23 @@ func (gv *TreeVisitor) VisitClassBody(ctx *parser.ClassBodyContext) node.Node {
 	class := ast.NewClass()
 
 	for _, decl := range ctx.AllClassBodyDeclaration() {
-		method := gv.VisitClassBodyDeclaration(decl)
-		if method == nil {
+		member := gv.VisitClassBodyDeclaration(decl)
+		if member == nil {
 			if decl.GetText() != ";" {
-				fmt.Printf("WARNING: skipping class method: %s\n", decl.GetText())
+				fmt.Printf("WARNING: skipping class member: %s\n", decl.GetText())
 			}
 			continue
 		}
-		if subClass, ok := method.(*ast.Class); ok {
-			class.OtherMembers = append(class.OtherMembers, subClass)
-		} else if f, ok := method.(*ast.Field); ok {
+		if subClass, ok := member.(*ast.Class); ok {
+			class.NestedClasses = append(class.NestedClasses, subClass)
+		} else if f, ok := member.(*ast.Field); ok {
 			class.Fields = append(class.Fields, f)
-		} else if fl, ok := method.(*ast.FieldList); ok {
+		} else if fl, ok := member.(*ast.FieldList); ok {
 			class.Fields = append(class.Fields, fl.Fields...)
-		} else if m, ok := method.(*ast.Method); ok {
+		} else if m, ok := member.(*ast.Method); ok {
 			class.Methods = append(class.Methods, m)
 		} else {
-			class.OtherMembers = append(class.OtherMembers, method)
+			panic(fmt.Sprintf("warning: other members: (%T)\n%s\n\n", member, decl.GetText()))
 		}
 	}
 
@@ -188,7 +188,7 @@ func (v *TreeVisitor) VisitConstructorDeclaration(ctx *parser.ConstructorDeclara
 func (gv *TreeVisitor) VisitEnumDeclaration(ctx *parser.EnumDeclarationContext) node.Node {
 	methods := make([]*ast.Method, 0)
 	fields := make([]*ast.Field, 0)
-	otherMembers := make([]node.Node, 0)
+	nestedClasses := make([]*ast.Class, 0)
 	if ctx.EnumBodyDeclarations() != nil {
 		for _, decl := range ctx.EnumBodyDeclarations().AllClassBodyDeclaration() {
 			method := gv.VisitClassBodyDeclaration(decl)
@@ -200,7 +200,7 @@ func (gv *TreeVisitor) VisitEnumDeclaration(ctx *parser.EnumDeclarationContext) 
 			}
 			if subClass, ok := method.(*ast.Class); ok {
 				// We don't do subclasses
-				otherMembers = append(otherMembers, subClass)
+				nestedClasses = append(nestedClasses, subClass)
 			} else if f, ok := method.(*ast.Field); ok {
 				fields = append(fields, f)
 			} else if fl, ok := method.(*ast.FieldList); ok {
@@ -208,12 +208,13 @@ func (gv *TreeVisitor) VisitEnumDeclaration(ctx *parser.EnumDeclarationContext) 
 			} else if m, ok := method.(*ast.Method); ok {
 				methods = append(methods, m)
 			} else {
-				otherMembers = append(otherMembers, method)
+				panic("unknown member type adding to enum as a nested class")
+				// nestedClasses = append(nestedClasses, method)
 			}
 		}
 	}
 
-	return ast.NewEnum(ctx, fields, methods, otherMembers)
+	return ast.NewEnum(ctx, fields, methods, nestedClasses)
 }
 
 func (gv *TreeVisitor) VisitInterfaceDeclaration(ctx *parser.InterfaceDeclarationContext) node.Node {

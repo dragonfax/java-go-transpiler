@@ -29,6 +29,7 @@ type Method struct {
 	Synchronized bool
 	Constructor  bool
 	Interface    bool
+	Initializer  bool
 
 	LocalVars map[string]*LocalVarDecl
 }

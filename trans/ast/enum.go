@@ -36,13 +36,13 @@ const (
 
 var enumTemplateCompiled = template.Must(template.New("enum").Parse(enumTemplate))
 
-func NewEnum(ctx *parser.EnumDeclarationContext, fields []*Field, methods []*Method, otherMembers []node.Node) *Class {
+func NewEnum(ctx *parser.EnumDeclarationContext, fields []*Field, methods []*Method, NestedClasses []*Class) *Class {
 	this := NewClass()
 	this.Name = ctx.IDENTIFIER().GetText()
 	this.Methods = methods
 	this.Fields = fields
 	this.Enum = true
-	this.OtherMembers = otherMembers
+	this.NestedClasses = NestedClasses
 
 	if ctx.TypeList() != nil {
 		for _, typeType := range ctx.TypeList().AllTypeType() {
