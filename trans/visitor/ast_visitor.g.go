@@ -33,7 +33,6 @@ type GenASTVisitor[T comparable] interface {
 	VisitBreak(tree *ast.Break) T
 	VisitContinue(tree *ast.Continue) T
 	VisitLabel(tree *ast.Label) T
-	VisitIdentifier(tree *ast.Identifier) T
 	VisitSwitch(tree *ast.Switch) T
 	VisitSwitchCase(tree *ast.SwitchCase) T
 	VisitSynchronizedBlock(tree *ast.SynchronizedBlock) T

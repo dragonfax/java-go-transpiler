@@ -38,7 +38,8 @@ func NewMethodReference(expression *parser.ExpressionContext) node.Node {
 	} else if ctx.TypeType(0) != nil {
 		instance = NewTypeNodeFromContext(ctx.TypeType(0))
 	} else if ctx.ClassType() != nil {
-		instance = NewIdentifier(ctx.ClassType().GetText())
+		panic("class type used: ") //  + ctx.ClassType().GetText())
+		// instance = NewIdentifier(ctx.ClassType().GetText())
 	}
 
 	if instance == nil {

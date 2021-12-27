@@ -95,9 +95,6 @@ func (av *BaseASTVisitor[T]) VisitNode(tree node.Node) T {
 	} else if n, ok := tree.(*ast.Label); ok {
 		return av.root.VisitLabel(n)
 
-	} else if n, ok := tree.(*ast.Identifier); ok {
-		return av.root.VisitIdentifier(n)
-
 	} else if n, ok := tree.(*ast.Switch); ok {
 		return av.root.VisitSwitch(n)
 
@@ -241,10 +238,6 @@ func (av *BaseASTVisitor[T]) VisitContinue(tree *ast.Continue) T {
 }
 
 func (av *BaseASTVisitor[T]) VisitLabel(tree *ast.Label) T {
-	return av.root.VisitChildren(tree)
-}
-
-func (av *BaseASTVisitor[T]) VisitIdentifier(tree *ast.Identifier) T {
 	return av.root.VisitChildren(tree)
 }
 

@@ -94,6 +94,9 @@ type Label struct {
 }
 
 func (l *Label) Children() []node.Node {
+	if l.Expression == nil {
+		return nil
+	}
 	return []node.Node{l.Expression}
 }
 
@@ -101,30 +104,12 @@ func NewLabel(label string, exp node.Node) *Label {
 	if label == "" {
 		panic("label missing")
 	}
-	if tool.IsNilInterface(exp) {
-		panic("expression missing")
-	}
 	return &Label{Base: node.New(), Label: label, Expression: exp}
 }
 
 func (ln *Label) String() string {
-	return fmt.Sprintf("%s: %s\n", ln.Label, ln.Expression)
-}
-
-type Identifier struct {
-	*node.Base
-
-	Identifier string
-}
-
-func (i *Identifier) Children() []node.Node {
-	return nil
-}
-
-func NewIdentifier(id string) *Identifier {
-	return &Identifier{Base: node.New(), Identifier: id}
-}
-
-func (in *Identifier) String() string {
-	return in.Identifier
+	if ln.Expression != nil {
+		return fmt.Sprintf("%s: %s\n", ln.Label, ln.Expression)
+	}
+	return fmt.Sprintf("%s:\n", ln.Label)
 }

@@ -23,9 +23,11 @@ func (s *Switch) Children() []node.Node {
 var switchTemplate = `
 switch ( {{.Condition}} ) {
 {{range .Cases}}
-{{if ne (index .Labels 0).String "default"}}case{{end}} {{range $index, $element := .Labels}}{{if $index}},{{end}}{{ $element }}{{end}}:
-{{range .Statements}}{{ . }}
-{{end}}
+	case {{range $index, $element := .Labels}}{{if $index}},{{end}}{{ $element }}{{end}}:
+	{{if .Statements}}
+		{{range .Statements}}{{ . }}
+		{{end}}
+	{{end}}
 {{end}}
 }
 `
@@ -95,7 +97,7 @@ func NewSwitch(ctx *parser.StatementContext) *Switch {
 
 func switchLabelsFromContext(ctx *parser.SwitchLabelContext) []node.Node {
 	if ctx.DEFAULT() != nil {
-		return []node.Node{NewIdentifier("default")}
+		return []node.Node{NewLabel("default", nil)}
 	}
 
 	if ctx.GetEnumConstantName() != nil {

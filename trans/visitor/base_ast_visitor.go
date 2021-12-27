@@ -40,11 +40,12 @@ func (av *BaseASTVisitor[T]) VisitChildren(tree node.Node) T {
 	var result T
 	for _, child := range tree.Children() {
 		if child == nil {
-			ast.DebugPrint(tree)
-			panic("someone delivered a nil child")
+			// ast.DebugPrint(tree)
+			fmt.Println("someone delivered a nil child")
+			continue
 		}
 		if tool.IsNilInterface(child) {
-			fmt.Printf("someone delivered a typed nil child\n")
+			fmt.Println("someone delivered a typed nil child")
 			continue
 		}
 		nextResult := av.VisitNode(child)
