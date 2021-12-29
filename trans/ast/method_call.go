@@ -20,7 +20,7 @@ type MethodCall struct {
 
 	MethodName    string // or class name for constructors
 	TypeArguments []*TypePath
-	Arguments     []node.Node
+	Arguments     []Expression
 	Super         bool
 	This          bool
 	Constructor   bool

@@ -16,13 +16,13 @@ type LocalVarDecl struct {
 	*BaseMethodScope
 
 	Name       string
-	Expression node.Node
+	Expression Expression
 	TypePath   *TypePath
 	Ellipses   bool
 	IsArgument bool
 }
 
-func NewLocalVarDecl(typ *TypePath, name string, expression node.Node) *LocalVarDecl {
+func NewLocalVarDecl(typ *TypePath, name string, expression Expression) *LocalVarDecl {
 	return &LocalVarDecl{
 		Base:            node.New(),
 		BaseMethodScope: NewMethodScope(),

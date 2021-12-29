@@ -8,7 +8,7 @@ import (
 )
 
 type BaseOperator struct {
-	*node.Base
+	*BaseExpression
 
 	Operator string
 }
@@ -20,17 +20,21 @@ func (bo *BaseOperator) NodeName() string {
 }
 
 type BinaryOperator struct {
-	BaseOperator
+	*BaseOperator
 
-	Left  node.Node
-	Right node.Node
+	Left  Expression
+	Right Expression
 }
 
 func (bo *BinaryOperator) Children() []node.Node {
 	return []node.Node{bo.Left, bo.Right}
 }
 
-func NewBinaryOperator(operator string, left node.Node, right node.Node) *BinaryOperator {
+func NewOperator(operator string) *BaseOperator {
+	return &BaseOperator{BaseExpression: NewExpression(), Operator: operator}
+}
+
+func NewBinaryOperator(operator string, left, right Expression) *BinaryOperator {
 	if operator == "" {
 		panic("no operator")
 	}
@@ -40,10 +44,7 @@ func NewBinaryOperator(operator string, left node.Node, right node.Node) *Binary
 	if tool.IsNilInterface(right) {
 		panic("no right expression")
 	}
-	this := &BinaryOperator{Left: left, Right: right}
-	this.Base = node.New()
-	this.Operator = operator
-	return this
+	return &BinaryOperator{BaseOperator: NewOperator(operator), Left: left, Right: right}
 }
 
 func (bo *BinaryOperator) String() string {
@@ -57,20 +58,18 @@ func (bo *BinaryOperator) String() string {
 	return fmt.Sprintf("%s%s%s", bo.Left, bo.Operator, bo.Right)
 }
 
-var _ node.Node = &UnaryOperator{}
-
 type UnaryOperator struct {
-	BaseOperator
+	*BaseOperator
 	Prefix bool
 
-	Left node.Node
+	Left Expression
 }
 
 func (uo *UnaryOperator) Children() []node.Node {
 	return []node.Node{uo.Left}
 }
 
-func NewUnaryOperator(prefix bool, operator string, left node.Node) node.Node {
+func NewUnaryOperator(prefix bool, operator string, left Expression) node.Node {
 	if operator == "" {
 		panic("no operator")
 	}
@@ -94,9 +93,7 @@ func NewUnaryOperator(prefix bool, operator string, left node.Node) node.Node {
 		return NewBinaryOperator("*", NewLiteral(Integer, "-1"), left)
 	}
 
-	this := &UnaryOperator{Left: left, Prefix: prefix}
-	this.Base = node.New()
-	this.Operator = operator
+	this := &UnaryOperator{BaseOperator: NewOperator(operator), Left: left, Prefix: prefix}
 	return this
 }
 
@@ -108,18 +105,18 @@ func (uo *UnaryOperator) String() string {
 }
 
 type TernaryOperator struct {
-	BaseOperator
+	*BaseOperator
 
-	Left   node.Node
-	Middle node.Node
-	Right  node.Node
+	Left   Expression
+	Middle Expression
+	Right  Expression
 }
 
 func (to *TernaryOperator) Children() []node.Node {
 	return []node.Node{to.Left, to.Middle, to.Right}
 }
 
-func NewTernaryOperator(operator string, left node.Node, middle node.Node, right node.Node) *TernaryOperator {
+func NewTernaryOperator(operator string, left, middle, right Expression) *TernaryOperator {
 	if operator == "" {
 		panic("no operator")
 	}
@@ -132,9 +129,7 @@ func NewTernaryOperator(operator string, left node.Node, middle node.Node, right
 	if tool.IsNilInterface(right) {
 		panic("no right expression")
 	}
-	this := &TernaryOperator{Left: left, Middle: middle, Right: right}
-	this.Base = node.New()
-	this.Operator = operator
+	this := &TernaryOperator{BaseOperator: NewOperator(operator), Left: left, Middle: middle, Right: right}
 	return this
 }
 
