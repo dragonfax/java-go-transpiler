@@ -34,3 +34,15 @@ $(GENERATED_PARSER_FILES): stg.jar $(GRAMMAR_FILES)
 
 $(GENERATED_VISITOR_FILES): cmd/gen/main.go cmd/gen/*.tmpl trans/node/*.go trans/ast/*.go
 	$(GO) run cmd/gen/main.go
+
+CLASSPATH = -cp lib/spoon-core-10.0.0-jar-with-dependencies.jar:lib/gumtree-spoon-ast-diff-1.46-jar-with-dependencies.jar:. \
+
+javasrc/Main.class: javasrc/Main.java
+	javac $(CLASSPATH) javasrc/Main.java
+
+
+analyze: javasrc/Main.class
+	java \
+		$(CLASSPATH) \
+		javasrc.Main \
+		-i $(source)
