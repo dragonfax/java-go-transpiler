@@ -50,6 +50,9 @@ func (av *BaseASTVisitor[T]) VisitNode(tree node.Node) T {
 	} else if n, ok := tree.(*ast.Hierarchy); ok {
 		return av.root.VisitHierarchy(n)
 
+	} else if n, ok := tree.(*ast.IdentRef); ok {
+		return av.root.VisitIdentRef(n)
+
 	} else if n, ok := tree.(*ast.If); ok {
 		return av.root.VisitIf(n)
 
@@ -128,9 +131,6 @@ func (av *BaseASTVisitor[T]) VisitNode(tree node.Node) T {
 	} else if n, ok := tree.(*ast.TypeParameter); ok {
 		return av.root.VisitTypeParameter(n)
 
-	} else if n, ok := tree.(*ast.IdentRef); ok {
-		return av.root.VisitIdentRef(n)
-
 	} else {
 		return av.root.VisitChildren(tree)
 	}
@@ -181,6 +181,10 @@ func (av *BaseASTVisitor[T]) VisitClassicFor(tree *ast.ClassicFor) T {
 }
 
 func (av *BaseASTVisitor[T]) VisitHierarchy(tree *ast.Hierarchy) T {
+	return av.root.VisitChildren(tree)
+}
+
+func (av *BaseASTVisitor[T]) VisitIdentRef(tree *ast.IdentRef) T {
 	return av.root.VisitChildren(tree)
 }
 
@@ -285,9 +289,5 @@ func (av *BaseASTVisitor[T]) VisitTypeParameterList(tree *ast.TypeParameterList)
 }
 
 func (av *BaseASTVisitor[T]) VisitTypeParameter(tree *ast.TypeParameter) T {
-	return av.root.VisitChildren(tree)
-}
-
-func (av *BaseASTVisitor[T]) VisitIdentRef(tree *ast.IdentRef) T {
 	return av.root.VisitChildren(tree)
 }

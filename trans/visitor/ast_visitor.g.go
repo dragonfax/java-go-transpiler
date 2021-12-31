@@ -18,6 +18,7 @@ type GenASTVisitor[T comparable] interface {
 	VisitEnhancedFor(tree *ast.EnhancedFor) T
 	VisitClassicFor(tree *ast.ClassicFor) T
 	VisitHierarchy(tree *ast.Hierarchy) T
+	VisitIdentRef(tree *ast.IdentRef) T
 	VisitIf(tree *ast.If) T
 	VisitImport(tree *ast.Import) T
 	VisitLambda(tree *ast.Lambda) T
@@ -44,5 +45,4 @@ type GenASTVisitor[T comparable] interface {
 	VisitTypeElement(tree *ast.TypeElement) T
 	VisitTypeParameterList(tree *ast.TypeParameterList) T
 	VisitTypeParameter(tree *ast.TypeParameter) T
-	VisitIdentRef(tree *ast.IdentRef) T
 }
