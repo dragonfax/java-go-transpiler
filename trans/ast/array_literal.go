@@ -9,7 +9,7 @@ import (
 )
 
 type ArrayLiteral struct {
-	*BaseExpression
+	*node.Base
 
 	Elements []Expression
 }
@@ -18,8 +18,7 @@ func (al *ArrayLiteral) GetType() *Class {
 	if len(al.Elements) == 0 {
 		return nil
 	}
-	al.Type = al.Elements[0].GetType()
-	return al.Type
+	return al.Elements[0].GetType()
 }
 
 func (al *ArrayLiteral) Children() []node.Node {
@@ -32,14 +31,19 @@ func (al *ArrayLiteral) String() string {
 	for _, node := range al.Elements {
 		l = append(l, node.String())
 	}
-	return fmt.Sprintf("[]{%s}", strings.Join(l, ","))
+	typ := al.GetType()
+	var t = "/* Unresolved */"
+	if typ == nil {
+		t = typ.Name
+	}
+	return fmt.Sprintf("[]%s{%s}", t, strings.Join(l, ","))
 }
 
 func NewArrayLiteral(lit *parser.ArrayInitializerContext) *ArrayLiteral {
 	ctx := lit
 
 	if len(ctx.AllVariableInitializer()) == 0 {
-		return &ArrayLiteral{BaseExpression: NewExpression()}
+		return &ArrayLiteral{Base: node.New()}
 	}
 
 	l := make([]Expression, 0)
@@ -56,7 +60,7 @@ func NewArrayLiteral(lit *parser.ArrayInitializerContext) *ArrayLiteral {
 	}
 
 	return &ArrayLiteral{
-		BaseExpression: NewExpression(),
-		Elements:       l,
+		Base:     node.New(),
+		Elements: l,
 	}
 }

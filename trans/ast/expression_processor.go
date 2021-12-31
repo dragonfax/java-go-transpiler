@@ -30,11 +30,6 @@ func ExpressionProcessor(expressionI *parser.ExpressionContext) Expression {
 		return NewConstructorCall(expression.Creator())
 	}
 
-	if expression.MethodCall() != nil {
-		methodCall := expression.MethodCall()
-		return NewMethodCall(methodCall, nil)
-	}
-
 	if expression.GetPrefix() != nil {
 		// prefix operator
 		return NewUnaryOperator(true, expression.GetPrefix().GetText(), ExpressionProcessor(expression.Expression(0)))
@@ -90,6 +85,11 @@ func ExpressionProcessor(expressionI *parser.ExpressionContext) Expression {
 			panic("missing right for binary: " + expression.GetText() + "\n\n" + expression.ToStringTree(parser.RuleNames, nil))
 		}
 		return NewBinaryOperator(expression.GetBop().GetText(), left, right)
+	}
+
+	if expression.MethodCall() != nil {
+		methodCall := expression.MethodCall()
+		return NewMethodCall(methodCall, nil)
 	}
 
 	if expression.LBRACK() != nil {

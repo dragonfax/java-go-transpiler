@@ -16,6 +16,8 @@ type MethodRef struct {
 
 	Instance   node.Node
 	MethodName string
+
+	Method *Method
 }
 
 func (mr *MethodRef) GetType() *Class {
@@ -63,5 +65,9 @@ func NewMethodRef(expression *parser.ExpressionContext) *MethodRef {
 }
 
 func (mf *MethodRef) String() string {
-	return fmt.Sprintf("%s.%s", mf.Instance, mf.MethodName)
+	resolved := ""
+	if mf.Method == nil {
+		resolved = " /* Unresolved */"
+	}
+	return fmt.Sprintf("%s.%s%s", mf.Instance, mf.MethodName, resolved)
 }

@@ -63,6 +63,9 @@ func (ir *IdentRef) String() string {
 		return ir.LocalVariableDecl.Name
 	}
 	if ir.Field != nil {
+		if ir.Field.ClassScope != nil && ir.MethodScope.ClassScope != nil && ir.Field.ClassScope == ir.MethodScope.ClassScope {
+			return "this." + ir.Field.Name
+		}
 		return ir.Field.Name
 	}
 	panic("no solution")

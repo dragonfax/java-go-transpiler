@@ -156,12 +156,16 @@ func (mc *MethodCall) String() string {
 	if mc.InstanceExpression != nil {
 		instance = mc.InstanceExpression.String()
 	}
-	return fmt.Sprintf("%s%s(%s)", instance, mc.MethodName, ArgumentListToString(mc.Arguments))
+	return fmt.Sprintf("%s.%s(%s)", instance, mc.MethodName, ArgumentListToString(mc.Arguments))
 }
 
 func (cc *MethodCall) ConstructorString() string {
+	resolved := ""
+	if cc.Class == nil {
+		resolved = " /* Unresolved */"
+	}
 	if len(cc.TypeArguments) == 0 {
-		return fmt.Sprintf("New%s(%s)", cc.MethodName, ArgumentListToString(cc.Arguments))
+		return fmt.Sprintf("New%s(%s)%s", cc.MethodName, ArgumentListToString(cc.Arguments), resolved)
 	}
 
 	list := make([]string, 0)
@@ -175,5 +179,5 @@ func (cc *MethodCall) ConstructorString() string {
 		argumentCount = fmt.Sprintf("%d", len(cc.Arguments))
 	}
 
-	return fmt.Sprintf("New%s%s[%s](%s)", cc.MethodName, argumentCount, strings.Join(list, ","), ArgumentListToString(cc.Arguments))
+	return fmt.Sprintf("New%s%s[%s](%s)%s", cc.MethodName, argumentCount, strings.Join(list, ","), ArgumentListToString(cc.Arguments), resolved)
 }

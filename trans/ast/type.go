@@ -128,6 +128,10 @@ func (te *TypeElement) Children() []node.Node {
 func (tn *TypeElement) String() string {
 
 	star := "*"
+	resolved := ""
+	if tn.Class == nil {
+		resolved = " /* Unresolved */"
+	}
 
 	if len(tn.TypeArguments) > 0 {
 
@@ -136,7 +140,7 @@ func (tn *TypeElement) String() string {
 			list = append(list, s.String())
 		}
 
-		return fmt.Sprintf("%s%s[%s]", star, tn.ClassName, strings.Join(list, ","))
+		return fmt.Sprintf("%s%s[%s]%s", star, tn.ClassName, strings.Join(list, ","), resolved)
 	}
 
 	return star + tn.ClassName

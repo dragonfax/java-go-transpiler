@@ -15,14 +15,14 @@ import (
  *
  * Also fields can have various modifiers
  *
- * Appears only outside of a method. Inside, such a thing is a LocalVariableDeclaration
+ * Appears only outside of a method. Inside a method, such a thing is a LocalVariableDeclaration
  */
 type Field struct {
 	*BaseExpression
 	*BaseClassScope
 
 	Name       string
-	Expression Expression // for now
+	Expression Expression // what the value is set to on construction.
 	TypePath   *TypePath
 
 	Public    bool

@@ -47,9 +47,12 @@ func NewFieldRef(fieldName string, instance node.Node) *FieldRef {
 }
 
 func (fr *FieldRef) String() string {
-	if fr.InstanceExpression != nil {
-		return fmt.Sprintf("%s.%s", fr.InstanceExpression.String(), fr.FieldName)
-
+	if fr.InstanceExpression == nil {
+		panic("shouldn't happen")
 	}
-	return fmt.Sprintf("%s", fr.FieldName)
+	name := fr.FieldName
+	if fr.Field == nil {
+		name += " /* Unresolved */"
+	}
+	return fmt.Sprintf("%s.%s", fr.InstanceExpression.String(), name)
 }
