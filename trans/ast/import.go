@@ -27,7 +27,7 @@ func (i *Import) NodeName() string {
 }
 
 func (i *Import) String() string {
-	return fmt.Sprintf("import \"%s\"", i.ClassScope.PackageScope.RootPackage()+"/"+strings.ReplaceAll(i.ImportPackage.QualifiedName, ".", "/"))
+	return fmt.Sprintf("import \"%s\"", i.ClassScope.PackageScope.RootGoPackage()+"/"+strings.ReplaceAll(i.ImportPackage.QualifiedName, ".", "/"))
 }
 
 func (i *Import) Children() []node.Node {

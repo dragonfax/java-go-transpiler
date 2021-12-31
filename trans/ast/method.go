@@ -34,6 +34,13 @@ type Method struct {
 	LocalVars map[string]*LocalVarDecl
 }
 
+/* Not an expression, but has a GetType anyways.
+ * The expression version is MethodCall
+ */
+func (m *Method) GetType() *Class {
+	return m.ReturnType.GetType()
+}
+
 func NewConstructor(ctx *parser.ConstructorDeclarationContext) *Method {
 
 	c := &Method{

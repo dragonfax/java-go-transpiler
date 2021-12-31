@@ -32,7 +32,7 @@ func ExpressionProcessor(expressionI *parser.ExpressionContext) Expression {
 
 	if expression.MethodCall() != nil {
 		methodCall := expression.MethodCall()
-		return NewMethodCall(methodCall)
+		return NewMethodCall(methodCall, nil)
 	}
 
 	if expression.GetPrefix() != nil {

@@ -26,6 +26,17 @@ type BinaryOperator struct {
 	Right Expression
 }
 
+func (bo *BinaryOperator) GetType() *Class {
+	switch bo.Operator {
+	case "==", "!=", "&&", "||", "<", ">", ">=", "<=":
+		return RuntimePackage.GetClass("Boolean")
+	case "+", "-", "*", "/", "%", ">>", "<<", "&", "|", "^", "+=", "=", "*=", "/=", "&=", "^=", ">>=", ">>>=", ">>>", "<<=", "<<<=", "%=":
+		return bo.Left.GetType()
+	default:
+		return nil
+	}
+}
+
 func (bo *BinaryOperator) Children() []node.Node {
 	return []node.Node{bo.Left, bo.Right}
 }
@@ -69,7 +80,7 @@ func (uo *UnaryOperator) Children() []node.Node {
 	return []node.Node{uo.Left}
 }
 
-func NewUnaryOperator(prefix bool, operator string, left Expression) node.Node {
+func NewUnaryOperator(prefix bool, operator string, left Expression) Expression {
 	if operator == "" {
 		panic("no operator")
 	}
@@ -97,6 +108,10 @@ func NewUnaryOperator(prefix bool, operator string, left Expression) node.Node {
 	return this
 }
 
+func (uo *UnaryOperator) GetType() *Class {
+	return uo.Left.GetType()
+}
+
 func (uo *UnaryOperator) String() string {
 	if uo.Prefix {
 		return fmt.Sprintf("%s%s", uo.Operator, uo.Left)
@@ -107,9 +122,14 @@ func (uo *UnaryOperator) String() string {
 type TernaryOperator struct {
 	*BaseOperator
 
-	Left   Expression
-	Middle Expression
-	Right  Expression
+	Left   Expression // conditional
+	Middle Expression // expression if true
+	Right  Expression // expression if false
+}
+
+func (to *TernaryOperator) GetType() *Class {
+	// Left is always a boolean, so its either Middle or Right (frankly they should match, but we don't verify that)
+	return to.Middle.GetType()
 }
 
 func (to *TernaryOperator) Children() []node.Node {

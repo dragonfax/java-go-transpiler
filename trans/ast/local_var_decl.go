@@ -32,6 +32,11 @@ func NewLocalVarDecl(typ *TypePath, name string, expression Expression) *LocalVa
 	}
 }
 
+/* not an expression, but has a GetType, for its var references to refer to */
+func (lv *LocalVarDecl) GetType() *Class {
+	return lv.TypePath.GetType()
+}
+
 func NewArgument(typ *TypePath, name string, ellipses bool) *LocalVarDecl {
 	if typ == nil {
 		panic(" no variable type")

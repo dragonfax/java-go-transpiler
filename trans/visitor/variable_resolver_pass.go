@@ -73,8 +73,7 @@ func (cv *VarResolver) VisitVarRef(varRef *ast.VarRef) int {
 
 	}
 
-	runtimePkg := cv.Hierarchy.GetPackage("runtime")
-	refClass := class.ResolveClassName(runtimePkg, name)
+	refClass := class.ResolveClassName(name)
 	if refClass != nil {
 		// fmt.Println("found var ref as a class")
 		varRef.VariableDecl = refClass

@@ -30,6 +30,10 @@ func NewClassRef(className string) *ClassRef {
 	}
 }
 
+func (cr *ClassRef) GetType() *Class {
+	return RuntimePackage.GetClass("JavaClass")
+}
+
 func (cr *ClassRef) String() string {
 	if cr.Class == nil {
 		return cr.ClassName + ".class /* unresolved */"

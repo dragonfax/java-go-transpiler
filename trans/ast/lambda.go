@@ -13,6 +13,10 @@ type Lambda struct {
 	Body      node.Node
 }
 
+func (l *Lambda) GetType() *Class {
+	return RuntimePackage.GetClass("Function")
+}
+
 func (ln *Lambda) Children() []node.Node {
 	return node.AppendNodeLists(ln.Arguments, ln.Body)
 }

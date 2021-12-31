@@ -102,7 +102,7 @@ func Translate(sourceDir, targetDir, targetPackage, targetStubDir string) error 
 	if targetDir == "" {
 		targetDir = generateOutputRoot(dir)
 	}
-	h.RootPackage = targetPackage
+	h.RootGoPackage = targetPackage
 	outputStructures(h.GetClasses(), targetDir)
 	fmt.Println("writing files complete")
 

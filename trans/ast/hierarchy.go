@@ -5,10 +5,9 @@ import "github.com/dragonfax/java_converter/trans/node"
 type Hierarchy struct {
 	*node.Base
 
-	Packages         map[string]*Package
-	PrimitiveClasses map[string]*Class
+	Packages map[string]*Package
 
-	RootPackage string // "github.com/blah/something"
+	RootGoPackage string // "github.com/blah/something"
 }
 
 func ListToSet[E comparable](list []E) map[E]struct{} {
@@ -21,21 +20,8 @@ func ListToSet[E comparable](list []E) map[E]struct{} {
 
 func NewHierarchy() *Hierarchy {
 	this := &Hierarchy{
-		Base:             node.New(),
-		Packages:         make(map[string]*Package),
-		PrimitiveClasses: make(map[string]*Class),
-	}
-
-	// Adding boxing classes to runtime package
-	runtimePkg := this.GetPackage("runtime")
-	for _, primitive := range primitiveClasses {
-		primitive.PackageName = "runtime"
-		primitive.PackageScope = runtimePkg
-		runtimePkg.AddClass(primitive.Class)
-		// available by either name
-		// later will result to the class's real name, and then finally translated to a go type, if necessary
-		this.PrimitiveClasses[primitive.JavaPrimitive] = primitive.Class
-		this.PrimitiveClasses[primitive.Class.Name] = primitive.Class
+		Base:     node.New(),
+		Packages: make(map[string]*Package),
 	}
 
 	return this

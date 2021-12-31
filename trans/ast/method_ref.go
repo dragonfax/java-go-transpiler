@@ -7,28 +7,37 @@ import (
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
+/* Not a method call, but a reference to a method that can be passed around and called like a function later.
+ * Thus no arguments to speak of there.
+ * It IS an expression, though its type is a Function<A,R> with Arguments and Return values (both type parameters ignored in this system)
+ */
 type MethodRef struct {
-	*node.Base
+	*BaseExpression
 
-	Instance node.Node
-	Method   string
+	Instance   node.Node
+	MethodName string
+}
+
+func (mr *MethodRef) GetType() *Class {
+	// TODO We drop the type parmaeter here, but we may want it in the future, as we may have to type dereferences of this.
+	return RuntimePackage.GetClass("Function")
 }
 
 func (mr *MethodRef) Children() []node.Node {
 	return []node.Node{mr.Instance}
 }
 
-func NewMethodRef(expression *parser.ExpressionContext) node.Node {
+func NewMethodRef(expression *parser.ExpressionContext) *MethodRef {
 	ctx := expression
 
-	method := ""
+	methodName := ""
 	if ctx.IDENTIFIER() != nil {
-		method = ctx.IDENTIFIER().GetText()
+		methodName = ctx.IDENTIFIER().GetText()
 	} else if ctx.NEW() != nil {
-		method = "new"
+		methodName = "new"
 	}
 
-	if method == "" {
+	if methodName == "" {
 		panic("no method name in method reference")
 	}
 
@@ -46,9 +55,13 @@ func NewMethodRef(expression *parser.ExpressionContext) node.Node {
 		panic("no instance/expression for method reference")
 	}
 
-	return &MethodRef{Base: node.New(), Method: method, Instance: instance}
+	return &MethodRef{
+		BaseExpression: NewExpression(),
+		MethodName:     methodName,
+		Instance:       instance,
+	}
 }
 
 func (mf *MethodRef) String() string {
-	return fmt.Sprintf("%s.%s", mf.Instance, mf.Method)
+	return fmt.Sprintf("%s.%s", mf.Instance, mf.MethodName)
 }

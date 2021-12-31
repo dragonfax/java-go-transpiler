@@ -10,22 +10,17 @@ import (
  */
 type ClassResolver struct {
 	*BaseASTVisitor[int] // throwaway return value
-
-	RuntimePackage *ast.Package
 }
 
 func NewClassResolver(h *ast.Hierarchy) ASTVisitor[int] {
 	this := &ClassResolver{}
 	this.BaseASTVisitor = NewASTVisitor[int](h, this)
-
-	this.RuntimePackage = h.GetPackage("runtime")
-
 	return this
 }
 
 func (rp *ClassResolver) VisitClassRef(classRef *ast.ClassRef) int {
 
-	classRef.Class = classRef.ClassScope.ResolveClassName(rp.RuntimePackage, classRef.ClassName)
+	classRef.Class = classRef.ClassScope.ResolveClassName(classRef.ClassName)
 
 	return 0
 }
@@ -34,7 +29,7 @@ func (rp *ClassResolver) VisitClass(class *ast.Class) int {
 
 	// base class
 	if class.BaseClassName != "" {
-		class.BaseClass = class.ResolveClassName(rp.RuntimePackage, class.BaseClassName)
+		class.BaseClass = class.ResolveClassName(class.BaseClassName)
 	}
 
 	return rp.VisitChildren(class)
@@ -46,7 +41,7 @@ func (rp *ClassResolver) VisitMethodCall(methodCall *ast.MethodCall) int {
 	// but constructor calls do.
 
 	if methodCall.Constructor {
-		methodCall.Class = methodCall.MethodScope.ClassScope.ResolveClassName(rp.RuntimePackage, methodCall.MethodName)
+		methodCall.Class = methodCall.MethodScope.ClassScope.ResolveClassName(methodCall.MethodName)
 	}
 
 	return rp.VisitChildren(methodCall)
@@ -54,7 +49,7 @@ func (rp *ClassResolver) VisitMethodCall(methodCall *ast.MethodCall) int {
 
 func (rp *ClassResolver) VisitTypeElement(typeElement *ast.TypeElement) int {
 
-	typeElement.Class = typeElement.ClassScope.ResolveClassName(rp.RuntimePackage, typeElement.ClassName)
+	typeElement.Class = typeElement.ClassScope.ResolveClassName(typeElement.ClassName)
 
 	return rp.VisitChildren(typeElement)
 }

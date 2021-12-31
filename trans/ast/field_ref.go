@@ -6,14 +6,21 @@ import (
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
-/* starts off as just the field name.
- * we won't have the instance expression until after resolving
- */
+/* referencing a field of a class, either this class or another */
 type FieldRef struct {
 	*node.Base
 
 	FieldName          string
 	InstanceExpression node.Node
+
+	Field *Field
+}
+
+func (fr *FieldRef) GetType() *Class {
+	if fr.Field != nil {
+		return fr.Field.GetType()
+	}
+	return nil
 }
 
 func (fr *FieldRef) NodeName() string {

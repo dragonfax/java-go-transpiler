@@ -6,6 +6,16 @@ import (
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
+var RuntimePackage *Package = NewPackage("runtime")
+
+func init() {
+	// Adding primitive classes to runtime package
+	for _, primitive := range primitiveClasses {
+		RuntimePackage.AddClass(primitive.Class)
+	}
+
+}
+
 type Package struct {
 	*node.Base
 
@@ -34,8 +44,8 @@ func (pkg *Package) Dir() string {
 	return strings.Join(strings.Split(pkg.QualifiedName, "."), "/")
 }
 
-func (pkg *Package) RootPackage() string {
-	return pkg.GetParent().(*Hierarchy).RootPackage
+func (pkg *Package) RootGoPackage() string {
+	return pkg.GetParent().(*Hierarchy).RootGoPackage
 }
 
 /* AddClass, only for use before the AST walking phases begin

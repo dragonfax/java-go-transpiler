@@ -15,7 +15,7 @@ import (
  * Doesn't have the class its connected to until after resolution phase is complete
  */
 type MethodCall struct {
-	*node.Base
+	*BaseExpression
 	*BaseMethodScope
 
 	MethodName         string // or class name for constructors
@@ -26,7 +26,17 @@ type MethodCall struct {
 	Constructor        bool
 	InstanceExpression node.Node
 
-	Class *Class // class with method, or to be constructed, after resolution
+	Class  *Class // class with method, or to be constructed, after resolution
+	Method *Method
+}
+
+func (mc *MethodCall) GetType() *Class {
+	if mc.Constructor {
+		mc.Type = mc.Class
+	} else if mc.Method != nil {
+		mc.Type = mc.Method.GetType()
+	}
+	return mc.Type
 }
 
 func (mc *MethodCall) NodeName() string {
@@ -76,7 +86,7 @@ func NewMethodCall(methodCall *parser.MethodCallContext, instance node.Node) *Me
 	}
 
 	this := &MethodCall{
-		Base:               node.New(),
+		BaseExpression:     NewExpression(),
 		BaseMethodScope:    NewMethodScope(),
 		MethodName:         methodName,
 		Arguments:          arguments,
@@ -129,7 +139,7 @@ func NewConstructorCall(creator *parser.CreatorContext) *MethodCall {
 	}
 
 	return &MethodCall{
-		Base:            node.New(),
+		BaseExpression:  NewExpression(),
 		BaseMethodScope: NewMethodScope(),
 		MethodName:      className,
 		TypeArguments:   typeArguments,

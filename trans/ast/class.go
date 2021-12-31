@@ -178,7 +178,7 @@ func (c *Class) NestedClassByName(className string) *Class {
 	return nil
 }
 
-func (thisClass *Class) ResolveClassName(runtimePkg *Package, className string) *Class {
+func (thisClass *Class) ResolveClassName(className string) *Class {
 	// resolve a classname to a another class from the scope of this class.
 	// class could come from the same package as this class, or an imported class, or an imported package
 	// TODO or a primitive boxing class
@@ -216,7 +216,7 @@ func (thisClass *Class) ResolveClassName(runtimePkg *Package, className string) 
 	}
 
 	// runtime package
-	if rClass := runtimePkg.HasClass(className); rClass != nil {
+	if rClass := RuntimePackage.HasClass(className); rClass != nil {
 		return rClass
 	}
 

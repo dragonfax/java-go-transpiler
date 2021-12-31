@@ -13,12 +13,18 @@ type VarRef struct {
 	This         bool
 	Super        bool
 
-	// Field or LocalVarDecl (variable or method/constructor parameter)
-	VariableDecl node.Node
+	VariableDecl *LocalVarDecl
 }
 
 func NewVarRef(name string) *VarRef {
 	return &VarRef{Base: node.New(), BaseMethodScope: NewMethodScope(), VariableName: name}
+}
+
+func (vr *VarRef) GetType() *Class {
+	if vr != nil {
+		return vr.VariableDecl.GetType()
+	}
+	return nil
 }
 
 func (vr *VarRef) NodeName() string {
