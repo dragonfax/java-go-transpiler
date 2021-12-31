@@ -95,14 +95,7 @@ func Translate(sourceDir, targetDir, targetPackage, targetStubDir string) error 
 	}
 
 	// process the hierarchy (all classes and packages) at once
-
-	visitor.ParentPass(h)
-	visitor.NewScopePass(h).VisitNode(h)
-	visitor.NewPopulatePass(h).VisitNode(h)
-	visitor.NewClassResolver(h).VisitNode(h)
-	visitor.NewVarResolver(h).VisitNode(h)
-	visitor.BaseClassPass(h)
-	// "check":    visitor.NewCheckPass,
+	visitor.RunGroup(h)
 
 	// output
 	fmt.Println("writing files")
