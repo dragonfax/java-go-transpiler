@@ -20,9 +20,6 @@ func (av *BaseASTVisitor[T]) VisitNode(tree node.Node) T {
 	} else if n, ok := tree.(*ast.Block); ok {
 		return av.root.VisitBlock(n)
 
-	} else if n, ok := tree.(*ast.Chain); ok {
-		return av.root.VisitChain(n)
-
 	} else if n, ok := tree.(*ast.Class); ok {
 		return av.root.VisitClass(n)
 
@@ -135,10 +132,6 @@ func (av *BaseASTVisitor[T]) VisitArrayLiteral(tree *ast.ArrayLiteral) T {
 }
 
 func (av *BaseASTVisitor[T]) VisitBlock(tree *ast.Block) T {
-	return av.root.VisitChildren(tree)
-}
-
-func (av *BaseASTVisitor[T]) VisitChain(tree *ast.Chain) T {
 	return av.root.VisitChildren(tree)
 }
 

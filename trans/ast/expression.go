@@ -33,7 +33,7 @@ func ExpressionProcessor(expressionI *parser.ExpressionContext) node.Node {
 
 	if expression.MethodCall() != nil {
 		methodCall := expression.MethodCall()
-		return NewMethodCall(methodCall)
+		return NewMethodCall(methodCall, nil)
 	}
 
 	if expression.GetPrefix() != nil {
@@ -56,10 +56,10 @@ func ExpressionProcessor(expressionI *parser.ExpressionContext) node.Node {
 				panic("qualified 'this'. For referencing outer class from inner class")
 			}
 			if expression.IDENTIFIER() != nil {
-				return NewChain(firstExpression, NewFieldRef(expression.IDENTIFIER().GetText()))
+				return NewFieldRef(expression.IDENTIFIER().GetText(), firstExpression)
 			}
 			if expression.MethodCall() != nil {
-				return NewChain(firstExpression, NewMethodCall(expression.MethodCall()))
+				return NewMethodCall(expression.MethodCall(), firstExpression)
 			}
 			if expression.NEW() != nil {
 				panic("qualified constructor, for constructing inner class from outer class")

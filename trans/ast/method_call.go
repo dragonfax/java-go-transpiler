@@ -18,12 +18,13 @@ type MethodCall struct {
 	*node.Base
 	*BaseMethodScope
 
-	MethodName    string // or class name for constructors
-	TypeArguments []*TypePath
-	Arguments     []node.Node
-	Super         bool
-	This          bool
-	Constructor   bool
+	MethodName         string // or class name for constructors
+	TypeArguments      []*TypePath
+	Arguments          []node.Node
+	Super              bool
+	This               bool
+	Constructor        bool
+	InstanceExpression node.Node
 
 	Class *Class // class with method, or to be constructed, after resolution
 }
@@ -40,7 +41,7 @@ func (mc *MethodCall) Children() []node.Node {
 	return node.AppendNodeLists(mc.TypeArguments, mc.Arguments...)
 }
 
-func NewMethodCall(methodCall *parser.MethodCallContext) *MethodCall {
+func NewMethodCall(methodCall *parser.MethodCallContext, instance node.Node) *MethodCall {
 	if tool.IsNilInterface(methodCall) {
 		panic("no method call")
 	}
@@ -48,10 +49,14 @@ func NewMethodCall(methodCall *parser.MethodCallContext) *MethodCall {
 	methodCallCtx := methodCall
 
 	methodName := ""
+	var super bool
+	var isThis bool
 	if methodCallCtx.SUPER() != nil {
 		methodName = "super"
+		super = true
 	} else if methodCallCtx.THIS() != nil {
 		methodName = "this"
+		isThis = true
 	} else if methodCallCtx.IDENTIFIER() != nil {
 		methodName = methodCallCtx.IDENTIFIER().GetText()
 	} else {
@@ -71,16 +76,13 @@ func NewMethodCall(methodCall *parser.MethodCallContext) *MethodCall {
 	}
 
 	this := &MethodCall{
-		Base:            node.New(),
-		BaseMethodScope: NewMethodScope(),
-		MethodName:      methodName,
-		Arguments:       arguments,
-	}
-
-	if methodCallCtx.SUPER() != nil {
-		this.Super = true
-	} else if methodCallCtx.THIS() != nil {
-		this.This = true
+		Base:               node.New(),
+		BaseMethodScope:    NewMethodScope(),
+		MethodName:         methodName,
+		Arguments:          arguments,
+		Super:              super,
+		This:               isThis,
+		InstanceExpression: instance,
 	}
 
 	return this
@@ -139,7 +141,12 @@ func (mc *MethodCall) String() string {
 	if mc.Constructor {
 		return mc.ConstructorString()
 	}
-	return fmt.Sprintf("%s(%s)", mc.MethodName, ArgumentListToString(mc.Arguments))
+
+	var instance = ""
+	if mc.InstanceExpression != nil {
+		instance = mc.InstanceExpression.String()
+	}
+	return fmt.Sprintf("%s%s(%s)", instance, mc.MethodName, ArgumentListToString(mc.Arguments))
 }
 
 func (cc *MethodCall) ConstructorString() string {

@@ -8,7 +8,6 @@ import (
 type GenASTVisitor[T comparable] interface {
 	VisitArrayLiteral(tree *ast.ArrayLiteral) T
 	VisitBlock(tree *ast.Block) T
-	VisitChain(tree *ast.Chain) T
 	VisitClass(tree *ast.Class) T
 	VisitClassRef(tree *ast.ClassRef) T
 	VisitEnumConstant(tree *ast.EnumConstant) T

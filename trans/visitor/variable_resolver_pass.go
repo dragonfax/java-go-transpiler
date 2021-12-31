@@ -28,17 +28,6 @@ func (cv *VarResolver) VisitVarRef(varRef *ast.VarRef) int {
 		return 0
 	}
 
-	parent := varRef.GetParent()
-	if chainParent, ok := parent.(*ast.Chain); ok {
-		siblings := chainParent.Children()
-
-		if siblings[0] != varRef {
-			// must the first element in a chain.
-			// or its not going to be resolvable by itself.
-			return 0
-		}
-	}
-
 	name := varRef.VariableName
 
 	// check in the method arguments and other method variables
