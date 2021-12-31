@@ -1,3 +1,4 @@
 convert
 .antlr
 stg.jar
+**.class

@@ -35,14 +35,18 @@ $(GENERATED_PARSER_FILES): stg.jar $(GRAMMAR_FILES)
 $(GENERATED_VISITOR_FILES): cmd/gen/main.go cmd/gen/*.tmpl trans/node/*.go trans/ast/*.go
 	$(GO) run cmd/gen/main.go
 
-CLASSPATH = -cp lib/spoon-core-10.0.0-jar-with-dependencies.jar:lib/gumtree-spoon-ast-diff-1.46-jar-with-dependencies.jar:. \
+CLASSPATH = -cp lib/spoon-core-10.0.0-jar-with-dependencies.jar:lib/gumtree-spoon-ast-diff-1.46-jar-with-dependencies.jar:lib/slf4j-simple-1.7.32.jar:. \
 
-javasrc/Main.class: javasrc/Main.java
-	javac $(CLASSPATH) javasrc/Main.java
+javasrc/*.class: $(MAKEFILE_LIST) javasrc/*.java
+	javac $(CLASSPATH) javasrc/*.java
 
 
-analyze: javasrc/Main.class
+analyze: javasrc/*.class
 	java \
+		-Dorg.slf4j.simpleLogger.log.com.google.gson=debug \
 		$(CLASSPATH) \
 		javasrc.Main \
-		-i $(source)
+		$(source)
+
+spoon-gui:
+	java -cp lib/spoon-core-10.0.0-jar-with-dependencies.jar spoon.Launcher -i $(source) --gui
