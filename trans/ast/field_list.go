@@ -29,7 +29,7 @@ func NewFieldList(ctx *parser.FieldDeclarationContext) *FieldList {
 
 		name := varDecCtx.VariableDeclaratorId().GetText()
 
-		var init node.Node
+		var init Expression
 		if varDecCtx.VariableInitializer() != nil {
 			initCtx := varDecCtx.VariableInitializer()
 			if initCtx.Expression() != nil {

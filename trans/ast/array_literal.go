@@ -9,12 +9,21 @@ import (
 )
 
 type ArrayLiteral struct {
-	*node.Base
+	*BaseExpression
 
-	Elements []node.Node
+	Elements []Expression
+}
+
+func (al *ArrayLiteral) GetType() *Class {
+	if len(al.Elements) == 0 {
+		return nil
+	}
+	al.Type = al.Elements[0].GetType()
+	return al.Type
 }
 
 func (al *ArrayLiteral) Children() []node.Node {
+
 	return node.ListOfNodesToNodeList(al.Elements)
 }
 
@@ -30,10 +39,10 @@ func NewArrayLiteral(lit *parser.ArrayInitializerContext) *ArrayLiteral {
 	ctx := lit
 
 	if len(ctx.AllVariableInitializer()) == 0 {
-		return &ArrayLiteral{Base: node.New()}
+		return &ArrayLiteral{BaseExpression: NewExpression()}
 	}
 
-	l := make([]node.Node, 0)
+	l := make([]Expression, 0)
 	for _, varInit := range ctx.AllVariableInitializer() {
 		varInitCtx := varInit
 
@@ -47,7 +56,7 @@ func NewArrayLiteral(lit *parser.ArrayInitializerContext) *ArrayLiteral {
 	}
 
 	return &ArrayLiteral{
-		Base:     node.New(),
-		Elements: l,
+		BaseExpression: NewExpression(),
+		Elements:       l,
 	}
 }

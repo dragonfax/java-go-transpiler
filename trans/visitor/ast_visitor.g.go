@@ -12,7 +12,7 @@ type GenASTVisitor[T comparable] interface {
 	VisitClassRef(tree *ast.ClassRef) T
 	VisitEnumConstant(tree *ast.EnumConstant) T
 	VisitEnumRef(tree *ast.EnumRef) T
-	VisitField(tree *ast.Field) T
+	VisitBaseExpression(tree *ast.BaseExpression) T
 	VisitFieldList(tree *ast.FieldList) T
 	VisitFieldRef(tree *ast.FieldRef) T
 	VisitEnhancedFor(tree *ast.EnhancedFor) T

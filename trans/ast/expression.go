@@ -11,7 +11,7 @@ type Expression interface {
 type BaseExpression struct {
 	*node.Base
 
-	Type *Class
+	Type *Class // cached return type of the expression.
 }
 
 func NewExpression() *BaseExpression {

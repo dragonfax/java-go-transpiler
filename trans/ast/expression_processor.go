@@ -6,7 +6,7 @@ import (
 )
 
 // deal with the recursive expression tree.
-func ExpressionProcessor(expressionI *parser.ExpressionContext) node.Expression {
+func ExpressionProcessor(expressionI *parser.ExpressionContext) Expression {
 	if tool.IsNilInterface(expressionI) {
 		return nil
 	}

@@ -18,11 +18,11 @@ import (
  * Appears only outside of a method. Inside, such a thing is a LocalVariableDeclaration
  */
 type Field struct {
-	*node.Base
 	*BaseClassScope
+	*BaseExpression
 
 	Name       string
-	Expression node.Node // for now
+	Expression Expression // for now
 	TypePath   *TypePath
 
 	Public    bool
@@ -30,14 +30,23 @@ type Field struct {
 	Static    bool
 }
 
-func NewField(typ *TypePath, name string, expression node.Node) *Field {
+func NewField(typ *TypePath, name string, expression Expression) *Field {
 	return &Field{
-		Base:           node.New(),
+		BaseExpression: NewExpression(),
 		BaseClassScope: NewClassScope(),
 		TypePath:       typ,
 		Name:           name,
 		Expression:     expression,
 	}
+}
+
+func (f *Field) GetType() *Class {
+	if f.TypePath == nil {
+		fmt.Println("warning: no typepath in field (use of var?)")
+		return nil
+	}
+	f.Type = f.TypePath.GetType()
+	return f.Type
 }
 
 func (f *Field) Children() []node.Node {

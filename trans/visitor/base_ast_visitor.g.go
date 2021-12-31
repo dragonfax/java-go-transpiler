@@ -32,8 +32,8 @@ func (av *BaseASTVisitor[T]) VisitNode(tree node.Node) T {
 	} else if n, ok := tree.(*ast.EnumRef); ok {
 		return av.root.VisitEnumRef(n)
 
-	} else if n, ok := tree.(*ast.Field); ok {
-		return av.root.VisitField(n)
+	} else if n, ok := tree.(*ast.BaseExpression); ok {
+		return av.root.VisitBaseExpression(n)
 
 	} else if n, ok := tree.(*ast.FieldList); ok {
 		return av.root.VisitFieldList(n)
@@ -151,7 +151,7 @@ func (av *BaseASTVisitor[T]) VisitEnumRef(tree *ast.EnumRef) T {
 	return av.root.VisitChildren(tree)
 }
 
-func (av *BaseASTVisitor[T]) VisitField(tree *ast.Field) T {
+func (av *BaseASTVisitor[T]) VisitBaseExpression(tree *ast.BaseExpression) T {
 	return av.root.VisitChildren(tree)
 }
 

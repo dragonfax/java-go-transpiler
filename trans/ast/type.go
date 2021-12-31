@@ -26,6 +26,12 @@ type TypePath struct {
 	Class *Class // shortcut, for resolution later
 }
 
+// TypePath isn't an expression per say, but it has a GetType for expressions to use.
+func (tp *TypePath) GetType() *Class {
+	// always returns the last element of the path
+	return tp.Elements[len(tp.Elements)-1].Class
+}
+
 func NewType(elements []*TypeElement) *TypePath {
 	return &TypePath{Base: node.New(), Elements: elements}
 }

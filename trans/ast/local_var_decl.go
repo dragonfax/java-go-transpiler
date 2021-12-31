@@ -89,7 +89,7 @@ func NewLocalVarDeclNodeList(decl *parser.LocalVariableDeclarationContext) []*Lo
 
 		varDeclCtx := varDecl
 
-		var exp node.Node
+		var exp Expression
 		if varDeclCtx.VariableInitializer() != nil {
 			varInitCtx := varDeclCtx.VariableInitializer()
 			exp = variableInitializerProcessor(varInitCtx)
@@ -105,14 +105,13 @@ func NewLocalVarDeclNodeList(decl *parser.LocalVariableDeclarationContext) []*Lo
 	return list
 }
 
-func variableInitializerProcessor(ctx *parser.VariableInitializerContext) node.Node {
-	var exp node.Node
+func variableInitializerProcessor(ctx *parser.VariableInitializerContext) Expression {
 	if ctx.Expression() != nil {
-		exp = ExpressionProcessor(ctx.Expression())
+		return ExpressionProcessor(ctx.Expression())
 	}
 	if ctx.ArrayInitializer() != nil {
-		exp = NewArrayLiteral(ctx.ArrayInitializer())
+		return NewArrayLiteral(ctx.ArrayInitializer())
 	}
 
-	return exp
+	return nil
 }
