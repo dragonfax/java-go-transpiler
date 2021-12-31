@@ -32,8 +32,8 @@ func (av *BaseASTVisitor[T]) VisitNode(tree node.Node) T {
 	} else if n, ok := tree.(*ast.EnumRef); ok {
 		return av.root.VisitEnumRef(n)
 
-	} else if n, ok := tree.(*ast.BaseExpression); ok {
-		return av.root.VisitBaseExpression(n)
+	} else if n, ok := tree.(*ast.Field); ok {
+		return av.root.VisitField(n)
 
 	} else if n, ok := tree.(*ast.FieldList); ok {
 		return av.root.VisitFieldList(n)
@@ -73,6 +73,15 @@ func (av *BaseASTVisitor[T]) VisitNode(tree node.Node) T {
 
 	} else if n, ok := tree.(*ast.MethodRef); ok {
 		return av.root.VisitMethodRef(n)
+
+	} else if n, ok := tree.(*ast.BinaryOperator); ok {
+		return av.root.VisitBinaryOperator(n)
+
+	} else if n, ok := tree.(*ast.UnaryOperator); ok {
+		return av.root.VisitUnaryOperator(n)
+
+	} else if n, ok := tree.(*ast.TernaryOperator); ok {
+		return av.root.VisitTernaryOperator(n)
 
 	} else if n, ok := tree.(*ast.Package); ok {
 		return av.root.VisitPackage(n)
@@ -151,7 +160,7 @@ func (av *BaseASTVisitor[T]) VisitEnumRef(tree *ast.EnumRef) T {
 	return av.root.VisitChildren(tree)
 }
 
-func (av *BaseASTVisitor[T]) VisitBaseExpression(tree *ast.BaseExpression) T {
+func (av *BaseASTVisitor[T]) VisitField(tree *ast.Field) T {
 	return av.root.VisitChildren(tree)
 }
 
@@ -204,6 +213,18 @@ func (av *BaseASTVisitor[T]) VisitMethodCall(tree *ast.MethodCall) T {
 }
 
 func (av *BaseASTVisitor[T]) VisitMethodRef(tree *ast.MethodRef) T {
+	return av.root.VisitChildren(tree)
+}
+
+func (av *BaseASTVisitor[T]) VisitBinaryOperator(tree *ast.BinaryOperator) T {
+	return av.root.VisitChildren(tree)
+}
+
+func (av *BaseASTVisitor[T]) VisitUnaryOperator(tree *ast.UnaryOperator) T {
+	return av.root.VisitChildren(tree)
+}
+
+func (av *BaseASTVisitor[T]) VisitTernaryOperator(tree *ast.TernaryOperator) T {
 	return av.root.VisitChildren(tree)
 }
 

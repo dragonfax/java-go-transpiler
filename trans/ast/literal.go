@@ -9,20 +9,29 @@ import (
 
 type LiteralType string
 
+// not part of primitive clases as these have to be available during parsing.
 const (
 	Integer LiteralType = "int"
+	Short   LiteralType = "short"
+	Long    LiteralType = "long"
 	Float   LiteralType = "float"
-	Char    LiteralType = "rune"
+	Double  LiteralType = "double"
+	Char    LiteralType = "char"
 	String  LiteralType = "string"
-	Bool    LiteralType = "bool"
-	Null    LiteralType = "nil"
+	Bool    LiteralType = "boolean"
+	Null    LiteralType = "null"
 )
 
 type Literal struct {
-	*node.Base
+	*BaseExpression
 
 	LiteralType LiteralType
 	Value       string
+}
+
+func (l *Literal) GetType() *Class {
+	// will get its type from an early visitor pass
+	return l.Type
 }
 
 func (ln *Literal) Children() []node.Node {
@@ -31,9 +40,9 @@ func (ln *Literal) Children() []node.Node {
 
 func NewLiteral(typ LiteralType, value string) *Literal {
 	return &Literal{
-		Base:        node.New(),
-		LiteralType: typ,
-		Value:       value,
+		BaseExpression: NewExpression(),
+		LiteralType:    typ,
+		Value:          value,
 	}
 }
 
@@ -64,9 +73,9 @@ func NewLiteralFromContext(literal *parser.LiteralContext) *Literal {
 	}
 
 	return &Literal{
-		Base:        node.New(),
-		LiteralType: typ,
-		Value:       literal.GetText(),
+		BaseExpression: NewExpression(),
+		LiteralType:    typ,
+		Value:          literal.GetText(),
 	}
 }
 

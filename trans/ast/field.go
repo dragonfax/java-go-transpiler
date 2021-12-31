@@ -18,8 +18,8 @@ import (
  * Appears only outside of a method. Inside, such a thing is a LocalVariableDeclaration
  */
 type Field struct {
-	*BaseClassScope
 	*BaseExpression
+	*BaseClassScope
 
 	Name       string
 	Expression Expression // for now

@@ -80,20 +80,37 @@ func main() {
 			}
 
 			sel, ok := star.X.(*ast.SelectorExpr)
-			if !ok {
-				continue
+			if ok {
+
+				if sel.Sel.Name != "Base" || sel.X.(*ast.Ident).Name != "node" {
+					continue
+				}
+
+				name := spec.Name.Name
+				if name == "BaseOperator" {
+					continue
+				}
+
+				if name == "BaseExpression" {
+					continue
+				}
+				nodeList = append(nodeList, name)
 			}
 
-			if sel.Sel.Name != "Base" || sel.X.(*ast.Ident).Name != "node" {
-				continue
-			}
+			ident, ok := star.X.(*ast.Ident)
+			if ok {
 
-			name := spec.Name.Name
-			if name == "BaseOperator" {
-				continue
-			}
+				if ident.Name != "BaseExpression" && ident.Name != "BaseOperator" {
+					continue
+				}
 
-			nodeList = append(nodeList, name)
+				name := spec.Name.Name
+				if name == "BaseOperator" {
+					continue
+				}
+
+				nodeList = append(nodeList, spec.Name.Name)
+			}
 		}
 
 		return nil

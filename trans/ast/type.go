@@ -8,15 +8,6 @@ import (
 	"github.com/dragonfax/java_converter/trans/node"
 )
 
-var primitiveTranslation = map[string]string{
-	"float":   "float64",
-	"double":  "float64",
-	"boolean": "bool",
-	"long":    "int64",
-	"String":  "string",
-	"void":    "",
-}
-
 type TypePath struct {
 	*node.Base
 
@@ -134,27 +125,9 @@ func (te *TypeElement) Children() []node.Node {
 	return node.ListOfNodesToNodeList(te.TypeArguments)
 }
 
-func (te *TypeElement) IsPrimitive() bool {
-	switch te.ClassName {
-	case "bypte", "float", "short", "int", "long", "double", "boolean", "char", "String", "void":
-		return true
-	default:
-		return false
-	}
-
-}
-
 func (tn *TypeElement) String() string {
 
 	star := "*"
-	if tn.IsPrimitive() {
-		star = ""
-	}
-
-	className := tn.ClassName
-	if tClassName, ok := primitiveTranslation[className]; ok {
-		className = tClassName
-	}
 
 	if len(tn.TypeArguments) > 0 {
 
@@ -163,8 +136,8 @@ func (tn *TypeElement) String() string {
 			list = append(list, s.String())
 		}
 
-		return fmt.Sprintf("%s%s[%s]", star, className, strings.Join(list, ","))
+		return fmt.Sprintf("%s%s[%s]", star, tn.ClassName, strings.Join(list, ","))
 	}
 
-	return star + className
+	return star + tn.ClassName
 }

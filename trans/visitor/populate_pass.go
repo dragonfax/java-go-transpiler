@@ -4,8 +4,9 @@ import (
 	"github.com/dragonfax/java_converter/trans/ast"
 )
 
-/* populate some maps and lists in nodes. */
-
+/* populate some maps and lists in nodes.
+ * list of var's ina method, list of fields in a class
+ */
 type PopulatePass struct {
 	*BaseASTVisitor[int] // throwaway return value
 }

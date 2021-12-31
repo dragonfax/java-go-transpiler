@@ -12,7 +12,7 @@ type GenASTVisitor[T comparable] interface {
 	VisitClassRef(tree *ast.ClassRef) T
 	VisitEnumConstant(tree *ast.EnumConstant) T
 	VisitEnumRef(tree *ast.EnumRef) T
-	VisitBaseExpression(tree *ast.BaseExpression) T
+	VisitField(tree *ast.Field) T
 	VisitFieldList(tree *ast.FieldList) T
 	VisitFieldRef(tree *ast.FieldRef) T
 	VisitEnhancedFor(tree *ast.EnhancedFor) T
@@ -26,6 +26,9 @@ type GenASTVisitor[T comparable] interface {
 	VisitMethod(tree *ast.Method) T
 	VisitMethodCall(tree *ast.MethodCall) T
 	VisitMethodRef(tree *ast.MethodRef) T
+	VisitBinaryOperator(tree *ast.BinaryOperator) T
+	VisitUnaryOperator(tree *ast.UnaryOperator) T
+	VisitTernaryOperator(tree *ast.TernaryOperator) T
 	VisitPackage(tree *ast.Package) T
 	VisitReturn(tree *ast.Return) T
 	VisitThrow(tree *ast.Throw) T

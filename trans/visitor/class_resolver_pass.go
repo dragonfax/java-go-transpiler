@@ -4,20 +4,28 @@ import (
 	"github.com/dragonfax/java_converter/trans/ast"
 )
 
+/* Resolve what various class references refer to within the entire package system
+ * i.e. baseclass, static method reference.
+ * Not to be confused with type resolution, which is for the value in a field or results of an expression.
+ */
 type ClassResolver struct {
 	*BaseASTVisitor[int] // throwaway return value
+
+	RuntimePackage *ast.Package
 }
 
 func NewClassResolver(h *ast.Hierarchy) ASTVisitor[int] {
 	this := &ClassResolver{}
 	this.BaseASTVisitor = NewASTVisitor[int](h, this)
 
+	this.RuntimePackage = h.GetPackage("runtime")
+
 	return this
 }
 
 func (rp *ClassResolver) VisitClassRef(classRef *ast.ClassRef) int {
 
-	classRef.Class = classRef.ClassScope.ResolveClassName(classRef.ClassName)
+	classRef.Class = classRef.ClassScope.ResolveClassName(rp.RuntimePackage, classRef.ClassName)
 
 	return 0
 }
@@ -26,7 +34,7 @@ func (rp *ClassResolver) VisitClass(class *ast.Class) int {
 
 	// base class
 	if class.BaseClassName != "" {
-		class.BaseClass = class.ResolveClassName(class.BaseClassName)
+		class.BaseClass = class.ResolveClassName(rp.RuntimePackage, class.BaseClassName)
 	}
 
 	return rp.VisitChildren(class)
@@ -38,7 +46,7 @@ func (rp *ClassResolver) VisitMethodCall(methodCall *ast.MethodCall) int {
 	// but constructor calls do.
 
 	if methodCall.Constructor {
-		methodCall.Class = methodCall.MethodScope.ClassScope.ResolveClassName(methodCall.MethodName)
+		methodCall.Class = methodCall.MethodScope.ClassScope.ResolveClassName(rp.RuntimePackage, methodCall.MethodName)
 	}
 
 	return rp.VisitChildren(methodCall)
@@ -46,7 +54,7 @@ func (rp *ClassResolver) VisitMethodCall(methodCall *ast.MethodCall) int {
 
 func (rp *ClassResolver) VisitTypeElement(typeElement *ast.TypeElement) int {
 
-	typeElement.Class = typeElement.ClassScope.ResolveClassName(typeElement.ClassName)
+	typeElement.Class = typeElement.ClassScope.ResolveClassName(rp.RuntimePackage, typeElement.ClassName)
 
 	return rp.VisitChildren(typeElement)
 }

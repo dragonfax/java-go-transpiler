@@ -7,6 +7,9 @@ import (
 	"github.com/dragonfax/java_converter/trans/ast"
 )
 
+/* Determine what each variable reference refers to, a field, on this class
+ * or another class, or is it the name of a class itself.
+ */
 type VarResolver struct {
 	*BaseASTVisitor[int] // throwaway return value
 }
@@ -70,7 +73,8 @@ func (cv *VarResolver) VisitVarRef(varRef *ast.VarRef) int {
 
 	}
 
-	refClass := class.ResolveClassName(name)
+	runtimePkg := cv.Hierarchy.GetPackage("runtime")
+	refClass := class.ResolveClassName(runtimePkg, name)
 	if refClass != nil {
 		// fmt.Println("found var ref as a class")
 		varRef.VariableDecl = refClass
