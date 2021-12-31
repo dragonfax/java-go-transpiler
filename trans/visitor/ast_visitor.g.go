@@ -44,5 +44,5 @@ type GenASTVisitor[T comparable] interface {
 	VisitTypeElement(tree *ast.TypeElement) T
 	VisitTypeParameterList(tree *ast.TypeParameterList) T
 	VisitTypeParameter(tree *ast.TypeParameter) T
-	VisitVarRef(tree *ast.VarRef) T
+	VisitIdentRef(tree *ast.IdentRef) T
 }

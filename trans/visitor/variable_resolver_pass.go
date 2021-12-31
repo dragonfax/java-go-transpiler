@@ -21,34 +21,34 @@ func NewVarResolver(h *ast.Hierarchy) ASTVisitor[int] {
 	return this
 }
 
-func (cv *VarResolver) VisitVarRef(varRef *ast.VarRef) int {
+func (cv *VarResolver) VisitIdentRef(identRef *ast.IdentRef) int {
 
-	if varRef.Super {
+	if identRef.Super {
 		return 0
 	}
 
-	if varRef.This {
+	if identRef.This {
 		return 0
 	}
 
-	name := varRef.VariableName
+	name := identRef.Name
 
 	// check in the method arguments and other method variables
-	if varRef.MethodScope == nil {
-		ast.DebugPrint(varRef.GetParent())
+	if identRef.MethodScope == nil {
+		ast.DebugPrint(identRef.GetParent())
 		fmt.Println("no method scope for var ref")
 		os.Exit(1)
 	}
 
-	localVar, ok := varRef.MethodScope.LocalVars[name]
+	localVar, ok := identRef.MethodScope.LocalVars[name]
 	if ok {
 		// fmt.Println("found var ref in method")
-		varRef.VariableDecl = localVar
+		identRef.LocalVariableDecl = localVar
 		return 0
 	}
 
 	// check in the class fields
-	class := varRef.MethodScope.ClassScope
+	class := identRef.MethodScope.ClassScope
 	if class == nil {
 		// fmt.Println("didn't find class for var ref.")
 		os.Exit(1)
@@ -57,7 +57,7 @@ func (cv *VarResolver) VisitVarRef(varRef *ast.VarRef) int {
 	field, ok := class.FieldsByName[name]
 	if ok {
 		// fmt.Println("found var ref in class")
-		varRef.VariableDecl = field
+		identRef.Field = field
 		return 0
 	}
 
@@ -67,7 +67,7 @@ func (cv *VarResolver) VisitVarRef(varRef *ast.VarRef) int {
 		field, ok := baseClass.FieldsByName[name]
 		if ok {
 			// fmt.Println("found var ref in base class")
-			varRef.VariableDecl = field
+			identRef.Field = field
 			return 0
 		}
 
@@ -76,7 +76,7 @@ func (cv *VarResolver) VisitVarRef(varRef *ast.VarRef) int {
 	refClass := class.ResolveClassName(name)
 	if refClass != nil {
 		// fmt.Println("found var ref as a class")
-		varRef.VariableDecl = refClass
+		identRef.Class = refClass
 	}
 
 	return 0 // these have no chuildren

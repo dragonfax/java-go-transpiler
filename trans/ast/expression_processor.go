@@ -137,17 +137,17 @@ func expressionFromPrimary(primary *parser.PrimaryContext) Expression {
 
 	if primaryCtx.IDENTIFIER() != nil {
 		// variable reference
-		return NewVarRef(primaryCtx.IDENTIFIER().GetText())
+		return NewIdentRef(primaryCtx.IDENTIFIER().GetText())
 	}
 
 	if primaryCtx.THIS() != nil {
-		v := NewVarRef("this")
+		v := NewIdentRef("this")
 		v.This = true
 		return v
 	}
 
 	if primaryCtx.SUPER() != nil {
-		v := NewVarRef("super")
+		v := NewIdentRef("super")
 		v.Super = true
 		return v
 	}

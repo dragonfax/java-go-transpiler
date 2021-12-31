@@ -128,8 +128,8 @@ func (av *BaseASTVisitor[T]) VisitNode(tree node.Node) T {
 	} else if n, ok := tree.(*ast.TypeParameter); ok {
 		return av.root.VisitTypeParameter(n)
 
-	} else if n, ok := tree.(*ast.VarRef); ok {
-		return av.root.VisitVarRef(n)
+	} else if n, ok := tree.(*ast.IdentRef); ok {
+		return av.root.VisitIdentRef(n)
 
 	} else {
 		return av.root.VisitChildren(tree)
@@ -288,6 +288,6 @@ func (av *BaseASTVisitor[T]) VisitTypeParameter(tree *ast.TypeParameter) T {
 	return av.root.VisitChildren(tree)
 }
 
-func (av *BaseASTVisitor[T]) VisitVarRef(tree *ast.VarRef) T {
+func (av *BaseASTVisitor[T]) VisitIdentRef(tree *ast.IdentRef) T {
 	return av.root.VisitChildren(tree)
 }
