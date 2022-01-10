@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"text/template"
 
-	"github.com/dragonfax/java_converter/trans/node"
+	"github.com/dragonfax/java-go-transpiler/trans/node"
 )
 
 type Class struct {

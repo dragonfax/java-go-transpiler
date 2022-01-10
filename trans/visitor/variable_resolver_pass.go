@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/dragonfax/java_converter/trans/ast"
+	"github.com/dragonfax/java-go-transpiler/trans/ast"
 )
 
 /* Determine what each variable reference refers to, a field, on this class

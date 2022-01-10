@@ -1,6 +1,6 @@
 package ast
 
-import "github.com/dragonfax/java_converter/trans/node"
+import "github.com/dragonfax/java-go-transpiler/trans/node"
 
 /* Refers to something by name.
  * But until until we resolve what, it could be any of

@@ -1,7 +1,7 @@
 package visitor
 
 import (
-	"github.com/dragonfax/java_converter/trans/node"
+	"github.com/dragonfax/java-go-transpiler/trans/node"
 )
 
 type ASTVisitor[T comparable] interface {

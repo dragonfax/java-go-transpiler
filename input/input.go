@@ -2,7 +2,7 @@ package input
 
 import (
 	"github.com/antlr/antlr4/runtime/Go/antlr"
-	"github.com/dragonfax/java_converter/input/parser"
+	"github.com/dragonfax/java-go-transpiler/input/parser"
 )
 
 var lexer = parser.NewJavaLexer(nil)

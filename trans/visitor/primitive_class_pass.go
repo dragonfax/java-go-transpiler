@@ -1,7 +1,7 @@
 package visitor
 
 import (
-	"github.com/dragonfax/java_converter/trans/ast"
+	"github.com/dragonfax/java-go-transpiler/trans/ast"
 )
 
 /* Tell primitives what their runtime class is */

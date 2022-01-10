@@ -1,7 +1,7 @@
 package ast
 
 import (
-	"github.com/dragonfax/java_converter/input/parser"
+	"github.com/dragonfax/java-go-transpiler/input/parser"
 )
 
 /* static and non-static initializers.

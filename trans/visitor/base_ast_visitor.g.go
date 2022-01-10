@@ -4,8 +4,8 @@ package visitor
 import (
 	"fmt"
 
-	"github.com/dragonfax/java_converter/trans/ast"
-	"github.com/dragonfax/java_converter/trans/node"
+	"github.com/dragonfax/java-go-transpiler/trans/ast"
+	"github.com/dragonfax/java-go-transpiler/trans/node"
 )
 
 func (av *BaseASTVisitor[T]) VisitNode(tree node.Node) T {

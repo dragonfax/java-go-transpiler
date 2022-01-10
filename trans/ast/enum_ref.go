@@ -1,6 +1,6 @@
 package ast
 
-import "github.com/dragonfax/java_converter/trans/node"
+import "github.com/dragonfax/java-go-transpiler/trans/node"
 
 /* Only used in the label of a switch statement
  * TODO probably replaceable with an IdentRef

@@ -2,7 +2,7 @@
 package visitor
 
 import (
-	"github.com/dragonfax/java_converter/trans/ast"
+	"github.com/dragonfax/java-go-transpiler/trans/ast"
 )
 
 type GenASTVisitor[T comparable] interface {

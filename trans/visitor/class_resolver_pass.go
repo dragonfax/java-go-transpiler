@@ -1,7 +1,7 @@
 package visitor
 
 import (
-	"github.com/dragonfax/java_converter/trans/ast"
+	"github.com/dragonfax/java-go-transpiler/trans/ast"
 )
 
 /* Resolve what various class references refer to within the entire package system

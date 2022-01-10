@@ -7,11 +7,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/dragonfax/java_converter/input"
-	"github.com/dragonfax/java_converter/trans"
-	"github.com/dragonfax/java_converter/trans/ast"
-	"github.com/dragonfax/java_converter/trans/node"
-	"github.com/dragonfax/java_converter/trans/visitor"
+	"github.com/dragonfax/java-go-transpiler/input"
+	"github.com/dragonfax/java-go-transpiler/trans"
+	"github.com/dragonfax/java-go-transpiler/trans/ast"
+	"github.com/dragonfax/java-go-transpiler/trans/node"
+	"github.com/dragonfax/java-go-transpiler/trans/visitor"
 	"github.com/schollz/progressbar/v3"
 )
 

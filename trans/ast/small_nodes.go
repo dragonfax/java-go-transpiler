@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strconv"
 
-	"github.com/dragonfax/java_converter/tool"
-	"github.com/dragonfax/java_converter/trans/node"
+	"github.com/dragonfax/java-go-transpiler/tool"
+	"github.com/dragonfax/java-go-transpiler/trans/node"
 )
 
 type Return struct {

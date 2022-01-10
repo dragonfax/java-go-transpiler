@@ -1,6 +1,6 @@
 package visitor
 
-import "github.com/dragonfax/java_converter/trans/ast"
+import "github.com/dragonfax/java-go-transpiler/trans/ast"
 
 func BaseClassPass(h *ast.Hierarchy) {
 	for _, class := range h.GetClasses() {

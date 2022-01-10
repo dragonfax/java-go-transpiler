@@ -1,6 +1,6 @@
 package ast
 
-import "github.com/dragonfax/java_converter/trans/node"
+import "github.com/dragonfax/java-go-transpiler/trans/node"
 
 /* Class reference is when you say Array.class,
  * in order to use the class as an instance value itself

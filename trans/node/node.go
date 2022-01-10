@@ -6,7 +6,7 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/dragonfax/java_converter/tool"
+	"github.com/dragonfax/java-go-transpiler/tool"
 	"github.com/tkrajina/go-reflector/reflector"
 )
 

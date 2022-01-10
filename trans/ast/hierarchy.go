@@ -1,6 +1,6 @@
 package ast
 
-import "github.com/dragonfax/java_converter/trans/node"
+import "github.com/dragonfax/java-go-transpiler/trans/node"
 
 type Hierarchy struct {
 	*node.Base

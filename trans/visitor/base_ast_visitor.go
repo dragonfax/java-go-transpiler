@@ -9,9 +9,9 @@ package visitor
 import (
 	"fmt"
 
-	"github.com/dragonfax/java_converter/tool"
-	"github.com/dragonfax/java_converter/trans/ast"
-	"github.com/dragonfax/java_converter/trans/node"
+	"github.com/dragonfax/java-go-transpiler/tool"
+	"github.com/dragonfax/java-go-transpiler/trans/ast"
+	"github.com/dragonfax/java-go-transpiler/trans/node"
 
 	"github.com/schollz/progressbar/v3"
 )

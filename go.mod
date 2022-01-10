@@ -1,4 +1,4 @@
-module github.com/dragonfax/java_converter
+module github.com/dragonfax/java-go-transpiler
 
 go 1.18
 

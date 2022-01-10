@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/dragonfax/java_converter/input/parser"
-	"github.com/dragonfax/java_converter/trans/node"
+	"github.com/dragonfax/java-go-transpiler/input/parser"
+	"github.com/dragonfax/java-go-transpiler/trans/node"
 )
 
 type ArrayLiteral struct {

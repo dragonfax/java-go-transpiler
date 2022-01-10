@@ -3,7 +3,7 @@ package ast
 import (
 	"strings"
 
-	"github.com/dragonfax/java_converter/trans/node"
+	"github.com/dragonfax/java-go-transpiler/trans/node"
 )
 
 var RuntimePackage *Package = NewPackage("runtime")

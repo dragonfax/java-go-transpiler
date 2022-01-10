@@ -1,6 +1,6 @@
 package visitor
 
-import "github.com/dragonfax/java_converter/trans/ast"
+import "github.com/dragonfax/java-go-transpiler/trans/ast"
 
 type FetchTypesPass struct {
 	*BaseASTVisitor[int] // throwaway return value

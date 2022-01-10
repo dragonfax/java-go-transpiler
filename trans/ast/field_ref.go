@@ -3,7 +3,7 @@ package ast
 import (
 	"fmt"
 
-	"github.com/dragonfax/java_converter/trans/node"
+	"github.com/dragonfax/java-go-transpiler/trans/node"
 )
 
 /* referencing a field of a class, either this class or another */

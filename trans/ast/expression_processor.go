@@ -1,8 +1,8 @@
 package ast
 
 import (
-	"github.com/dragonfax/java_converter/input/parser"
-	"github.com/dragonfax/java_converter/tool"
+	"github.com/dragonfax/java-go-transpiler/input/parser"
+	"github.com/dragonfax/java-go-transpiler/tool"
 )
 
 // deal with the recursive expression tree.
