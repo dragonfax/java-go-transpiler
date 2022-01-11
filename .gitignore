@@ -1,3 +1,6 @@
 .antlr
 stg.jar
 /convert
+
+**.class
+/test_converted/

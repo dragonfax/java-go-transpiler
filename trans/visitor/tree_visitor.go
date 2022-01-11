@@ -31,15 +31,6 @@ func (gv *TreeVisitor) AggregateResult(aggregate, nextResult node.Node) node.Nod
 }
 
 func (gv *TreeVisitor) VisitCompilationUnit(ctx *parser.CompilationUnitContext) node.Node {
-
-	packageName := ctx.PackageDeclaration().QualifiedName().GetText()
-
-	imports := make([]*ast.Import, 0)
-	for _, importCtx := range ctx.AllImportDeclaration() {
-		importedPackageName := importCtx.QualifiedName().GetText()
-		imports = append(imports, ast.NewImport(importedPackageName))
-	}
-
 	if len(ctx.AllTypeDeclaration()) == 0 {
 		return nil
 	}
@@ -54,7 +45,18 @@ func (gv *TreeVisitor) VisitCompilationUnit(ctx *parser.CompilationUnitContext) 
 	}
 
 	class := node.(*ast.Class)
+
+	packageName := "." // default package
+	if ctx.PackageDeclaration() != nil {
+		packageName = ctx.PackageDeclaration().QualifiedName().GetText()
+	}
 	class.PackageName = packageName
+
+	imports := make([]*ast.Import, 0)
+	for _, importCtx := range ctx.AllImportDeclaration() {
+		importedPackageName := importCtx.QualifiedName().GetText()
+		imports = append(imports, ast.NewImport(importedPackageName))
+	}
 	class.Imports = imports
 
 	return class
